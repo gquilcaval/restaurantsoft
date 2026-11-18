@@ -119,7 +119,7 @@ Pregunta si quieres reemplazar los datos: escribe `s` y Enter. **Borra los datos
 
 | Quiero... | Comando |
 |---|---|
-| Encender el sistema | Abrir Docker Desktop (arranca solo) o `docker compose up -d` |
+| Encender el sistema | Abrir Docker Desktop y `docker compose up -d` |
 | Apagarlo | `docker compose stop` |
 | Aplicar cambios de código | `docker compose up -d --build` |
 | Ver errores del servidor | `docker compose logs -f backend` |
@@ -152,4 +152,3 @@ Con **Claude Code**: abre Claude Code dentro de la carpeta `restos`. Lee el arch
 | El celular no abre la página | Misma Wi-Fi, IP correcta en `.env`, `docker compose up -d` después de cambiarla y, en Windows, permiso del firewall. |
 | Los QR llevan a otra dirección | `PUBLIC_BASE_URL` del `.env` tiene otra IP. Corrígela y `docker compose up -d`. |
 | `./scripts/...: Permission denied` | `chmod +x scripts/*.sh` y repite. |
-| `$'\r': command not found` al correr un script en Windows | `git config core.autocrlf false`, luego `git rm -r --cached . && git reset --hard` y repite. |
