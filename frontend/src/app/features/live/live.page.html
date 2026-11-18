@@ -1,0 +1,267 @@
+<app-shell title="Modo TV" eyebrow="El pulso de tu local">
+  <div shell-actions class="tv-actions">
+    <button class="secondary small" (click)="toggleFullscreen()">
+      <app-icon [name]="fullscreen() ? 'minimize' : 'maximize'" [size]="15" />
+      {{ fullscreen() ? 'Salir de pantalla completa' : 'Pantalla completa' }}
+    </button>
+  </div>
+
+  <div
+    #screen
+    class="tv"
+    [class.is-fullscreen]="fullscreen()"
+    [class.tv-replay]="mode() === 'replay'"
+  >
+    <header class="tv-head">
+      <div class="tv-clock">
+        <strong>{{ now() | date: 'HH:mm' }}<small>{{ now() | date: ':ss' }}</small></strong>
+        <span>{{ todayLabel() }}</span>
+      </div>
+      <div class="tv-modes" role="tablist" aria-label="Vista del tablero">
+        <i class="tv-modes-thumb" [attr.data-pos]="mode()"></i>
+        <button role="tab" [class.on]="mode() === 'live'" [attr.aria-selected]="mode() === 'live'" (click)="setMode('live')"><i class="tv-live-dot"></i>En vivo</button>
+        <button role="tab" [class.on]="mode() === 'heat'" [attr.aria-selected]="mode() === 'heat'" (click)="setMode('heat')"><app-icon name="flame" [size]="16" /> Mapa de calor</button>
+        <button role="tab" [class.on]="mode() === 'replay'" [attr.aria-selected]="mode() === 'replay'" (click)="setMode('replay')"><app-icon name="repeat" [size]="16" /> Repetición</button>
+      </div>
+    </header>
+
+    @if (summary(); as data) {
+      <section class="tv-top">
+        <article class="lg tv-hero">
+          <small>Ventas de hoy</small>
+          <strong [appCountUp]="data.revenue" countUpFormat="currency"></strong>
+          @if (salesTrend() !== null) {
+            <span class="tv-trend" [class.down]="salesTrend()! < 0">{{ salesTrend()! >= 0 ? '↗ +' : '↘ ' }}{{ salesTrend() }}% vs mismo día de la semana pasada</span>
+          }
+          <p>{{ data.payments }} {{ data.payments === 1 ? 'cobro' : 'cobros' }} · {{ data.orders }} {{ data.orders === 1 ? 'ronda' : 'rondas' }} a cocina</p>
+          <div class="tv-hero-bars" aria-hidden="true">
+            @for (bar of salesHours(); track bar.hour) { <i [class.now]="bar.hour === nowHour()" [style.--h]="bar.ratio"></i> }
+          </div>
+        </article>
+        <div class="tv-kpi-grid">
+          <article class="lg tv-kpi"><span class="tv-dot blue">🪑</span><div><b><span [appCountUp]="data.busyTables"></span><em>/{{ data.tables }}</em></b><small>Mesas ocupadas</small></div><i class="tv-chip">{{ occupancyPercent() }}%</i></article>
+          <article class="lg tv-kpi"><span class="tv-dot violet">👥</span><div><b [appCountUp]="data.guests"></b><small>Comensales ahora</small></div></article>
+          <article class="lg tv-kpi"><span class="tv-dot green">🧾</span><div><b [appCountUp]="data.averageTicket" countUpFormat="currency"></b><small>Ticket promedio</small></div>
+            @if (ticketTrend() !== null) { <i class="tv-chip" [class.up]="ticketTrend()! >= 0" [class.down]="ticketTrend()! < 0">{{ ticketTrend()! >= 0 ? '+' : '' }}{{ ticketTrend() }}%</i> }</article>
+          <article class="lg tv-kpi" [class.warn]="(data.kitchenMinutes || 0) >= 20"><span class="tv-dot amber">⏱️</span><div><b>{{ data.kitchenMinutes !== null ? data.kitchenMinutes + ' min' : '—' }}</b><small>Tiempo de cocina</small></div><i class="tv-chip">{{ data.inKitchen }} en cocina</i></article>
+          <article class="lg tv-kpi"><span class="tv-dot red">📋</span><div><b [appCountUp]="data.orders"></b><small>Pedidos de hoy</small></div></article>
+          <article class="lg tv-kpi"><span class="tv-dot gold">⭐</span><div><b>{{ data.ratingAverage ?? '—' }}</b><small>Calificación (7 días)</small></div>
+            @if (data.ratingsToday) { <i class="tv-chip up">+{{ data.ratingsToday }} hoy</i> }</article>
+        </div>
+      </section>
+    }
+
+    <app-goal-bar size="large" class="tv-goal" />
+
+    <div class="tv-grid">
+      <section class="lg tv-panel tv-floor">
+        @switch (mode()) {
+          @case ('live') {
+            <app-floor-view
+              [tables]="liveStates()"
+              [zones]="zones()"
+              [plan]="plan()"
+              [interactive]="false"
+            />
+            <app-waiter-load class="tv-load" [tables]="tables()" />
+          }
+          @case ('heat') {
+            <div class="tv-controls">
+              <div class="seg">
+                <button
+                  [class.active]="heatMetric() === 'revenue'"
+                  (click)="heatMetric.set('revenue')"
+                >
+                  <app-icon name="money" [size]="15" /> Ventas
+                </button>
+                <button [class.active]="heatMetric() === 'turns'" (click)="heatMetric.set('turns')">
+                  <app-icon name="refresh" [size]="15" /> Giros
+                </button>
+                <button
+                  [class.active]="heatMetric() === 'minutes'"
+                  (click)="heatMetric.set('minutes')"
+                >
+                  <app-icon name="clock" [size]="15" /> Tiempo ocupada
+                </button>
+              </div>
+              <div class="seg">
+                <button [class.active]="heatPeriod() === 'today'" (click)="setHeatPeriod('today')">
+                  Hoy
+                </button>
+                <button [class.active]="heatPeriod() === '7'" (click)="setHeatPeriod('7')">
+                  7 días
+                </button>
+                <button [class.active]="heatPeriod() === '30'" (click)="setHeatPeriod('30')">
+                  30 días
+                </button>
+              </div>
+            </div>
+            <app-floor-view
+              [tables]="heatStates()"
+              [zones]="zones()"
+              [plan]="plan()"
+              [interactive]="false"
+              mode="heat"
+              [heat]="heatMap()"
+            />
+            <div class="tv-heat-legend"><span>Menos</span><i></i><span>Más</span></div>
+          }
+          @case ('replay') {
+            <div class="tv-controls">
+              <label class="tv-date"
+                >Día
+                <input type="date" [ngModel]="replayDate()" (ngModelChange)="setReplayDate($event)"
+              /></label>
+              <div class="tv-replay-clock">
+                <strong>{{ clockLabel(replayMinute()) }}</strong>
+                <span>{{ replayBusy() }} de {{ tables().length }} mesas ocupadas</span>
+              </div>
+            </div>
+            <app-floor-view
+              [tables]="replayStates()"
+              [zones]="zones()"
+              [plan]="plan()"
+              [interactive]="false"
+              mode="replay"
+              [at]="replayAt()"
+            />
+            <div class="tv-player">
+              <button
+                class="tv-play"
+                (click)="togglePlay()"
+                [attr.aria-label]="playing() ? 'Pausar' : 'Reproducir'"
+              >
+                <app-icon [name]="playing() ? 'pause' : 'play'" [size]="18" />
+              </button>
+              <input
+                type="range"
+                [min]="replayRange().start"
+                [max]="replayRange().end"
+                step="5"
+                [ngModel]="replayMinute()"
+                (ngModelChange)="replayMinute.set(+$event)"
+                aria-label="Hora del día"
+              />
+              <span>{{ clockLabel(replayRange().end) }}</span>
+            </div>
+            <div class="tv-hours" aria-label="Ocupación máxima por hora">
+              @for (hour of occupancyHours(); track hour.hour) {
+                <button
+                  class="tv-hour"
+                  [class.current]="hour.hour === replayHour()"
+                  [class.peak]="peakHour()?.hour === hour.hour"
+                  [style.--ratio]="hour.ratio"
+                  (click)="jumpToHour(hour.hour)"
+                  [title]="hour.hour + ':00 · ' + hour.peak + ' mesas · ' + money(hour.revenue)"
+                >
+                  <i></i><small>{{ hour.hour }}h</small>
+                </button>
+              }
+            </div>
+            @if (peakHour(); as peak) {
+              <p class="tv-insight">
+                🔥 Hora pico: <b>{{ peak.hour }}:00 – {{ peak.hour + 1 }}:00</b> con
+                {{ peak.peak }} de {{ tables().length }} mesas ocupadas ({{ money(peak.revenue) }}
+                cobrados). Refuerza el salón en ese horario.
+              </p>
+            } @else {
+              <p class="tv-insight">No hubo mesas ocupadas este día.</p>
+            }
+          }
+        }
+      </section>
+
+      <aside class="tv-side">
+        @if (mode() === 'heat') {
+          <section class="lg tv-panel">
+            <h2>¿Qué zona rinde más?</h2>
+            <p class="tv-caption">
+              Promedio por mesa ·
+              {{ heatPeriod() === 'today' ? 'hoy' : 'últimos ' + heatPeriod() + ' días' }}
+            </p>
+            @for (zone of zoneRanking(); track zone.name; let index = $index) {
+              <div class="tv-rank" [style.--delay]="index * 80 + 'ms'">
+                <span class="tv-rank-pos">{{ index + 1 }}</span>
+                <div>
+                  <strong><i [style.background]="zone.color"></i>{{ zone.name }}</strong>
+                  <small>{{ zoneValue(zone.perTable) }} por mesa · {{ zone.tables }} mesas</small>
+                  <span class="tv-bar"
+                    ><i [style.width.%]="zone.ratio * 100" [style.background]="zone.color"></i
+                  ></span>
+                </div>
+              </div>
+            }
+          </section>
+          <section class="lg tv-panel tv-facts">
+            @if (bestTable(); as best) {
+              <p>
+                🏆 La mesa estrella es <b>{{ best.label }}</b> con {{ best.value }}.
+              </p>
+            }
+            @if (idleTables()) {
+              <p>
+                💤 {{ idleTables() }}
+                {{ idleTables() === 1 ? 'mesa no se usó' : 'mesas no se usaron' }} en el período.
+                ¿Vale la pena moverlas a otra zona?
+              </p>
+            }
+          </section>
+        } @else if (summary(); as data) {
+          <section class="lg tv-panel">
+            <h2>{{ topProducts().title }}</h2>
+            @for (product of topProducts().items; track product.name; let index = $index) {
+              <div class="tv-product" [style.--delay]="index * 80 + 'ms'">
+                <span class="tv-rank-pos">{{ index + 1 }}</span>
+                <div>
+                  <strong>{{ product.name }}</strong>
+                  <span class="tv-bar"
+                    ><i [style.width.%]="(product.quantity / maxProduct()) * 100"></i
+                  ></span>
+                </div>
+                <b>{{ product.quantity }}</b>
+              </div>
+            } @empty {
+              <p class="tv-caption">Aún no hay pedidos hoy.</p>
+            }
+          </section>
+          <section class="lg tv-panel">
+            <h2>Ventas por hora</h2>
+            <div class="tv-sales">
+              @for (bar of salesHours(); track bar.hour) {
+                <div
+                  class="tv-sale"
+                  [class.now]="bar.hour === nowHour()"
+                  [title]="bar.hour + ':00 · ' + money(bar.amount)"
+                >
+                  <i [style.height.%]="bar.ratio * 100"></i><small>{{ bar.hour }}</small>
+                </div>
+              } @empty {
+                <p class="tv-caption">Las ventas aparecerán con el primer cobro.</p>
+              }
+            </div>
+          </section>
+          <section class="lg tv-panel">
+            <h2>Últimos cobros</h2>
+            @for (payment of data.recent; track payment.id) {
+              <div class="tv-payment" [class.fresh]="freshPayments().has(payment.id)">
+                <span>💵</span>
+                <div>
+                  <strong>{{ payment.label }}</strong
+                  ><small
+                    >{{ methodLabel(payment.method) }} · {{ payment.paidAt | date: 'HH:mm' }}</small
+                  >
+                </div>
+                <b>{{ payment.amount | currency: 'PEN' : 'S/ ' }}</b>
+              </div>
+            } @empty {
+              <p class="tv-caption">Todavía no hay cobros hoy.</p>
+            }
+          </section>
+          <section class="lg tv-panel">
+            <app-team-board [compact]="true" />
+          </section>
+        }
+      </aside>
+    </div>
+  </div>
+</app-shell>

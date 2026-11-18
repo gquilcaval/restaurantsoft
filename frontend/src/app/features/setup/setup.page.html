@@ -1,0 +1,113 @@
+<app-shell title="Puesta en marcha" eyebrow="Asistente de configuración">
+  <div class="su">
+    <!-- Progreso y pasos -->
+    <aside class="lg su-steps">
+      <div class="su-progress">
+        <div class="su-ring" [style.--p]="progress()"><b>{{ progress() }}%</b></div>
+        <div><strong>{{ progress() === 100 ? '¡Todo listo para atender!' : 'Deja listo tu restaurante' }}</strong><small>{{ doneCount() }} de {{ steps().length }} pasos · los opcionales no cuentan</small></div>
+      </div>
+      <ol class="su-list">
+        @for (step of steps(); track step.key; let index = $index) {
+          <li><button [class.on]="active() === step.key" [class.done]="step.done" (click)="open(step.key)">
+            <span class="su-check">@if (step.done) {<app-icon name="check" [size]="14" />} @else {<i>{{ index + 1 }}</i>}</span>
+            <span class="su-step-text"><strong>{{ step.title }}@if (step.optional) {<em>opcional</em>}</strong><small>{{ step.detail }}</small></span>
+          </button></li>
+        }
+      </ol>
+    </aside>
+
+    <!-- Paso abierto -->
+    @if (current(); as step) {
+      <section class="lg su-work">
+        <header class="su-head">
+          <span class="su-head-ico" [class.done]="step.done"><app-icon [name]="step.done ? 'check' : step.icon" [size]="20" /></span>
+          <div><small>{{ step.done ? 'Listo' : step.optional ? 'Opcional' : 'Pendiente' }}</small><h2>{{ step.title }}</h2></div>
+          <button class="su-pill" (click)="next()">Siguiente paso<app-icon name="send" [size]="14" /></button>
+        </header>
+        <div class="su-body">
+          @switch (step.key) {
+            @case ('menu') {
+              <div class="su-intro"><p>Llena la plantilla de Excel con una fila por producto (categoría, nombre, descripción, precio y estación) y súbela. Si un producto ya existe con el mismo nombre, se actualiza su precio y categoría.</p>
+                <button class="su-pill" (click)="downloadTemplate()"><app-icon name="download" [size]="15" />Descargar plantilla</button></div>
+    <label class="setup-drop" [class.disabled]="busy()">
+      <input type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" (change)="chooseFile($event)" [disabled]="busy()" hidden>
+      <strong>{{ busy() ? 'Leyendo archivo…' : fileName() || 'Elegir archivo Excel (.xlsx)' }}</strong>
+      <small>Primero verás una vista previa; nada se guarda hasta que confirmes.</small>
+    </label>
+    @if (preview(); as result) {
+      <div class="setup-summary">
+        <span class="status ready">{{ result.toCreate }} nuevos</span>
+        <span class="status delivered">{{ result.toUpdate }} a actualizar</span>
+        <span class="status neutral">{{ result.newCategories }} categorías nuevas</span>
+        @if (result.errors) { <span class="status review">{{ result.errors }} con error</span> }
+        @if (result.applied) { <span class="status ready">Importado ✓</span> }
+      </div>
+      <div class="inventory-table setup-preview">
+        <div class="inventory-row head"><span>Fila</span><span>Producto</span><span>Categoría</span><span>Precio</span><span>Estación</span><span>Resultado</span></div>
+        @for (row of result.rows; track row.line) {
+          <div class="inventory-row" [class.negative]="row.action === 'ERROR'">
+            <span>{{ row.line }}</span>
+            <span><strong>{{ row.name || '—' }}</strong>@if (row.description) {<small>{{ row.description }}</small>}</span>
+            <span>{{ row.category || '—' }}</span>
+            <span>{{ row.price !== null ? (row.price | currency:'PEN':'S/ ') : '—' }}</span>
+            <span>{{ row.station || '—' }}</span>
+            <span><span class="audit-action" [attr.data-kind]="row.action === 'ERROR' ? 'WASTE' : row.action === 'CREATE' ? 'PURCHASE' : 'ADJUSTMENT'">{{ actionLabel(row.action) }}</span>@if (row.error) {<small class="negative-text">{{ row.error }}</small>}</span>
+          </div>
+        }
+      </div>
+      @if (!result.applied) {
+        <button class="su-pill primary" [disabled]="result.errors > 0 || !result.rows.length || busy()" (click)="upload(true)">{{ result.errors ? 'Corrige los errores en el Excel y vuelve a subirlo' : 'Importar ' + (result.toCreate + result.toUpdate) + ' productos' }}</button>
+      }
+    }
+            }
+            @case ('tables') {
+              <p class="su-text">Crea todas tus mesas de una vez. Las que ya existan con el mismo nombre se omiten. Para cambiar una mesa usa Configuración → Mesas y QR.</p>
+    <form class="setup-tables-form" (ngSubmit)="createTables()">
+      <label>Nombre<input name="prefix" [(ngModel)]="tablePrefix" maxlength="20" placeholder="Mesa"></label>
+      <label>Desde el número<input name="from" type="number" min="1" max="999" [(ngModel)]="tableFrom"></label>
+      <label>Cantidad<input name="count" type="number" min="1" max="100" [(ngModel)]="tableCount"></label>
+      <label>Personas por mesa<input name="capacity" type="number" min="1" max="50" [(ngModel)]="tableCapacity"></label>
+      @if (zones().length) { <label>Zona<select name="zone" [(ngModel)]="tableZoneId"><option value="">Sin zona</option>@for (zone of zones(); track zone.id) { <option [value]="zone.id">{{ zone.name }}</option> }</select></label> }
+      <button class="su-pill primary" [disabled]="busy() || tableCount < 1">Crear {{ tableCount }} mesas</button>
+    </form>
+    <p class="muted">Se crearán «{{ tablePrefix ? tablePrefix + ' ' : '' }}{{ tableFrom < 10 ? '0' + tableFrom : tableFrom }}» en adelante. Las que ya existan con el mismo nombre se omiten. Para cambiar capacidad o nombre de una mesa usa Configuración.</p>
+            }
+            @case ('qr') {
+              <div class="su-qr-layout">
+                <div class="su-qr-config">
+    <div class="setup-qr-options">
+      <label>Por hoja A4<select [(ngModel)]="qrPerPage"><option [ngValue]="6">6 (tarjetas de mesa)</option><option [ngValue]="4">4 (medianas)</option><option [ngValue]="1">1 (afiche grande)</option></select></label>
+      <label class="setup-qr-message">Mensaje<input [(ngModel)]="qrMessage" maxlength="80"></label>
+    </div>
+    <div class="station-chips setup-table-chips">
+      <button type="button" (click)="selectAll(true)">Todas</button><button type="button" (click)="selectAll(false)">Ninguna</button>
+      @for (table of tables(); track table.id) { <button type="button" [class.selected]="selectedTables().has(table.id)" (click)="toggleTable(table.id)">{{ table.label }}</button> }
+    </div>
+    <button class="su-pill primary" [disabled]="!selectedTables().size" (click)="printQrs()"><app-icon name="download" [size]="16" />Generar PDF de {{ selectedTables().size }} QR</button>
+    <p class="muted">Se abrirá la vista de impresión: elige «Guardar como PDF» para obtener el archivo o imprímelo directamente. Los QR son permanentes; solo cambian si regeneras el código de una mesa.</p>
+                </div>
+                <div class="su-qr-preview" aria-label="Vista previa de la tarjeta">
+                  <small>Así se verá cada tarjeta</small>
+                  <div class="su-card">
+                    @if (brandLogo()) { <img class="su-card-logo" [src]="brandLogo()" alt=""> }
+                    <span class="su-card-brand">{{ brandName() }}</span>
+                    <strong>{{ sampleLabel() }}</strong>
+                    @if (qrSample()) { <img class="su-card-qr" [src]="qrSample()" alt="QR de ejemplo"> } @else { <span class="su-card-qr empty"></span> }
+                    <span class="su-card-hint">{{ qrMessage }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+            @default {
+              <div class="su-guide">
+                <p>{{ step.why }}</p>
+                <p class="su-status"><app-icon [name]="step.done ? 'check' : 'info'" [size]="16" />{{ step.detail }}</p>
+                @if (step.link) { <a class="su-pill primary" [routerLink]="step.link" [queryParams]="step.section ? { s: step.section } : null">{{ step.cta || 'Ir' }}<app-icon name="send" [size]="14" /></a> }
+              </div>
+            }
+          }
+        </div>
+      </section>
+    }
+  </div>
+</app-shell>

@@ -1,0 +1,25 @@
+// Formulario de reserva y elección de mesa.
+.rv-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; animation: rv-in .3s var(--ease-spring); }
+.rv-form .wide { grid-column: 1 / -1; }
+.rv-form label { display: grid; gap: 5px; font-size: .8rem; font-weight: 700; }
+.rv-form label small { color: var(--muted); font-weight: 600; }
+.rv-form input, .rv-form select { width: 100%; min-width: 0; height: 38px; padding: 0 12px; border: 0; border-radius: 12px; background: color-mix(in srgb, var(--text) 7%, transparent); color: var(--text); font: inherit; font-weight: 600; outline: none; }
+.rv-form input:focus, .rv-form select:focus { box-shadow: 0 0 0 2px var(--brand); }
+.rv-stepper { display: flex; align-items: center; justify-content: space-between; height: 38px; padding: 0 4px; border-radius: 12px; background: color-mix(in srgb, var(--text) 7%, transparent); }
+.rv-stepper button { width: 30px; height: 30px; border: 0; border-radius: 50%; color: var(--text); font-weight: 800; background: color-mix(in srgb, var(--text) 9%, transparent); }
+.rv-stepper b { font: 800 1rem var(--font-display); }
+.rv-switch { display: inline-flex; align-items: center; gap: 10px; justify-self: start; height: 38px; padding: 0 14px 0 6px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--text) 6%, transparent); color: var(--text); font-weight: 700; font-size: .82rem; }
+.rv-switch i { position: relative; width: 38px; height: 24px; border-radius: 999px; background: color-mix(in srgb, var(--text) 18%, transparent); transition: background .25s; }
+.rv-switch i::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .35s var(--ease-spring); }
+.rv-switch[aria-checked='true'] i { background: var(--ok); } .rv-switch[aria-checked='true'] i::after { transform: translateX(14px); }
+.rv-tables { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+.rv-tables button { display: grid; gap: 2px; padding: 12px; border: 0; border-radius: 14px; text-align: left; color: var(--text); background: color-mix(in srgb, var(--text) 6%, transparent); }
+.rv-tables button small { color: var(--muted); font-size: .72rem; }
+.rv-tables button.small small { color: var(--warn); }
+.rv-tables button.selected { background: color-mix(in srgb, var(--brand) 18%, transparent); box-shadow: inset 0 0 0 2px var(--brand); }
+.rv-form label > span { display: flex; gap: 5px; align-items: baseline; }
+.rv-online { display: grid; gap: 8px; justify-items: center; width: 100%; margin-top: 18px; padding: 14px; border-radius: 18px; background: color-mix(in srgb, var(--text) 5%, transparent); }
+.rv-online.on { background: color-mix(in srgb, var(--ok) 10%, transparent); }
+.rv-online small { max-width: 280px; color: var(--muted); font-size: .76rem; line-height: 1.4; text-transform: none !important; letter-spacing: 0 !important; font-weight: 500 !important; }
+.rv-online-link { display: flex; align-items: center; gap: 6px; width: 100%; }
+.rv-online-link span { flex: 1; min-width: 0; padding: 0 10px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--muted); font-size: .72rem; text-align: left; }

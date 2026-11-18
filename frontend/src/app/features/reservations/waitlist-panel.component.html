@@ -1,0 +1,155 @@
+<div class="wl">
+  <form class="lg wl-form" (ngSubmit)="add()">
+    <div>
+      <p class="eyebrow">Nuevo en la lista</p>
+      <h2>¿Quién llega?<app-info-tip text="Si dejas su celular, se abre WhatsApp con el enlace para que siga su turno desde el teléfono." /></h2>
+    </div>
+    <label
+      >Nombre<input
+        name="name"
+        [(ngModel)]="name"
+        required
+        maxlength="120"
+        placeholder="Familia Pérez"
+    /></label>
+    <label
+      >Celular (WhatsApp)<input
+        name="phone"
+        [(ngModel)]="phone"
+        maxlength="30"
+        inputmode="tel"
+        placeholder="987 654 321"
+    /></label>
+    <label
+      >Personas
+      <span class="wl-stepper">
+        <button type="button" (click)="partySize = partySize > 1 ? partySize - 1 : 1">−</button>
+        <b>{{ partySize }}</b>
+        <button type="button" (click)="partySize = partySize < 50 ? partySize + 1 : 50">+</button>
+      </span>
+    </label>
+    <label
+      >Nota<input
+        name="notes"
+        [(ngModel)]="notes"
+        maxlength="200"
+        placeholder="Silla de bebé, terraza…"
+    /></label>
+    <button class="primary" [disabled]="busy() || !name.trim()"><app-icon name="plus" [size]="16" /> Agregar a la lista</button>
+  </form>
+
+  <section class="lg wl-list">
+    <header class="wl-head">
+      <h2>
+        En espera <b>{{ waiting().length }}</b>
+      </h2>
+      @if (board(); as value) {
+        <small
+          >{{ value.freeTables.length }}
+          {{ value.freeTables.length === 1 ? 'mesa libre' : 'mesas libres' }} · visita promedio
+          {{ value.averageVisitMinutes }} min</small
+        >
+      }
+    </header>
+    <div class="wl-scroll">
+    @for (entry of waiting(); track entry.id; let index = $index) {
+      <article
+        class="wl-card"
+        [class.notified]="entry.status === 'NOTIFIED'"
+        [class.match]="suggestions().has(entry.id)"
+        [style.--delay]="index * 60 + 'ms'"
+      >
+        <span class="wl-pos">{{ entry.position }}</span>
+        <div class="wl-info">
+          <strong
+            >{{ entry.customerName }} <em><app-icon name="users" [size]="12" />{{ entry.partySize }}</em></strong
+          >
+          <small>
+            Espera {{ waitedMinutes(entry) }} min
+            @if (entry.status === 'WAITING') {
+              ·
+              {{
+                entry.estimatedMinutes
+                  ? '~' + entry.estimatedMinutes + ' min más'
+                  : 'mesa disponible ya'
+              }}
+            }
+            @if (entry.notes) {
+              · {{ entry.notes }}
+            }
+          </small>
+          @if (entry.status === 'NOTIFIED') {
+            <span class="wl-tag ring"
+              ><app-icon name="bell" [size]="12" /> Avisado {{ entry.notifiedAt | date: 'HH:mm'
+              }}{{ entry.tableLabel ? ' · ' + entry.tableLabel : '' }}</span
+            >
+          } @else if (suggestions().get(entry.id); as table) {
+            <span class="wl-tag"
+              ><app-icon name="sparkles" [size]="12" /> {{ table.label }} ({{ table.capacity }}) está libre para este grupo</span
+            >
+          }
+        </div>
+        <div class="wl-actions">
+          @if (entry.status === 'WAITING') {
+            <button class="primary small" (click)="notifyReady(entry)"><app-icon name="bell" [size]="15" /> Avisar</button>
+          }
+          <button class="secondary small" (click)="openSeat(entry)"><app-icon name="chair" [size]="15" /> Sentar</button>
+          <span class="wl-more">
+            @if (entry.phone) {
+              <button (click)="sendLink(entry)" title="Enviar enlace por WhatsApp" class="icon-btn"><app-icon name="send" [size]="16" /></button>
+            }
+            <button (click)="copyLink(entry)" title="Copiar enlace de seguimiento" class="icon-btn"><app-icon name="link" [size]="16" /></button>
+            <button (click)="close(entry, true)" title="No llegó" class="icon-btn"><app-icon name="hourglass" [size]="16" /></button>
+            <button (click)="close(entry, false)" title="Quitar" class="icon-btn danger"><app-icon name="x" [size]="16" /></button>
+          </span>
+        </div>
+      </article>
+    } @empty {
+      <div class="wl-empty">
+        <span><app-icon name="check" [size]="22" /></span><strong>Nadie esperando</strong
+        ><small>Cuando el local se llene, agrega aquí a los clientes que llegan.</small>
+      </div>
+    }
+    @if (history().length) {
+      <h3 class="wl-subtitle">Últimas horas</h3>
+      @for (entry of history(); track entry.id) {
+        <div class="wl-history" [attr.data-status]="entry.status">
+          <span>{{ entry.customerName }} · {{ entry.partySize }} pers.</span>
+          <small
+            >{{ statusLabel(entry.status)
+            }}{{ entry.tableLabel && entry.status === 'SEATED' ? ' en ' + entry.tableLabel : '' }} ·
+            {{ entry.closedAt | date: 'HH:mm' }}</small
+          >
+        </div>
+      }
+    }
+    </div>
+  </section>
+</div>
+
+@if (seating(); as entry) {
+  <div class="modal-backdrop" (click)="seating.set(null)">
+    <section
+      class="qr-dialog wl-seat"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      aria-modal="true"
+    >
+      <button class="modal-close" (click)="seating.set(null)" aria-label="Cerrar">×</button>
+      <p class="eyebrow">Sentar a {{ entry.customerName }}</p>
+      <h2>Elige la mesa</h2>
+      <div class="wl-tables">
+        @for (table of fitting(entry); track table.id) {
+          <button (click)="seat(entry, table)">
+            <strong>{{ table.label }}</strong
+            ><small>{{ table.capacity }} personas</small>
+          </button>
+        } @empty {
+          <p class="muted">
+            No hay mesas libres para {{ entry.partySize }} personas en este momento.
+          </p>
+        }
+      </div>
+    </section>
+  </div>
+}

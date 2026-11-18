@@ -1,0 +1,22 @@
+// Tarjetas de producto.
+.mn-card { display: flex; flex-direction: column; padding: 0; border-radius: 20px; overflow: hidden; cursor: pointer; animation: mn-in .4s var(--ease-spring) var(--d) backwards; transition: transform .35s var(--ease-spring), box-shadow .25s; }
+.mn-card:hover { transform: translateY(-3px); }
+.mn-card.selected { box-shadow: var(--elev-2), inset 0 0 0 2px var(--brand); }
+.mn-card.hidden .mn-photo, .mn-card.soldout .mn-photo { filter: grayscale(.8); opacity: .7; }
+.mn-photo { position: relative; aspect-ratio: 16 / 9; display: grid; place-items: center; background: linear-gradient(135deg, color-mix(in srgb, var(--brand) 22%, transparent), color-mix(in srgb, #a46bff 18%, transparent)); }
+.mn-photo img { width: 100%; height: 100%; object-fit: cover; }
+.mn-photo span { font: 800 1.5rem var(--font-display); color: color-mix(in srgb, var(--text) 55%, transparent); }
+.mn-flag { position: absolute; top: 8px; left: 8px; padding: 2px 9px; border-radius: 999px; font-size: .66rem; font-weight: 800; color: #fff; background: rgba(0, 0, 0, .55); }
+.mn-flag.bad { background: #ef5d55; }
+.mn-card-body { display: grid; gap: 3px; padding: 10px 12px 12px; }
+.mn-card-body strong { font: 750 .9rem var(--font-display); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.mn-card-body strong i { font-style: normal; margin-left: 4px; font-size: .8em; }
+.mn-card-body small { color: var(--muted); font-size: .72rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.mn-card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+.mn-card-foot b { font: 800 .95rem var(--font-display); }
+.mn-avail { position: relative; width: 38px; height: 22px; padding: 0; border: 0; border-radius: 999px; background: #ef5d55; cursor: pointer; transition: background .25s; }
+.mn-avail i { position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .35s var(--ease-spring); }
+.mn-avail[aria-checked='true'] { background: var(--ok); } .mn-avail[aria-checked='true'] i { transform: translateX(16px); }
+.mn-empty { grid-column: 1 / -1; display: flex; align-items: center; gap: 14px; padding: 30px 10px; }
+.mn-empty > span { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 15px; color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); }
+.mn-empty div { display: grid; gap: 2px; } .mn-empty small { color: var(--muted); font-size: .8rem; }

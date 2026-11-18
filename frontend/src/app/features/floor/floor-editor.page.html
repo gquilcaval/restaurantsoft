@@ -1,0 +1,477 @@
+<app-shell title="Plano del salón" eyebrow="Diseña tu local">
+  <div shell-actions class="fe-actions">
+    <button
+      class="fe-pill"
+      (click)="undo()"
+      [disabled]="!history().length"
+      title="Deshacer (Ctrl+Z)"
+    >
+      <app-icon name="undo" [size]="15" /> Deshacer
+    </button>
+    <button
+      class="fe-pill primary fe-save"
+      [class.dirty]="dirty()"
+      (click)="save()"
+      [disabled]="saving() || !dirty()"
+    >
+      {{ saving() ? 'Guardando…' : dirty() ? 'Guardar plano' : 'Guardado' }}
+    </button>
+  </div>
+
+  <div class="fe">
+  <div class="fe-bar">
+  <nav class="fe-zones" aria-label="Planos del local">
+    @for (tab of tabs(); track tab.id) {
+      <button
+        [class.active]="zoneId() === tab.id"
+        [style.--zone-color]="tab.color"
+        (click)="selectZone(tab.id)"
+      >
+        <i></i>{{ tab.name }}
+      </button>
+    }
+    <button class="fe-new-plan" (click)="createPlan()"><app-icon name="plus" [size]="15" /> Nuevo plano</button>
+  </nav>
+    @if (activeZone()) {
+      <span class="fe-plan-actions">
+        <button (click)="renamePlan()" title="Renombrar este plano"><app-icon name="edit" [size]="14" /> Renombrar</button>
+        <button (click)="deletePlan()" title="Eliminar este plano"><app-icon name="trash" [size]="14" /> Eliminar</button>
+      </span>
+    }
+  </div>
+
+  <div class="fe-modebar">
+    <nav class="fe-modes" role="tablist" aria-label="Herramientas del estudio">
+      @for (item of modes; track item.key) {
+        <button role="tab" [attr.aria-selected]="mode() === item.key" (click)="setMode(item.key)"><app-icon [name]="item.icon" [size]="15" />{{ item.label }}
+          @if (item.key === 'AISLES' && aisles().length) {<b class="fe-badge bad">{{ aisles().length }}</b>}</button>
+      }
+    </nav>
+    <button class="fe-3d" [class.on]="view3d()" (click)="toggle3d()" title="Ver el salón en perspectiva"><app-icon name="layers" [size]="15" />{{ view3d() ? 'Volver a 2D' : 'Vista 3D' }}</button>
+    <span class="fe-capacity" [class.over]="overCapacity()" [title]="zoneSettings().maxCapacity ? 'Aforo permitido: ' + zoneSettings().maxCapacity : 'Define el aforo en Ajustes del plano'">
+      <app-icon name="users" [size]="14" /><b>{{ seats() }}</b> sillas · {{ placedTables().length }} mesas@if (zoneSettings().maxCapacity) { · aforo {{ zoneSettings().maxCapacity }}}
+    </span>
+  </div>
+
+  @if (mode() === 'DESIGN' && !view3d()) {
+  <div class="fe-toolbar">
+    <button type="button" class="fe-templates-button" (click)="templatesOpen.set(true)">
+      <app-icon name="sparkles" [size]="16" />Plantillas
+    </button>
+    <span>Agregar al plano</span>
+    @for (kind of kinds; track kind.kind) {
+      <button type="button" (click)="addElement(kind.kind)" [title]="'Agregar ' + kind.label">
+        <b>{{ kind.icon }}</b
+        >{{ kind.label }}
+      </button>
+    }
+    @if (multiCount() > 1) {
+      <span class="fe-align">
+        <em>{{ multiCount() }} mesas</em>
+        <button (click)="arrangeSelected('row')" title="Alinear en una fila">⇹ Fila</button>
+        <button (click)="arrangeSelected('column')" title="Alinear en una columna">⇳ Columna</button>
+        <button (click)="arrangeSelected('spread-x')" title="Repartir parejo a lo ancho">↔ Repartir</button>
+        <button (click)="arrangeSelected('spread-y')" title="Repartir parejo a lo alto">↕ Repartir</button>
+      </span>
+    }
+  </div>
+  }
+
+  <div class="fe-layout">
+    <div class="fe-stage" [class.dragging]="dragging()" [class.is-3d]="view3d()" [attr.data-mode]="mode()" [style.--zone-color]="zoneColor()">
+      @if (loading()) {
+        <div class="fe-loading">Cargando plano…</div>
+      }
+      <svg
+        #canvas
+        class="fp-svg"
+        [attr.viewBox]="'0 0 ' + area.width + ' ' + area.height"
+        (pointermove)="onPointerMove($event)"
+        (pointerup)="endDrag($event)"
+        (pointercancel)="endDrag($event)"
+        role="img"
+        aria-label="Plano editable del salón"
+      >
+        @if (zoneSettings().backgroundUrl) {
+          <image class="fe-bg" [attr.href]="zoneSettings().backgroundUrl" x="0" y="0" [attr.width]="area.width" [attr.height]="area.height"
+            preserveAspectRatio="xMidYMid slice" [attr.opacity]="zoneSettings().backgroundOpacity / 100" />
+        }
+        <rect
+          class="fp-floor"
+          [attr.width]="area.width"
+          [attr.height]="area.height"
+          (pointerdown)="startMarquee($event)"
+        />
+        <g
+          appFloorElements
+          [elements]="elements()"
+          [editable]="true"
+          [selectedId]="selectedElement()?.id || null"
+          (pointer)="onElementPointer($event)"
+        ></g>
+        @for (item of placedTables(); track item.table.id; let index = $index) {
+          <g
+            class="fp-table fe-table"
+            [class.selected]="isSelected('table', item.table.id)"
+            [class.multi]="multi().has(item.table.id) && multiCount() > 1 || (mode() === 'WAITERS' && multi().has(item.table.id))"
+            [class.heat]="mode() === 'HEAT'"
+            [style.--heat]="mode() === 'HEAT' ? heatColor(heatMap()[item.table.id]?.ratio || 0) : null"
+            [style.--waiter]="mode() === 'WAITERS' ? waiterColor(placementOf(item.table.id).waiterId) : null"
+            [attr.transform]="tableTransform(item.place)"
+            [style.--delay]="index * 30 + 'ms'"
+            (pointerdown)="startDrag($event, 'table', item.table.id)"
+          >
+            <g class="fp-body">
+              <g [attr.transform]="'rotate(' + item.place.rotation + ')'">
+                @for (chair of item.chairs; track $index) {
+                  <rect
+                    class="fp-chair"
+                    x="-9"
+                    y="-7"
+                    width="18"
+                    height="14"
+                    rx="5"
+                    [attr.transform]="
+                      'translate(' + chair.x + ' ' + chair.y + ') rotate(' + chair.angle + ')'
+                    "
+                  />
+                }
+                @if (item.place.shape === 'ROUND') {
+                  <circle class="fp-top" [attr.r]="item.size.width / 2" />
+                } @else {
+                  <rect
+                    class="fp-top"
+                    [attr.x]="-item.size.width / 2"
+                    [attr.y]="-item.size.height / 2"
+                    [attr.width]="item.size.width"
+                    [attr.height]="item.size.height"
+                    rx="12"
+                  />
+                }
+              </g>
+            </g>
+            <text class="fp-label" y="-3">{{ item.table.label }}</text>
+            @if (mode() === 'HEAT') {
+              <text class="fp-sub fe-heat-text" y="14">{{ heatMetric() === 'revenue' ? money(heatMap()[item.table.id]?.revenue || 0) : (heatMap()[item.table.id]?.turns || 0) + ' giros' }}</text>
+            } @else {
+              <text class="fp-sub" y="14">{{ item.table.capacity }} pers.</text>
+            }
+            @if (mode() === 'WAITERS' && placementOf(item.table.id).waiterId) {
+              <g class="fe-waiter-badge" [attr.transform]="'translate(' + (item.size.width / 2) + ' ' + (-item.size.height / 2) + ')'"><circle r="15" /><text>{{ waiterInitials(placementOf(item.table.id).waiterId) }}</text></g>
+            }
+          </g>
+        }
+        <!-- Capas del estudio -->
+        @for (guide of guides(); track guide.axis + guide.value) {
+          @if (guide.axis === 'x') { <line class="fe-guide" [attr.x1]="guide.value" y1="0" [attr.x2]="guide.value" [attr.y2]="area.height" /> }
+          @else { <line class="fe-guide" x1="0" [attr.y1]="guide.value" [attr.x2]="area.width" [attr.y2]="guide.value" /> }
+        }
+        @if (marquee(); as box) { <rect class="fe-marquee" [attr.x]="box.x" [attr.y]="box.y" [attr.width]="box.w" [attr.height]="box.h" rx="8" /> }
+        @if (mode() === 'AISLES') {
+          @for (issue of aisles(); track issue.key) {
+            <g class="fe-aisle"><line [attr.x1]="issue.from.x" [attr.y1]="issue.from.y" [attr.x2]="issue.to.x" [attr.y2]="issue.to.y" />
+              <rect [attr.x]="(issue.from.x + issue.to.x) / 2 - 26" [attr.y]="(issue.from.y + issue.to.y) / 2 - 11" width="52" height="22" rx="11" />
+              <text [attr.x]="(issue.from.x + issue.to.x) / 2" [attr.y]="(issue.from.y + issue.to.y) / 2">{{ issue.cm }} cm</text></g>
+          }
+        }
+        @if (mode() === 'ROUTES' && origin(); as start) {
+          @for (route of routeLines(); track route.id; let index = $index) {
+            <g class="fe-route" [class.far]="index < 3"><line [attr.x1]="start.point.x" [attr.y1]="start.point.y" [attr.x2]="route.to.x" [attr.y2]="route.to.y" />
+              @if (index < 3) { <text [attr.x]="route.to.x" [attr.y]="route.to.y - 46">{{ route.meters }} m</text> }</g>
+          }
+          <g class="fe-origin" [attr.transform]="'translate(' + start.point.x + ' ' + start.point.y + ')'"><circle r="16" /><text>★</text></g>
+        }
+      </svg>
+      @if (!loading() && !placedTables().length && !elements().length) {
+        <div class="fe-empty">
+          <strong>Este plano está vacío</strong>
+          <p>
+            Ubica tus mesas y agrega la barra, puertas o la cocina para que el salón se vea como tu
+            local.
+          </p>
+          @if (unplacedTables().length) {
+            <button class="primary" (click)="placeAll()">
+              Ubicar {{ unplacedTables().length }} mesas automáticamente
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    <aside class="lg fe-inspector">
+      @if (view3d()) {
+        <p class="eyebrow">Vista 3D</p>
+        <h2>Tu salón en perspectiva</h2>
+        <p class="muted">Así se ve el plano con volumen. Es solo para mirar y mostrar: para mover mesas vuelve a 2D.</p>
+        <div class="fe-stat-grid"><span><small>Mesas</small><b>{{ placedTables().length }}</b></span><span><small>Sillas</small><b>{{ seats() }}</b></span></div>
+        <button class="fe-pill primary wide" (click)="toggle3d()">Volver a 2D</button>
+      } @else if (mode() === 'DESIGN') {
+
+      @if (selectedTable(); as current) {
+        <p class="eyebrow">Mesa</p>
+        <h2>{{ current.table.label }}</h2>
+        <p class="muted">{{ current.table.capacity }} personas</p>
+        <span class="fe-field-label">Forma</span>
+        <div class="fe-segmented">
+          @for (shape of shapes; track shape.value) {
+            <button
+              [class.active]="current.place.shape === shape.value"
+              (click)="setShape(current.table.id, shape.value)"
+            >
+              <i [attr.data-shape]="shape.value"></i>{{ shape.label }}
+            </button>
+          }
+        </div>
+        <span class="fe-field-label">Girar</span>
+        <div class="fe-row">
+          <button class="secondary small" (click)="rotateSelected(-45)">↺ 45°</button>
+          <button class="secondary small" (click)="rotateSelected(45)">↻ 45°</button>
+          <span class="muted">{{ current.place.rotation }}°</span>
+        </div>
+        <button class="secondary small fe-danger" (click)="removeTable(current.table.id)">
+          Quitar del plano
+        </button>
+        <p class="fe-tip">La capacidad y el nombre se cambian en Configuración → Mesas.</p>
+      } @else if (selectedElement(); as el) {
+        <p class="eyebrow">Elemento</p>
+        <h2>{{ meta(el.kind).icon }} {{ meta(el.kind).label }}</h2>
+        <label class="fe-input"
+          >Texto
+          <input
+            [ngModel]="el.label"
+            (ngModelChange)="editElement(el.id, { label: $event })"
+            maxlength="40"
+          />
+        </label>
+        <div class="fe-row">
+          <label class="fe-input"
+            >Ancho<input
+              type="number"
+              min="10"
+              max="1200"
+              [ngModel]="el.width"
+              (ngModelChange)="editElement(el.id, { width: $event })"
+          /></label>
+          <label class="fe-input"
+            >Alto<input
+              type="number"
+              min="10"
+              max="800"
+              [ngModel]="el.height"
+              (ngModelChange)="editElement(el.id, { height: $event })"
+          /></label>
+        </div>
+        <div class="fe-row">
+          <button class="secondary small" (click)="rotateSelected(90)"><app-icon name="refresh" [size]="14" /> Girar 90°</button>
+          <button class="secondary small" (click)="duplicateElement(el)"><app-icon name="copy" [size]="14" /> Duplicar</button>
+        </div>
+        <button class="secondary small fe-danger" (click)="deleteElement(el.id)">Eliminar</button>
+        <p class="fe-tip">Arrastra la esquina verde para cambiar el tamaño.</p>
+      } @else {
+        <nav class="fe-ptabs" role="tablist">
+          <button role="tab" [attr.aria-selected]="panelTab() === 'TABLES'" (click)="panelTab.set('TABLES')">Mesas</button>
+          <button role="tab" [attr.aria-selected]="panelTab() === 'SETTINGS'" (click)="panelTab.set('SETTINGS')">Ajustes</button>
+          <button role="tab" [attr.aria-selected]="panelTab() === 'LAYOUTS'" (click)="panelTab.set('LAYOUTS')">Configuraciones</button>
+        </nav>
+        @if (panelTab() === 'TABLES') {
+        <p class="eyebrow">Mesas sin ubicar</p>
+        <h2>
+          {{
+            unplacedTables().length ? unplacedTables().length + ' pendientes' : 'Todas ubicadas'
+          }}
+        </h2>
+        <div class="fe-chips">
+          @for (table of unplacedTables(); track table.id) {
+            <button (click)="placeTable(table)" [title]="'Ubicar ' + table.label">
+              ＋ {{ table.label }}
+            </button>
+          }
+        </div>
+        @if (unplacedTables().length > 1) {
+          <button class="secondary small" (click)="placeAll()">Ubicar todas</button>
+        }
+        @if (unplacedTables().length) {
+          <p class="fe-warning">
+            Las mesas sin ubicar se muestran a los meseros debajo del plano, como «fuera del plano».
+          </p>
+        }
+        @if (!zoneTables().length) {
+          <p class="muted">Este plano todavía no tiene mesas. Tráelas desde otro plano.</p>
+        }
+        @if (activeZone() && otherTables().length) {
+          <p class="eyebrow fe-other-title">Mesas de otros planos</p>
+          <div class="fe-other">
+            @for (table of otherTables(); track table.id) {
+              <button
+                (click)="bringTable(table)"
+                [title]="'Traer ' + table.label + ' a este plano'"
+              >
+                <strong>{{ table.label }}</strong
+                ><small>{{ zoneLabel(table.zoneId) }}</small
+                ><b>Traer</b>
+              </button>
+            }
+          </div>
+        }
+        <ul class="fe-help">
+          <li><b>Arrastra</b> mesas y elementos para moverlos.</li>
+          <li><b>Flechas</b> mueven lo seleccionado (Shift = más rápido).</li>
+          <li><b>Supr</b> elimina un elemento; <b>Ctrl+Z</b> deshace.</li>
+        </ul>
+        } @else if (panelTab() === 'SETTINGS') {
+          @if (activeZone()) {
+            <p class="eyebrow">Foto de fondo</p>
+            <div class="fe-bg-edit">
+              @if (zoneSettings().backgroundUrl) { <img [src]="zoneSettings().backgroundUrl" alt="Fondo del plano"> } @else { <span><app-icon name="map" [size]="20" /></span> }
+              <div>
+                <label class="fe-pill small">{{ uploadingBg() ? 'Subiendo…' : zoneSettings().backgroundUrl ? 'Cambiar foto' : 'Subir foto o croquis' }}<input type="file" accept="image/jpeg,image/png,image/webp" hidden (change)="uploadBackground($event)" [disabled]="uploadingBg()"></label>
+                @if (zoneSettings().backgroundUrl) { <button class="fe-link" (click)="updateSettings({ backgroundUrl: null })">Quitar</button> }
+              </div>
+            </div>
+            @if (zoneSettings().backgroundUrl) {
+              <label class="fe-input">Transparencia · {{ zoneSettings().backgroundOpacity }}%<input type="range" min="5" max="100" [ngModel]="zoneSettings().backgroundOpacity" (ngModelChange)="updateSettings({ backgroundOpacity: $event })"></label>
+            }
+            <p class="fe-tip">Toma una foto del local desde arriba o sube un croquis y dibuja tus mesas encima.</p>
+            <p class="eyebrow">Medidas y aforo</p>
+            <div class="fe-row">
+              <label class="fe-input">Ancho real (m)<input type="number" min="3" max="200" step="0.5" [ngModel]="zoneSettings().widthMeters" (ngModelChange)="updateSettings({ widthMeters: $event })"></label>
+              <label class="fe-input">Aforo permitido<input type="number" min="1" max="5000" placeholder="Sin límite" [ngModel]="zoneSettings().maxCapacity" (ngModelChange)="updateSettings({ maxCapacity: $event })"></label>
+            </div>
+            <p class="fe-tip">Con el ancho real se miden los pasillos y los recorridos. Cada cuadrito del plano mide {{ (zoneSettings().widthMeters * 100 / 30) | number:'1.0-0' }} cm.</p>
+            @if (overCapacity()) { <p class="fe-warning">Hay {{ seats() }} sillas y el aforo permitido es {{ zoneSettings().maxCapacity }}. Retira {{ seats() - zoneSettings().maxCapacity! }} sillas.</p> }
+          } @else {
+            <p class="muted">Crea un plano con nombre (Salón, Terraza…) para usar foto de fondo, medidas y aforo.</p>
+          }
+        } @else {
+          @if (activeZone()) {
+            <p class="eyebrow">Configuraciones de este plano</p>
+            <p class="fe-tip">Guarda versiones del mismo salón y cámbialas con un toque: Día normal, Evento, Fin de semana…</p>
+            <div class="fe-layouts">
+              @for (layout of zoneLayouts(); track layout.id) {
+                <div class="fe-layout-row" [class.active]="zoneSettings().activeLayoutId === layout.id">
+                  <span><strong>{{ layout.name }}</strong><small>{{ layout.tables }} mesas · {{ layout.seats }} sillas</small></span>
+                  @if (zoneSettings().activeLayoutId === layout.id) { <em>En uso</em> } @else { <button class="fe-pill small primary" (click)="applyLayout(layout)">Usar</button> }
+                  <button class="fe-icon-btn" (click)="updateLayout(layout)" title="Actualizar con el plano actual"><app-icon name="refresh" [size]="14" /></button>
+                  <button class="fe-icon-btn" (click)="deleteLayout(layout)" title="Eliminar"><app-icon name="trash" [size]="14" /></button>
+                </div>
+              } @empty { <p class="muted">Aún no hay configuraciones guardadas.</p> }
+            </div>
+            <button class="fe-pill wide" (click)="saveAsLayout()"><app-icon name="plus" [size]="15" />Guardar el plano actual como…</button>
+          } @else {
+            <p class="muted">Crea un plano con nombre para guardar configuraciones.</p>
+          }
+        }
+      }
+      } @else if (mode() === 'AISLES') {
+        <p class="eyebrow">Validador de pasillos</p>
+        <h2>{{ aisles().length ? aisles().length + (aisles().length === 1 ? ' pasillo angosto' : ' pasillos angostos') : 'Pasillos cómodos' }}</h2>
+        <p class="muted">Espacio libre entre sillas de mesas vecinas. Un mesero con bandeja necesita unos 60 cm; una silla de ruedas, 90 cm.</p>
+        <label class="fe-input">Mínimo · {{ minAisle() }} cm<input type="range" min="60" max="150" step="5" [ngModel]="minAisle()" (ngModelChange)="minAisle.set($event)"></label>
+        <div class="fe-issues">
+          @for (issue of aisles().slice(0, 12); track issue.key) { <div><span>{{ issue.a }} ↔ {{ issue.b }}</span><b [class.bad]="issue.cm < 60">{{ issue.cm }} cm</b></div> }
+          @empty { <p class="fe-ok"><app-icon name="check" [size]="16" />Todo el salón tiene pasillos de {{ minAisle() }} cm o más.</p> }
+        </div>
+        <p class="fe-tip">Mide con el ancho real del salón ({{ zoneSettings().widthMeters }} m). Cámbialo en Diseñar → Ajustes.</p>
+      } @else if (mode() === 'ROUTES') {
+        <p class="eyebrow">Simulador de recorrido</p>
+        @if (origin(); as start) {
+          <h2>{{ nightKm() }} km por noche</h2>
+          <p class="muted">Lo que camina el equipo desde <b>{{ start.label }}</b>: {{ visitsPerNight() }} visitas por mesa, 3 viajes por visita (pedido, platos y cuenta), ida y vuelta.</p>
+          <div class="fe-stat-grid"><span><small>Promedio a una mesa</small><b>{{ routeAverage() }} m</b></span><span><small>Más lejana</small><b>{{ routeLines()[0]?.meters || 0 }} m</b></span></div>
+          <div class="fe-issues">
+            @for (route of routeLines().slice(0, 6); track route.id; let index = $index) { <div><span>{{ route.label }}</span><b [class.bad]="index === 0">{{ route.meters }} m</b></div> }
+          </div>
+          <p class="fe-tip">Las mesas más lejanas cansan y demoran el servicio: acerca una estación de servicio o asígnalas al mismo mesero.</p>
+        } @else {
+          <h2>Falta el punto de partida</h2>
+          <p class="muted">Agrega la <b>Cocina</b>, la <b>Barra</b> o la <b>Caja</b> al plano para calcular los recorridos.</p>
+        }
+      } @else if (mode() === 'HEAT') {
+        <p class="eyebrow">Rendimiento · últimos 30 días</p>
+        <div class="fe-seg"><button [class.on]="heatMetric() === 'revenue'" (click)="heatMetric.set('revenue')">Ventas</button><button [class.on]="heatMetric() === 'turns'" (click)="heatMetric.set('turns')">Giros</button></div>
+        <div class="fe-heat-legend"><i></i><span>Rinde poco</span><span>Rinde mucho</span></div>
+        <div class="fe-issues">
+          @for (row of heatRanking(); track row.id; let index = $index; let last = $last) {
+            @if (index < 3 || index >= heatRanking().length - 3) {
+              <div><span><i class="fe-dot" [style.background]="heatColor(row.heat.ratio)"></i>{{ row.label }}</span><b>{{ heatMetric() === 'revenue' ? money(row.heat.revenue) : row.heat.turns + ' giros' }}</b></div>
+            }
+            @if (index === 2 && heatRanking().length > 6) { <p class="fe-gap">…</p> }
+          }
+        </div>
+        <p class="fe-tip">Las mesas «frías» suelen estar junto al baño o la puerta: muévelas, júntalas o úsalas para grupos. Las mejores pueden tener precio de mesa preferente.</p>
+      } @else {
+        <p class="eyebrow">Mesas por mesero</p>
+        <h2>{{ multiCount() ? multiCount() + (multiCount() === 1 ? ' mesa elegida' : ' mesas elegidas') : 'Elige mesas' }}</h2>
+        <p class="muted">Toca mesas o arrastra un recuadro y luego el mesero. Cada uno verá «Mis mesas» en su pantalla.</p>
+        <div class="fe-waiters">
+          @for (member of staff(); track member.id) {
+            <button (click)="assignWaiter(member.id)" [disabled]="!multiCount()"><i [style.background]="waiterColor(member.id)">{{ waiterInitials(member.id) }}</i><span><strong>{{ member.name }}</strong><small>{{ waiterTables(member.id) }} mesas en este plano</small></span></button>
+          } @empty { <p class="muted">No hay meseros activos en esta sucursal.</p> }
+        </div>
+        <button class="fe-pill wide" [disabled]="!multiCount()" (click)="assignWaiter(null)">Quitar mesero a las elegidas</button>
+      }
+    </aside>
+  </div>
+
+</div>
+
+  @if (templatesOpen()) {
+    <div class="modal-backdrop" (click)="templatesOpen.set(false)">
+      <section
+        class="fe-templates"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tpl-title"
+        (click)="$event.stopPropagation()"
+      >
+        <button class="modal-close" (click)="templatesOpen.set(false)" aria-label="Cerrar">
+          ×
+        </button>
+        <p class="eyebrow">Diseños de partida</p>
+        <h2 id="tpl-title">Elige una plantilla</h2>
+        <p class="muted">
+          Se acomodan tus {{ zoneTables().length }} mesas y los elementos del local. Después puedes
+          moverlo todo.
+        </p>
+        <div class="fe-template-grid">
+          @for (template of templates; track template.id; let index = $index) {
+            <button
+              class="fe-template"
+              [style.--delay]="index * 70 + 'ms'"
+              (click)="applyTemplate(template)"
+            >
+              <svg class="fe-template-preview" viewBox="0 0 1200 800" aria-hidden="true">
+                <g appFloorElements [elements]="template.elements"></g>
+                @for (slot of template.slots; track $index) {
+                  @if (slot.shape === 'ROUND') {
+                    <circle
+                      class="fe-slot"
+                      [attr.cx]="slot.x"
+                      [attr.cy]="slot.y"
+                      [attr.r]="slotSize(slot).width / 2"
+                    />
+                  } @else {
+                    <rect
+                      class="fe-slot"
+                      [attr.x]="slot.x - slotSize(slot).width / 2"
+                      [attr.y]="slot.y - slotSize(slot).height / 2"
+                      [attr.width]="slotSize(slot).width"
+                      [attr.height]="slotSize(slot).height"
+                      rx="12"
+                      [attr.transform]="
+                        'rotate(' + slot.rotation + ' ' + slot.x + ' ' + slot.y + ')'
+                      "
+                    />
+                  }
+                }
+              </svg>
+              <strong>{{ template.icon }} {{ template.name }}</strong>
+              <small>{{ template.description }}</small>
+              <em>{{ template.slots.length }} lugares para mesas</em>
+            </button>
+          }
+        </div>
+      </section>
+    </div>
+  }
+</app-shell>

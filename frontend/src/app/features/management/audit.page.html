@@ -1,0 +1,73 @@
+<app-shell title="Auditoría" eyebrow="Control del negocio">
+  <div class="au">
+    <div class="au-navrow">
+      <div class="lg au-period">
+        <div class="au-presets" role="radiogroup" aria-label="Período">
+          @for (item of presets; track item.key) { <button role="radio" [attr.aria-checked]="preset() === item.key" (click)="choosePreset(item.key)">{{ item.label }}</button> }
+          <button role="radio" [attr.aria-checked]="preset() === 'CUSTOM'" (click)="choosePreset('CUSTOM')"><app-icon name="calendar" [size]="14" />Fechas</button>
+        </div>
+        @if (preset() === 'CUSTOM') {
+          <form class="au-dates" (ngSubmit)="reload()"><input type="date" name="from" [(ngModel)]="from" aria-label="Desde"><span>→</span><input type="date" name="to" [(ngModel)]="to" aria-label="Hasta"><button class="au-pill small primary">Ver</button></form>
+        }
+      </div>
+      <label class="au-search"><app-icon name="search" [size]="15" /><input type="search" placeholder="Buscar: mesa, plato, motivo…" [ngModel]="search()" (ngModelChange)="searchChanged($event)"></label>
+    </div>
+    <p class="au-purpose">Todo lo sensible queda registrado con nombre y hora: anulaciones, descuentos, caja, precios y accesos. Nada se puede borrar.</p>
+
+    <div class="au-layout">
+      <!-- Línea de tiempo -->
+      <section class="lg au-feed">
+        <div class="au-groups" role="radiogroup" aria-label="Tipo de acción">
+          @for (item of groups(); track item.key) {
+            <button role="radio" [attr.aria-checked]="group() === item.key" (click)="setGroup(item.key)"><app-icon [name]="item.icon" [size]="13" />{{ item.label }}<small>{{ item.count }}</small></button>
+          }
+        </div>
+        @if (activeUser() || search()) {
+          <p class="au-active-filter">Mostrando @if (activeUser(); as user) {<b>{{ user.name }}</b>}@if (search()) { con «{{ search() }}»} · <button class="au-link" (click)="clearFilters()">Quitar filtros</button></p>
+        }
+        @if (error()) { <p class="au-error">{{ error() }}</p> }
+        <div class="au-scroll" [class.busy]="loading()">
+          @for (day of days(); track day.day) {
+            <h4 class="au-day">{{ dayLabel(day.day) }}<small>{{ day.events.length }}</small></h4>
+            @for (event of day.events; track event.id; let index = $index) {
+              <article class="au-event" [attr.data-tone]="tone(event.action)" [style.--d]="(index < 15 ? index * 25 : 0) + 'ms'">
+                <time>{{ time(event.createdAt, page()!.timezone) }}</time>
+                <span class="au-ico"><app-icon [name]="icon(event.action)" [size]="15" /></span>
+                <div class="au-event-main"><strong>{{ label(event.action) }}</strong><p>{{ event.summary }}</p></div>
+                <div class="au-event-side">@if (event.amount !== null) {<b>{{ money(event.amount) }}</b>}<small>{{ event.userName }}</small></div>
+              </article>
+            }
+          } @empty {
+            <div class="au-empty"><span><app-icon name="check" [size]="22" /></span><div><strong>Sin acciones con estos filtros</strong><small>Prueba con otro período o quita los filtros.</small></div></div>
+          }
+        </div>
+        @if (page(); as data) {
+          @if (data.total > data.pageSize) {
+            <footer class="au-pager"><button class="au-pill small" [disabled]="data.page === 0" (click)="load(data.page - 1)">← Anterior</button><span>Página <b>{{ data.page + 1 }}</b> de {{ totalPages(data) }} · {{ data.total }} acciones</span><button class="au-pill small" [disabled]="(data.page + 1) * data.pageSize >= data.total" (click)="load(data.page + 1)">Siguiente →</button></footer>
+          }
+        }
+      </section>
+
+      <!-- Señales y personas -->
+      <aside class="lg au-side">
+        <h3>Señales de alerta</h3>
+        <div class="au-alerts">
+          @for (alert of alerts(); track alert.title) {
+            <button class="au-alert" [attr.data-tone]="alert.tone" (click)="openAlert(alert)"><span><app-icon [name]="alert.icon" [size]="15" /></span><div><strong>{{ alert.title }}</strong><small>{{ alert.detail }}</small></div></button>
+          } @empty {
+            <p class="au-ok"><app-icon name="check" [size]="16" />Nada fuera de lo normal en este período.</p>
+          }
+        </div>
+        <h3>Por persona</h3>
+        <div class="au-people">
+          @for (user of summary()?.users || []; track user.name) {
+            <button [class.on]="userId() === user.userId" (click)="setUser(user.userId)">
+              <i>{{ initials(user.name) }}</i>
+              <span><strong>{{ user.name }}</strong><small>{{ user.count }} acciones@if (user.voids) { · {{ user.voids }} anul.}@if (user.discounts) { · {{ user.discounts }} desc.}</small></span>
+            </button>
+          } @empty { <p class="au-muted">Sin actividad en el período.</p> }
+        </div>
+      </aside>
+    </div>
+  </div>
+</app-shell>

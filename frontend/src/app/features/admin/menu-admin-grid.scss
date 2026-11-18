@@ -1,0 +1,26 @@
+// Categorías (columna izquierda) y tarjetas de productos con foto.
+.mn-cats { min-height: 0; display: flex; flex-direction: column; gap: 10px; padding: 14px 10px; border-radius: 24px; overflow-y: auto; scrollbar-width: thin; }
+.mn-cats-head, .mn-stations header { display: flex; align-items: center; justify-content: space-between; padding: 0 6px; }
+.mn-cats-head h3 { margin: 0; font: 750 .95rem var(--font-display); }
+.mn-cat-list { display: grid; gap: 2px; }
+.mn-cat { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; padding: 9px 10px; border: 0; border-radius: 14px; background: transparent; color: var(--text); text-align: left; font: inherit; cursor: pointer; transition: background .2s; }
+.mn-cat:hover { background: color-mix(in srgb, var(--text) 6%, transparent); }
+.mn-cat.on { background: color-mix(in srgb, var(--brand) 16%, transparent); }
+.mn-cat.off { opacity: .6; }
+.mn-cat span { display: grid; gap: 1px; min-width: 0; font-weight: 750; font-size: .86rem; }
+.mn-cat em { font-style: normal; color: var(--muted); font-size: .68rem; font-weight: 600; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.mn-cat small { min-width: 22px; padding: 0 6px; border-radius: 999px; text-align: center; font: 800 .72rem var(--font-display); background: color-mix(in srgb, var(--text) 9%, transparent); }
+.mn-cat-edit { position: absolute; right: 40px; width: 26px; height: 26px; display: grid; place-items: center; border: 0; border-radius: 50%; color: var(--muted); background: color-mix(in srgb, var(--surface) 80%, transparent); opacity: 0; transition: opacity .2s; }
+.mn-cat:hover .mn-cat-edit, .mn-cat:focus-within .mn-cat-edit { opacity: 1; }
+.mn-cat-form { display: grid; gap: 8px; padding: 10px; border-radius: 16px; background: color-mix(in srgb, var(--text) 5%, transparent); animation: mn-in .3s var(--ease-spring); }
+.mn-cat-form input, .mn-cat-form select { width: 100%; min-width: 0; height: 34px; padding: 0 10px; border: 0; border-radius: 10px; background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--text); font: inherit; font-size: .8rem; outline: none; }
+.mn-cat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.mn-cat-row label { display: grid; gap: 3px; font-size: .68rem; font-weight: 700; color: var(--muted); }
+.mn-stations { display: grid; gap: 8px; margin-top: auto; padding-top: 8px; }
+.mn-stations h4 { margin: 0; color: var(--muted); font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+.mn-station-chips { display: flex; flex-wrap: wrap; gap: 5px; padding: 0 4px; }
+.mn-station-chips button { display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 10px; border: 0; border-radius: 999px; color: var(--text); font-size: .72rem; font-weight: 700; background: color-mix(in srgb, var(--text) 7%, transparent); }
+.mn-station-chips small { color: var(--muted); font-size: .72rem; }
+.mn-grid-wrap { min-height: 0; overflow-y: auto; padding: 2px 4px 8px; scrollbar-width: thin; }
+.mn-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); grid-auto-rows: max-content; gap: 10px; }
+@keyframes mn-in { from { opacity: 0; transform: translateY(8px); } }

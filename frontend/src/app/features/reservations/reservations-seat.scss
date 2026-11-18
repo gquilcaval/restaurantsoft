@@ -1,0 +1,16 @@
+// «Llegó»: elegir mesa y sentar al cliente.
+.st-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; }
+.st-avatar { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 16px; color: var(--brand); background: color-mix(in srgb, var(--brand) 16%, transparent); font: 800 1rem var(--font-display); }
+.st-head h2 { margin: 0; overflow: hidden; font: 800 1.2rem var(--font-display); letter-spacing: -.02em; white-space: nowrap; text-overflow: ellipsis; }
+.st-head small { color: var(--muted); font-size: .78rem; font-weight: 600; }
+.st-title { margin: 4px 0 0; font: 800 .95rem var(--font-display); }
+.st-tables { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+.st-table { position: relative; display: grid; justify-items: start; align-content: start; gap: 2px; padding: 14px 12px 12px; border: 0; border-radius: 18px; color: var(--text); background: color-mix(in srgb, var(--text) 6%, transparent); text-align: left; transition: background .2s, transform .25s var(--ease-spring); }
+.st-table:active { transform: scale(.95); }
+.st-table b { font: 800 1rem var(--font-display); }
+.st-table small { color: var(--muted); font-size: .74rem; font-weight: 600; }
+.st-table.small:not(.on) small { color: var(--warn); }
+.st-table.on { color: var(--brand); background: color-mix(in srgb, var(--brand) 20%, transparent); }
+.st-empty { display: grid; justify-items: center; gap: 6px; padding: 30px 10px; text-align: center; }
+.st-empty span { font-size: 2rem; }
+.st-empty small { color: var(--muted); font-size: .8rem; }

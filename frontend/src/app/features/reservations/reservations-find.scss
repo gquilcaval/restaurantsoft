@@ -1,0 +1,10 @@
+// Encontrar al cliente que llega: buscador y bloque «Llegan ahora».
+.rv-search { flex-shrink: 0; display: flex; align-items: center; gap: 8px; height: 44px; margin: 2px 2px 8px; padding: 0 6px 0 14px; border-radius: 14px; color: var(--muted); background: color-mix(in srgb, var(--text) 6%, transparent); transition: box-shadow .2s, background .2s; }
+.rv-search:focus-within { background: color-mix(in srgb, var(--brand) 8%, transparent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 55%, transparent); }
+.rv-search input { flex: 1; min-width: 0; height: 100%; border: 0; outline: none; color: var(--text); background: none; font: 600 .9rem inherit; -webkit-appearance: none; appearance: none; }
+.rv-search input::-webkit-search-cancel-button { display: none; }
+.rv-search button { width: 30px; height: 30px; display: grid; place-items: center; border: 0; border-radius: 50%; color: var(--text); background: color-mix(in srgb, var(--text) 9%, transparent); }
+.rv-hour.rv-now span { color: var(--brand); }
+.rv-hour.rv-now i { background: color-mix(in srgb, var(--brand) 30%, transparent); }
+.rv-pill.rv-solo { animation: rv-solo 1.4s ease-in-out infinite; }
+@keyframes rv-solo { 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--brand) 25%, transparent); } }

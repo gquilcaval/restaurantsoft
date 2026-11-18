@@ -1,0 +1,197 @@
+.insights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.insight-panel > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.insight-panel h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.forecast-row {
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+  animation: ins-in 0.45s ease-out var(--delay) backwards;
+}
+.forecast-icon {
+  font-size: 1.3rem;
+  text-align: center;
+}
+.forecast-row[data-level='TODAY'] .forecast-icon {
+  animation: ins-tick 1.6s ease-in-out 3;
+}
+.forecast-row div {
+  display: grid;
+  gap: 3px;
+}
+.forecast-row small {
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+.forecast-row small b {
+  color: var(--orange);
+}
+.forecast-row[data-level='OUT'] strong {
+  color: var(--danger);
+}
+.forecast-bar {
+  display: block;
+  height: 6px;
+  border-radius: 9px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.forecast-bar b {
+  display: block;
+  height: 100%;
+  border-radius: 9px;
+  background: linear-gradient(90deg, var(--danger), var(--orange));
+  transform-origin: left;
+  animation: ins-grow 1s ease-out backwards;
+}
+.forecast-stock {
+  display: grid;
+  text-align: right;
+  font-weight: 800;
+  font-size: 0.86rem;
+}
+.forecast-stock small {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.7rem;
+}
+.insight-ok {
+  margin: 4px 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--green-soft);
+  color: var(--green);
+  font-weight: 700;
+  font-size: 0.86rem;
+}
+.insight-caption {
+  margin: 10px 0 0;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+.supplier-card {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  animation: ins-in 0.4s ease-out backwards;
+}
+.supplier-card > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.supplier-card > header div {
+  display: grid;
+}
+.supplier-card > header small {
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+.supplier-form {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
+}
+.supplier-form input {
+  flex: 1 1 140px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 8px;
+  background: var(--surface);
+  color: var(--text);
+}
+.link-button {
+  border: 0;
+  background: transparent;
+  color: var(--brand-accent);
+  font-weight: 750;
+  font-size: 0.8rem;
+}
+.shopping-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px dashed var(--border);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.shopping-row.off {
+  opacity: 0.45;
+}
+.shopping-row > span:nth-child(2) {
+  display: grid;
+  gap: 2px;
+}
+.shopping-row small {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+.shopping-qty {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.shopping-qty input {
+  width: 76px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px;
+  background: var(--surface);
+  color: var(--text);
+  text-align: right;
+}
+.supplier-card footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.supplier-card footer span {
+  margin-right: auto;
+  font-size: 0.82rem;
+}
+.whatsapp-button {
+  background: #25d366 !important;
+}
+@keyframes ins-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes ins-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes ins-tick {
+  50% {
+    transform: rotate(180deg);
+  }
+}

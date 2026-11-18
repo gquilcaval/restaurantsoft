@@ -1,0 +1,28 @@
+// Ficha del insumo: stock, acciones rápidas, historial y formularios en el mismo panel.
+.iv-panel { min-height: 0; display: flex; flex-direction: column; gap: 14px; padding: 18px; border-radius: 24px; overflow-y: auto; scrollbar-width: thin; }
+.iv-panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.iv-panel-head small { color: var(--muted); font-size: .74rem; font-weight: 650; }
+.iv-panel-head h2 { margin: 2px 0 0; font: 800 1.25rem var(--font-display); letter-spacing: -.02em; }
+.iv-close { flex-shrink: 0; width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 50%; color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); }
+.iv-hero { --tone: #3fbf2a; display: grid; gap: 6px; }
+.iv-hero.low { --tone: #f5b301; } .iv-hero.negative { --tone: #ef5d55; }
+.iv-hero > small { color: var(--muted); font-size: .76rem; font-weight: 600; }
+.iv-hero strong { font: 800 2.2rem var(--font-display); letter-spacing: -.03em; line-height: 1.1; color: var(--tone); }
+.iv-hero strong span { font-size: 1.1rem; color: var(--muted); }
+.iv-level.big { height: 10px; overflow: visible; }
+.iv-level.big em { position: absolute; top: -3px; width: 2px; height: 16px; border-radius: 2px; background: var(--text); opacity: .45; }
+.iv-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.iv-facts span { display: grid; gap: 1px; } .iv-facts small { color: var(--muted); font-size: .7rem; font-weight: 650; }
+.iv-facts b { font: 750 .95rem var(--font-display); }
+.iv-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.iv-action { --tone: #3fbf2a; display: grid; justify-items: start; gap: 2px; padding: 12px; border: 0; border-radius: 16px; text-align: left; color: var(--text); background: color-mix(in srgb, var(--tone) 11%, transparent); transition: transform .35s var(--ease-spring), background .2s; }
+.iv-action[data-tone='bad'] { --tone: #ef5d55; } .iv-action[data-tone='blue'] { --tone: #4f8cff; }
+.iv-action:hover { transform: translateY(-2px); background: color-mix(in srgb, var(--tone) 18%, transparent); }
+.iv-action app-icon { color: var(--tone); margin-bottom: 4px; } .iv-action b { font: 750 .88rem var(--font-display); } .iv-action small { color: var(--muted); font-size: .68rem; }
+.iv-history { display: grid; gap: 7px; }
+.iv-history h4 { display: flex; align-items: center; justify-content: space-between; margin: 0; color: var(--muted); font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+.iv-history > div { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; font-size: .8rem; }
+.iv-history small { color: var(--muted); font-size: .72rem; } .iv-history b { font-family: var(--font-display); } .iv-history b.neg { color: var(--bad); }
+.iv-kind { padding: 2px 9px; border-radius: 999px; font-size: .68rem; font-weight: 800; color: var(--muted); background: color-mix(in srgb, var(--text) 8%, transparent); white-space: nowrap; }
+.iv-kind[data-kind='PURCHASE'] { color: var(--ok); background: var(--ok-soft); } .iv-kind[data-kind='WASTE'] { color: var(--bad); background: var(--bad-soft); }
+.iv-kind[data-kind='SALE'] { color: #4f8cff; background: rgba(79, 140, 255, .14); } .iv-kind[data-kind='ADJUSTMENT'] { color: var(--warn); background: var(--warn-soft); }

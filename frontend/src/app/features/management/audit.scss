@@ -1,0 +1,27 @@
+// Auditoría en Liquid Glass: período, búsqueda, grupos y línea de tiempo por día.
+.au { display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0; }
+.au-navrow { display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; flex-shrink: 0; }
+.au-period { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 6px; border-radius: 999px; }
+.au-presets { display: flex; gap: 2px; }
+.au-presets button { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 15px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-weight: 750; font-size: .84rem; transition: background .25s, color .25s; }
+.au-presets button:hover { color: var(--text); }
+.au-presets button[aria-checked='true'] { color: var(--on-brand, #04110a); background: var(--brand); }
+.au-dates { display: flex; align-items: center; gap: 6px; } .au-dates span { color: var(--muted); }
+.au-dates input { height: 34px; padding: 0 10px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--text) 7%, transparent); color: var(--text); font: inherit; outline: none; }
+.au-search { display: flex; align-items: center; gap: 8px; flex: 1 1 200px; max-width: 320px; height: 40px; margin-left: auto; padding: 0 14px; border-radius: 999px; color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); }
+.au-search:focus-within { box-shadow: 0 0 0 2px var(--brand); }
+.au-search input { flex: 1; width: 100%; min-width: 0; height: 100%; border: 0; background: transparent; color: var(--text); font: inherit; font-weight: 600; outline: none; }
+.au-purpose { margin: -2px 0 0; color: var(--muted); font-size: .82rem; }
+.au-layout { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 16px; }
+.au-feed { min-height: 0; display: flex; flex-direction: column; gap: 10px; padding: 14px 14px 10px; border-radius: 24px; }
+.au-groups { display: flex; gap: 4px; flex-shrink: 0; overflow-x: auto; scrollbar-width: none; }
+.au-groups button { flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: 0; border-radius: 999px; color: var(--muted); font-weight: 750; font-size: .76rem; background: color-mix(in srgb, var(--text) 6%, transparent); }
+.au-groups button small { padding: 0 6px; border-radius: 999px; font-size: .68rem; background: color-mix(in srgb, var(--text) 9%, transparent); }
+.au-groups button[aria-checked='true'] { color: var(--text); background: color-mix(in srgb, var(--brand) 18%, transparent); box-shadow: inset 0 0 0 1.5px var(--brand); }
+.au-active-filter { margin: 0; color: var(--muted); font-size: .78rem; } .au-active-filter b { color: var(--text); }
+.au-link { border: 0; background: none; color: var(--brand); font-size: .78rem; font-weight: 750; }
+.au-scroll { flex: 1; min-height: 0; overflow-y: auto; margin: 0 -6px; padding: 0 6px; scrollbar-width: thin; transition: opacity .2s; }
+.au-scroll.busy { opacity: .55; }
+.au-day { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; gap: 8px; margin: 6px 0 4px; padding: 6px 4px; color: var(--muted); font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; background: color-mix(in srgb, var(--surface) 70%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-radius: 10px; }
+.au-day small { padding: 0 6px; border-radius: 999px; background: color-mix(in srgb, var(--text) 9%, transparent); }
+@media (max-width: 1100px) { .au-layout { grid-template-columns: minmax(0, 1fr); } .au-side { display: none; } }

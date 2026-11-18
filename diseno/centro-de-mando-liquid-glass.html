@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RestOS · Centro de mando (Liquid Glass)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand: #44d62c; --blue: #4f8cff; --violet: #a46bff; --amber: #ffb347; --red: #ff5f6d;
+    --text: #f5f7f6; --muted: rgba(245, 247, 246, .62); --faint: rgba(245, 247, 246, .38);
+    --glass: linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.05));
+    --glass-strong: linear-gradient(135deg, rgba(255,255,255,.22), rgba(255,255,255,.08));
+    --edge: rgba(255,255,255,.22);
+    --bg: #05070a;
+    --display: 'Plus Jakarta Sans', Inter, system-ui, sans-serif;
+  }
+  body.light {
+    --text: #0d1512; --muted: rgba(13,21,18,.62); --faint: rgba(13,21,18,.4);
+    --glass: linear-gradient(135deg, rgba(255,255,255,.62), rgba(255,255,255,.28));
+    --glass-strong: linear-gradient(135deg, rgba(255,255,255,.78), rgba(255,255,255,.42));
+    --edge: rgba(255,255,255,.75); --bg: #e9eef0;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; font-family: Inter, system-ui, sans-serif; color: var(--text); background: var(--bg); overflow-x: hidden; font-variant-numeric: tabular-nums; transition: background .6s; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+
+  /* ——— Fondo vivo: el vidrio necesita color detrás ——— */
+  .wallpaper { position: fixed; inset: 0; z-index: 0; overflow: hidden; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .75; animation: drift 18s ease-in-out infinite alternate; }
+  .b1 { width: 46vw; height: 46vw; left: -8vw; top: -12vw; background: radial-gradient(circle, var(--brand), transparent 65%); }
+  .b2 { width: 40vw; height: 40vw; right: -10vw; top: 10vh; background: radial-gradient(circle, var(--blue), transparent 65%); animation-delay: -6s; }
+  .b3 { width: 38vw; height: 38vw; left: 30vw; bottom: -18vw; background: radial-gradient(circle, var(--violet), transparent 65%); animation-delay: -12s; }
+  .b4 { width: 22vw; height: 22vw; right: 18vw; bottom: 8vh; background: radial-gradient(circle, var(--amber), transparent 65%); opacity: .5; animation-delay: -3s; }
+  body.light .blob { opacity: .55; }
+  @keyframes drift { to { transform: translate(4vw, -3vw) scale(1.12); } }
+
+  /* ——— Liquid glass ——— */
+  .glass {
+    position: relative; isolation: isolate; border-radius: 28px; background: var(--glass);
+    -webkit-backdrop-filter: blur(28px) saturate(190%); backdrop-filter: blur(28px) saturate(190%);
+    box-shadow: inset 0 1px 0 var(--edge), inset 0 -1px 0 rgba(255,255,255,.05), 0 24px 60px rgba(0,0,0,.35);
+    transition: transform .45s cubic-bezier(.2,1.4,.4,1), box-shadow .3s;
+  }
+  body.light .glass { box-shadow: inset 0 1px 0 var(--edge), 0 20px 50px rgba(30,50,40,.15); }
+  /* borde especular: más brillante arriba a la izquierda, como luz sobre vidrio curvo */
+  .glass::before {
+    content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1.2px; pointer-events: none; z-index: 2;
+    background: linear-gradient(140deg, rgba(255,255,255,.75), rgba(255,255,255,.08) 35%, rgba(255,255,255,.02) 60%, rgba(255,255,255,.35));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  }
+  /* brillo que sigue al puntero */
+  .glass::after {
+    content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 1; opacity: 0; transition: opacity .35s;
+    background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,.16), transparent 60%);
+  }
+  .glass:hover::after { opacity: 1; }
+  .lift:hover { transform: translateY(-3px) scale(1.006); }
+  .press:active { transform: scale(.965); }
+
+  /* ——— Riel lateral flotante en cápsula ——— */
+  .rail { position: fixed; z-index: 10; left: 18px; top: 50%; transform: translateY(-50%); display: grid; gap: 6px; padding: 10px; border-radius: 34px; }
+  .rail .logo { width: 48px; height: 48px; display: grid; place-items: center; margin-bottom: 6px; border-radius: 18px; background: var(--brand); color: #04110a; font: 800 1.2rem var(--display); box-shadow: 0 8px 22px rgba(68,214,44,.45); }
+  .rail button { position: relative; width: 48px; height: 48px; display: grid; place-items: center; border: 0; border-radius: 18px; background: transparent; color: var(--muted); transition: background .25s, color .25s, transform .35s cubic-bezier(.2,1.5,.4,1); }
+  .rail button:hover { background: rgba(255,255,255,.12); color: var(--text); transform: scale(1.08); }
+  .rail button.on { background: var(--glass-strong); color: var(--text); box-shadow: inset 0 1px 0 var(--edge), 0 6px 18px rgba(0,0,0,.25); }
+  .rail button.on::before { content: ''; position: absolute; left: -10px; width: 4px; height: 20px; border-radius: 4px; background: var(--brand); box-shadow: 0 0 12px var(--brand); }
+  .rail .sep { height: 1px; margin: 4px 8px; background: rgba(255,255,255,.14); }
+  .rail svg, .ico { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .rail button span { position: absolute; left: 62px; padding: 7px 12px; border-radius: 12px; white-space: nowrap; font-size: .8rem; font-weight: 600; background: rgba(10,14,12,.85); color: #fff; opacity: 0; pointer-events: none; transform: translateX(-6px); transition: .2s; }
+  .rail button:hover span { opacity: 1; transform: none; }
+
+  /* ——— Contenido ——— */
+  .app { position: relative; z-index: 1; padding: 22px 26px 40px 110px; max-width: 1500px; margin: 0 auto; display: grid; gap: 18px; }
+  .topbar { position: sticky; top: 14px; z-index: 9; display: flex; align-items: center; gap: 14px; padding: 10px 12px 10px 22px; border-radius: 999px; }
+  .topbar h1 { margin: 0; font: 700 1.35rem var(--display); letter-spacing: -.02em; }
+  .topbar p { margin: 0; font-size: .8rem; color: var(--muted); }
+  .live { display: inline-flex; align-items: center; gap: 6px; color: var(--brand); font-weight: 600; }
+  .live i { width: 7px; height: 7px; border-radius: 50%; background: var(--brand); box-shadow: 0 0 0 0 rgba(68,214,44,.6); animation: ping 1.8s infinite; }
+  @keyframes ping { 70% { box-shadow: 0 0 0 8px transparent; } }
+  .search { margin-left: auto; display: flex; align-items: center; gap: 8px; width: min(320px, 30vw); height: 44px; padding: 0 16px; border-radius: 999px; background: rgba(255,255,255,.08); box-shadow: inset 0 1px 0 rgba(255,255,255,.12); color: var(--faint); font-size: .88rem; }
+  body.light .search { background: rgba(255,255,255,.5); }
+  .search kbd { margin-left: auto; padding: 2px 8px; border-radius: 8px; background: rgba(255,255,255,.12); font: 600 .7rem Inter; color: var(--muted); }
+  .pill { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border: 0; border-radius: 999px; font-weight: 600; font-size: .88rem; background: rgba(255,255,255,.1); box-shadow: inset 0 1px 0 rgba(255,255,255,.18); transition: transform .35s cubic-bezier(.2,1.5,.4,1), background .2s; }
+  .pill:hover { background: rgba(255,255,255,.18); transform: translateY(-1px); }
+  .pill:active { transform: scale(.94); }
+  .pill.primary { background: var(--brand); color: #04110a; box-shadow: 0 10px 26px rgba(68,214,44,.45), inset 0 1px 0 rgba(255,255,255,.5); }
+  .avatar { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; font-weight: 700; background: linear-gradient(135deg, var(--violet), var(--blue)); box-shadow: inset 0 1px 0 rgba(255,255,255,.4); }
+
+  .grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 18px; }
+  .card { padding: 22px 24px; }
+  .span-8 { grid-column: span 8; } .span-4 { grid-column: span 4; } .span-5 { grid-column: span 5; } .span-7 { grid-column: span 7; }
+  .label { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: .86rem; font-weight: 600; color: var(--muted); }
+  .title { margin: 0; font: 700 1.05rem var(--display); color: var(--text); }
+
+  /* Hero de hoy */
+  .hero { display: grid; grid-template-columns: minmax(0, 1fr) 200px; gap: 20px; align-items: center; }
+  .big { font: 800 clamp(2.6rem, 4.6vw, 4rem) var(--display); letter-spacing: -.035em; line-height: 1; margin: 10px 0 8px; }
+  .trend { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; font-size: .82rem; font-weight: 700; color: #b9ffad; background: rgba(68,214,44,.18); box-shadow: inset 0 1px 0 rgba(255,255,255,.15); }
+  body.light .trend { color: #1f7a12; }
+  .sub { margin: 12px 0 0; color: var(--muted); font-size: .92rem; }
+  .ring { position: relative; width: 200px; aspect-ratio: 1; }
+  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); filter: drop-shadow(0 0 18px rgba(68,214,44,.35)); }
+  .ring .track { fill: none; stroke: rgba(255,255,255,.1); stroke-width: 14; }
+  .ring .fill { fill: none; stroke: url(#ringGrad); stroke-width: 14; stroke-linecap: round; stroke-dasharray: 534; stroke-dashoffset: 534; animation: ringIn 1.8s cubic-bezier(.2,.9,.3,1) .3s forwards; }
+  @keyframes ringIn { to { stroke-dashoffset: 150; } }
+  .ring div { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+  .ring strong { font: 800 2.3rem var(--display); }
+  .ring small { color: var(--muted); font-size: .78rem; }
+  .spark { display: flex; align-items: flex-end; gap: 6px; height: 64px; margin-top: 18px; }
+  .spark i { flex: 1; border-radius: 8px 8px 4px 4px; background: linear-gradient(180deg, rgba(255,255,255,.45), rgba(255,255,255,.08)); transform-origin: bottom; animation: grow 1s cubic-bezier(.2,1.3,.4,1) backwards; }
+  .spark i.now { background: linear-gradient(180deg, var(--brand), rgba(68,214,44,.25)); box-shadow: 0 0 18px rgba(68,214,44,.5); }
+  @keyframes grow { from { transform: scaleY(0); } }
+
+  /* Segmentado líquido con indicador que se desliza */
+  .seg { position: relative; display: inline-flex; padding: 4px; border-radius: 999px; background: rgba(255,255,255,.08); box-shadow: inset 0 1px 0 rgba(255,255,255,.1); }
+  .seg button { position: relative; z-index: 1; border: 0; background: transparent; padding: 7px 14px; border-radius: 999px; font-size: .8rem; font-weight: 600; color: var(--muted); transition: color .3s; }
+  .seg button.on { color: var(--text); }
+  .seg .thumb { position: absolute; z-index: 0; top: 4px; bottom: 4px; border-radius: 999px; background: var(--glass-strong); box-shadow: inset 0 1px 0 var(--edge), 0 4px 14px rgba(0,0,0,.25); transition: left .5s cubic-bezier(.2,1.4,.4,1), width .5s cubic-bezier(.2,1.4,.4,1); }
+
+  /* KPIs */
+  .kpis { display: grid; gap: 12px; }
+  .kpi { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-radius: 22px; }
+  .kpi .dot { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 15px; box-shadow: inset 0 1px 0 rgba(255,255,255,.3); }
+  .kpi b { display: block; font: 800 1.45rem var(--display); }
+  .kpi small { color: var(--muted); font-size: .8rem; }
+  .kpi em { margin-left: auto; font-style: normal; font-size: .78rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.1); }
+  .up { color: #9dff8c; } .warn { color: #ffd08a; }
+  body.light .up { color: #1f7a12; } body.light .warn { color: #a35c00; }
+
+  /* Atención */
+  .todo { display: grid; gap: 10px; margin-top: 14px; }
+  .task { display: grid; grid-template-columns: 46px 1fr auto; align-items: center; gap: 14px; padding: 12px 12px 12px 14px; border-radius: 22px; background: rgba(255,255,255,.06); box-shadow: inset 0 1px 0 rgba(255,255,255,.08); transition: transform .4s cubic-bezier(.2,1.5,.4,1), background .25s; animation: slideIn .6s cubic-bezier(.2,1.2,.4,1) backwards; }
+  .task:hover { transform: translateX(6px); background: rgba(255,255,255,.11); }
+  .task .ic { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 16px; }
+  .task strong { display: block; font-size: .95rem; }
+  .task small { color: var(--muted); font-size: .8rem; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(14px); } }
+  .badge { min-width: 26px; height: 26px; padding: 0 9px; display: inline-grid; place-items: center; border-radius: 999px; background: var(--red); color: #fff; font-size: .78rem; font-weight: 800; box-shadow: 0 0 16px rgba(255,95,109,.55); }
+
+  /* Salón y cocina */
+  .floor { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 16px; }
+  .t { aspect-ratio: 1; display: grid; place-items: center; border-radius: 16px; font-size: .78rem; font-weight: 700; background: rgba(255,255,255,.06); box-shadow: inset 0 1px 0 rgba(255,255,255,.1); transition: transform .35s cubic-bezier(.2,1.6,.4,1); }
+  .t:hover { transform: scale(1.1); }
+  .t.busy { background: rgba(79,140,255,.28); box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 0 16px rgba(79,140,255,.35); }
+  .t.call { background: rgba(255,95,109,.32); animation: ring2 1.6s infinite; }
+  .t.ready { background: rgba(68,214,44,.3); box-shadow: 0 0 18px rgba(68,214,44,.5); }
+  .t.bill { background: rgba(164,107,255,.32); }
+  @keyframes ring2 { 0% { box-shadow: 0 0 0 0 rgba(255,95,109,.6); } 70% { box-shadow: 0 0 0 10px transparent; } }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; font-size: .76rem; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 9px; height: 9px; border-radius: 50%; }
+  .pipe { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+  .stage { padding: 16px 12px; border-radius: 20px; text-align: center; background: rgba(255,255,255,.06); box-shadow: inset 0 1px 0 rgba(255,255,255,.1); }
+  .stage b { display: block; font: 800 2rem var(--display); }
+  .stage small { color: var(--muted); font-size: .76rem; font-weight: 600; }
+  .stage.prep { background: rgba(255,179,71,.18); } .stage.prep b { color: #ffd08a; }
+  .stage.done { background: rgba(68,214,44,.18); } .stage.done b { color: #9dff8c; }
+  body.light .stage.prep b { color: #a35c00; } body.light .stage.done b { color: #1f7a12; }
+  .row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid rgba(255,255,255,.08); font-size: .9rem; }
+  .row:first-of-type { border-top: 0; }
+  .row .bar { flex: 1; height: 8px; border-radius: 99px; background: rgba(255,255,255,.08); overflow: hidden; }
+  .row .bar i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--brand), #b4ff9f); animation: barIn 1.2s cubic-bezier(.2,.9,.3,1) backwards; }
+  @keyframes barIn { from { width: 0 !important; } }
+  .team { display: flex; align-items: flex-end; justify-content: center; gap: 14px; margin-top: 18px; }
+  .podium { display: grid; justify-items: center; gap: 6px; }
+  .podium .avatar { width: 54px; height: 54px; }
+  .podium.first .avatar { width: 66px; height: 66px; background: linear-gradient(135deg, #ffd86b, #ff9f43); color: #3b2500; box-shadow: 0 0 24px rgba(255,190,80,.5); }
+  .podium .block { width: 78px; border-radius: 16px 16px 6px 6px; display: grid; place-items: center; font: 800 1.2rem var(--display); background: var(--glass-strong); box-shadow: inset 0 1px 0 var(--edge); }
+
+  .toggle { position: fixed; right: 20px; bottom: 20px; z-index: 20; }
+  @media (max-width: 1100px) { .span-8, .span-4, .span-5, .span-7 { grid-column: span 12; } .hero { grid-template-columns: 1fr; } }
+  @media (max-width: 760px) { .rail { display: none; } .app { padding: 14px; } .search { display: none; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b4ff9f"/><stop offset="1" stop-color="#44d62c"/></linearGradient></defs>
+</svg>
+<div class="wallpaper"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div></div>
+
+<nav class="rail glass" aria-label="Navegación">
+  <div class="logo">R</div>
+  <button class="on"><svg viewBox="0 0 24 24"><path d="M4 13h6V4H4zM4 20h6v-4H4zM14 20h6v-9h-6zM14 4v4h6V4z"/></svg><span>Centro de mando</span></button>
+  <button><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/></svg><span>Modo TV</span></button>
+  <button><svg viewBox="0 0 24 24"><path d="M4 4v16h16M8 16v-5M13 16V7M18 16v-3"/></svg><span>Reportes</span></button>
+  <button><svg viewBox="0 0 24 24"><path d="M4 10h16v10H4zM7 10V4h10v6"/></svg><span>Caja</span></button>
+  <div class="sep"></div>
+  <button><svg viewBox="0 0 24 24"><path d="M4 7h16v13H4zM7 4h10v3"/></svg><span>Mesas</span></button>
+  <button><svg viewBox="0 0 24 24"><path d="M4 17a8 8 0 0 1 16 0M2 20h20M12 9V6"/></svg><span>Cocina</span></button>
+  <button><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg><span>Reservas</span></button>
+  <div class="sep"></div>
+  <button><svg viewBox="0 0 24 24"><path d="M12 5v15M3 4h5a4 4 0 0 1 4 2 4 4 0 0 1 4-2h5v15h-5a4 4 0 0 0-4 2 4 4 0 0 0-4-2H3Z"/></svg><span>Menú</span></button>
+  <button><svg viewBox="0 0 24 24"><path d="M4 8 12 4l8 4v8l-8 4-8-4V8Z"/></svg><span>Inventario</span></button>
+  <button><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg><span>Configuración</span></button>
+</nav>
+
+<main class="app">
+  <header class="topbar glass">
+    <div>
+      <p>Domingo 4 de octubre · <span class="live"><i></i>Servicio en curso</span></p>
+      <h1>Buenas noches, Valeria</h1>
+    </div>
+    <div class="search"><svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>Buscar o ir a…<kbd>Ctrl K</kbd></div>
+    <button class="pill press"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M12 11v6M9 14h6"/></svg>Reserva</button>
+    <button class="pill primary press"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8"/></svg>Modo TV</button>
+    <div class="avatar">VR</div>
+  </header>
+
+  <section class="grid">
+    <article class="glass card span-8 lift">
+      <div class="label"><span>Ventas de hoy</span>
+        <div class="seg" id="seg"><span class="thumb"></span><button class="on">Hoy</button><button>Semana</button><button>Mes</button></div>
+      </div>
+      <div class="hero">
+        <div>
+          <div class="big" id="sales">S/ 0</div>
+          <span class="trend"><svg class="ico" style="width:16px;height:16px" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M14 7h7v7"/></svg>+12% vs domingo pasado</span>
+          <p class="sub">Meta <b>S/ 4,500</b> · faltan S/ 1,260 · al ritmo actual cierras en <b>S/ 4,800</b> 🔥</p>
+          <div class="spark">
+            <i style="height:22%;animation-delay:.05s"></i><i style="height:48%;animation-delay:.1s"></i><i style="height:86%;animation-delay:.15s"></i><i style="height:64%;animation-delay:.2s"></i><i style="height:30%;animation-delay:.25s"></i><i style="height:38%;animation-delay:.3s"></i><i style="height:72%;animation-delay:.35s"></i><i class="now" style="height:58%;animation-delay:.4s"></i><i style="height:6%;animation-delay:.45s"></i><i style="height:6%;animation-delay:.5s"></i>
+          </div>
+        </div>
+        <div class="ring"><svg viewBox="0 0 200 200"><circle class="track" cx="100" cy="100" r="85"/><circle class="fill" cx="100" cy="100" r="85"/></svg><div><strong>72%</strong><small>de la meta</small></div></div>
+      </div>
+    </article>
+
+    <div class="kpis span-4">
+      <div class="glass kpi lift"><span class="dot" style="background:rgba(79,140,255,.3)">🪑</span><div><b>6 / 13</b><small>Mesas ocupadas</small></div><em>46%</em></div>
+      <div class="glass kpi lift"><span class="dot" style="background:rgba(68,214,44,.28)">🧾</span><div><b>S/ 106</b><small>Ticket promedio</small></div><em class="up">+4%</em></div>
+      <div class="glass kpi lift"><span class="dot" style="background:rgba(255,179,71,.3)">⏱️</span><div><b>15 min</b><small>Tiempo de cocina</small></div><em class="warn">+3 min</em></div>
+      <div class="glass kpi lift"><span class="dot" style="background:rgba(164,107,255,.3)">⭐</span><div><b>4.6</b><small>Calificación</small></div><em class="up">+0.2</em></div>
+    </div>
+
+    <article class="glass card span-7 lift">
+      <div class="label"><h2 class="title">Necesita tu atención</h2><span class="badge">4</span></div>
+      <div class="todo">
+        <div class="task" style="animation-delay:.1s"><span class="ic" style="background:rgba(255,95,109,.25)">⏰</span><div><strong>Mesa 02 espera su plato hace 22 min</strong><small>Cocina caliente va atrasada</small></div><button class="pill press">Ver cocina</button></div>
+        <div class="task" style="animation-delay:.18s"><span class="ic" style="background:rgba(255,179,71,.25)">📦</span><div><strong>Pisco bajo el mínimo · pescado se acaba hoy</strong><small>Lista de compras lista para WhatsApp</small></div><button class="pill press">Pedir</button></div>
+        <div class="task" style="animation-delay:.26s"><span class="ic" style="background:rgba(79,140,255,.25)">👥</span><div><strong>2 grupos esperando · Terraza 3 libre</strong><small>Familia Torres (4) espera hace 18 min</small></div><button class="pill press">Sentar</button></div>
+        <div class="task" style="animation-delay:.34s"><span class="ic" style="background:rgba(68,214,44,.25)">💬</span><div><strong>3 calificaciones nuevas · promedio 4.7</strong><small>«El ceviche espectacular»</small></div><button class="pill press">Leer</button></div>
+      </div>
+    </article>
+
+    <article class="glass card span-5 lift">
+      <div class="label"><h2 class="title">Salón en vivo</h2><span>Ver plano →</span></div>
+      <div class="floor">
+        <div class="t busy">01</div><div class="t call">02</div><div class="t">03</div><div class="t ready">04</div><div class="t">05</div>
+        <div class="t">06</div><div class="t busy">07</div><div class="t bill">08</div><div class="t">T1</div><div class="t busy">T2</div>
+      </div>
+      <div class="legend"><span><i style="background:#4f8cff"></i>Ocupada</span><span><i style="background:#ff5f6d"></i>Llama</span><span><i style="background:#44d62c"></i>Plato listo</span><span><i style="background:#a46bff"></i>Pide cuenta</span></div>
+    </article>
+
+    <article class="glass card span-4 lift">
+      <div class="label"><h2 class="title">Cocina</h2><span>15 min prom.</span></div>
+      <div class="pipe"><div class="stage"><b>3</b><small>Nuevos</small></div><div class="stage prep"><b>4</b><small>Preparando</small></div><div class="stage done"><b>2</b><small>Listos</small></div></div>
+    </article>
+
+    <article class="glass card span-4 lift">
+      <div class="label"><h2 class="title">Lo más vendido hoy</h2><span>🔥</span></div>
+      <div style="margin-top:10px">
+        <div class="row"><span style="width:120px">Ceviche</span><span class="bar"><i style="width:100%"></i></span><b>18</b></div>
+        <div class="row"><span style="width:120px">Lomo saltado</span><span class="bar"><i style="width:66%"></i></span><b>12</b></div>
+        <div class="row"><span style="width:120px">Pisco sour</span><span class="bar"><i style="width:55%"></i></span><b>10</b></div>
+      </div>
+    </article>
+
+    <article class="glass card span-4 lift">
+      <div class="label"><h2 class="title">Equipo de la semana</h2><span>🏆</span></div>
+      <div class="team">
+        <div class="podium"><span class="avatar">LP</span><div class="block" style="height:54px">2</div></div>
+        <div class="podium first"><span class="avatar">DS</span><div class="block" style="height:78px">1</div></div>
+        <div class="podium"><span class="avatar" style="background:linear-gradient(135deg,#ff9f6b,#ff5f6d)">CM</span><div class="block" style="height:40px">3</div></div>
+      </div>
+    </article>
+  </section>
+</main>
+
+<button class="pill toggle glass press" id="mode">☀️ Ver en claro</button>
+
+<script>
+  // Brillo especular que sigue al puntero en cada superficie de vidrio.
+  document.querySelectorAll('.glass').forEach(el => el.addEventListener('pointermove', e => {
+    const r = el.getBoundingClientRect();
+    el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+    el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+  }));
+  // Segmentado líquido: la cápsula se desliza con rebote.
+  const seg = document.getElementById('seg'), thumb = seg.querySelector('.thumb');
+  const place = b => { thumb.style.left = b.offsetLeft + 'px'; thumb.style.width = b.offsetWidth + 'px'; };
+  seg.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+    seg.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); place(b);
+  }));
+  requestAnimationFrame(() => place(seg.querySelector('.on')));
+  // Cifra principal que sube.
+  const target = 3240, el = document.getElementById('sales'), t0 = performance.now();
+  const tick = now => { const p = Math.min(1, (now - t0) / 1600), v = Math.round(target * (1 - Math.pow(1 - p, 4)));
+    el.textContent = 'S/ ' + v.toLocaleString('en-US'); if (p < 1) requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
+  // Claro / oscuro.
+  document.getElementById('mode').addEventListener('click', e => {
+    const light = document.body.classList.toggle('light');
+    e.currentTarget.textContent = light ? '🌙 Ver en oscuro' : '☀️ Ver en claro';
+  });
+</script>
+</body>
+</html>

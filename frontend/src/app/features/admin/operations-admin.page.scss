@@ -1,0 +1,19 @@
+// Piezas compartidas del centro de ajustes (selector de color, contador, estados, pasos y tarjetas de PIN).
+.st-stepper { display: flex; align-items: center; justify-content: space-between; height: 40px; padding: 0 4px; border-radius: 12px; background: color-mix(in srgb, var(--text) 7%, transparent); }
+.st-stepper button { width: 32px; height: 32px; border: 0; border-radius: 50%; color: var(--text); font-weight: 800; background: color-mix(in srgb, var(--text) 9%, transparent); } .st-stepper b { font: 800 1rem var(--font-display); }
+.st-swatches { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.st-swatches button { width: 28px; height: 28px; border: 0; border-radius: 50%; transition: transform .25s var(--ease-spring); } .st-swatches button.on { transform: scale(1.15); box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--text); }
+.st-swatches input { width: 32px; height: 30px; padding: 0; border: 0; background: none; }
+.st-zone i { width: 7px; height: 7px; border-radius: 50%; background: var(--zone); }
+.st-state { padding: 1px 8px; border-radius: 999px; font-style: normal; font-size: .64rem; font-weight: 800; color: var(--ok); background: var(--ok-soft); }
+.st-state.busy { color: var(--warn); background: var(--warn-soft); }
+.st-pin-box, .st-this-device { display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 12px; border-radius: 16px; background: color-mix(in srgb, var(--text) 4%, transparent); }
+.st-pin-box > span, .st-this-device > span { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; color: var(--muted); background: color-mix(in srgb, var(--text) 8%, transparent); }
+.st-this-device.on { background: color-mix(in srgb, var(--ok) 10%, transparent); } .st-this-device.on > span { color: var(--ok); background: var(--ok-soft); }
+.st-pin-box div, .st-this-device div { display: grid; gap: 1px; } .st-pin-box small, .st-this-device small { color: var(--muted); font-size: .72rem; }
+.st-muted { margin: 0; color: var(--muted); font-size: .76rem; font-weight: 500; }
+.st-empty { display: flex; align-items: center; gap: 12px; padding: 20px 8px; color: var(--muted); } .st-empty div { display: grid; } .st-empty strong { color: var(--text); }
+.st-steps { display: grid; gap: 8px; margin-top: 18px; }
+.st-steps p { display: flex; align-items: center; gap: 10px; margin: 0; color: var(--muted); font-size: .8rem; } .st-steps b { color: var(--text); }
+.st-steps i { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 8px; font-style: normal; font-weight: 800; color: var(--on-brand, #04110a); background: var(--brand); }
+.st-devices { display: flex; flex-direction: column; gap: 6px; padding: 16px; }

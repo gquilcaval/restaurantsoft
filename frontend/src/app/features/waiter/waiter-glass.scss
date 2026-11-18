@@ -1,0 +1,33 @@
+// Pendientes y detalle de mesa sobre vidrio, sin bordes ni cajas con fondo propio.
+.service-board .service-queue.lg { border: 0; border-radius: 24px; background: none; }
+.service-queue-head { padding: 20px 20px 10px; border-bottom: 0; }
+.service-queue-head h2 { font: 700 1.05rem var(--font-display); }
+.service-queue-head b { min-width: 26px; height: 26px; border-radius: 999px; color: var(--on-brand, #04110a); background: var(--brand); }
+.service-queue-list { padding: 0 14px 16px; }
+.queue-group { margin: 16px 6px 8px; font-size: .72rem; font-weight: 750; text-transform: uppercase; letter-spacing: .04em; }
+.queue-card { position: relative; margin-bottom: 8px; padding: 12px 12px 12px 16px; border: 0; border-radius: 16px; background: color-mix(in srgb, var(--text) 5%, transparent); }
+.queue-card::before { content: ''; position: absolute; left: 6px; top: 14px; bottom: 14px; width: 3px; border-radius: 3px; background: #f5b301; }
+.queue-card.food { border-left: 0; } .queue-card.food::before { background: #3fbf2a; }
+.queue-card strong { font: 750 .9rem var(--font-display); }
+.queue-tag { padding: 2px 8px; border-radius: 999px; font-size: .66rem; font-weight: 750; background: color-mix(in srgb, var(--text) 8%, transparent); }
+.queue-card footer button { min-height: 38px; border-radius: 999px; font-size: .74rem; font-weight: 750; }
+.ops-queue-alert { padding: 11px 12px; border-left: 0; border-radius: 16px; }
+.queue-check { border: 0; border-radius: 16px; color: var(--ok); background: var(--ok-soft); }
+.service-detail.waiter-detail-panel { background: color-mix(in srgb, var(--surface) 82%, transparent); backdrop-filter: blur(30px) saturate(180%); -webkit-backdrop-filter: blur(30px) saturate(180%); border: 0; border-radius: 28px; }
+.service-detail .waiter-detail-summary-total { background: color-mix(in srgb, var(--surface) 70%, transparent); backdrop-filter: blur(18px); border-bottom: 0; border-radius: 28px 28px 0 0; }
+.service-detail .waiter-detail-summary-total .total { border: 0; background: none; box-shadow: none; }
+.service-detail .waiter-detail-orders, .service-detail .waiter-detail-guests { border: 0; border-radius: 20px; background: color-mix(in srgb, var(--text) 4%, transparent); }
+.service-detail .waiter-detail-orders > header, .service-detail .waiter-detail-guests > header { border-bottom: 0; }
+.service-detail .waiter-order-item, .service-detail .waiter-guest-row { border-bottom-color: color-mix(in srgb, var(--text) 7%, transparent); }
+.waiter-detail-backdrop { background: rgba(8, 10, 8, .35); backdrop-filter: blur(4px); }
+.service-detail .waiter-detail-summary-total { flex-wrap: wrap; }
+.service-detail .total strong { color: var(--text); }
+.service-detail .waiter-order-item { margin: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.service-detail .waiter-order-quantity { border-radius: 10px; color: var(--brand); background: color-mix(in srgb, var(--brand) 14%, transparent); }
+.service-detail .waiter-guest-row { border: 0; }
+.mz-stage { font-size: .72rem; font-weight: 750; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mz-stage[data-stage='2'] { color: var(--warn); } .mz-stage[data-stage='3'] { color: var(--ok); } .mz-stage[data-stage='review'] { color: var(--bad); }
+.mz-bar-track { display: block; height: 4px; border-radius: 9px; background: color-mix(in srgb, var(--text) 9%, transparent); overflow: hidden; }
+.mz-bar-track em { display: block; height: 100%; border-radius: 9px; background: #4f8cff; transition: width .6s var(--ease-out); }
+.mz-bar-track[data-stage='2'] em { background: var(--warn); } .mz-bar-track[data-stage='3'] em { background: var(--ok); } .mz-bar-track[data-stage='4'] em { background: var(--muted); }
+.mz-reservation { display: inline-flex; align-items: center; gap: 5px; min-height: 22px; color: #4f8cff; font-size: .72rem; font-weight: 700; white-space: nowrap; overflow: hidden; }

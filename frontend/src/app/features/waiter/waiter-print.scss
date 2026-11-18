@@ -1,0 +1,14 @@
+// Comandas impresas por ronda: cómo salieron, reintentar/reimprimir y servir la ronda.
+.mz-rounds { display: grid; gap: 6px; margin-bottom: 12px; }
+.mz-round { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; padding: 8px 10px; border-radius: 14px; background: color-mix(in srgb, var(--text) 5%, transparent); }
+.mz-round.failed { background: color-mix(in srgb, var(--bad) 12%, transparent); }
+.mz-round > b { font-size: .82rem; }
+.mz-round-jobs { display: flex; flex-wrap: wrap; gap: 4px; flex: 1; min-width: 0; }
+.mz-job { padding: 3px 9px; border-radius: 999px; color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); font-size: .7rem; font-weight: 750; white-space: nowrap; }
+.mz-job[data-status='PRINTED'] { color: var(--ok); background: var(--ok-soft); }
+.mz-job[data-status='FAILED'] { color: var(--bad); background: var(--bad-soft); }
+.mz-round-actions { display: flex; gap: 6px; margin-left: auto; }
+.mz-mini { height: 32px; padding: 0 12px; border: 0; border-radius: 999px; color: var(--text); background: color-mix(in srgb, var(--text) 9%, transparent); font-size: .76rem; font-weight: 750; white-space: nowrap; }
+.mz-mini.primary { color: var(--on-brand, #04110a); background: var(--brand); }
+.mz-mini.warn { color: #fff; background: var(--bad); }
+.mz-mini:disabled { opacity: .5; }

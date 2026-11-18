@@ -1,0 +1,7 @@
+// Halos de color detrás de las maquetas: el vidrio los deja ver desenfocados.
+.lp-hero-visual::before, .lp-hero-visual::after { content: ''; position: absolute; z-index: -1; border-radius: 50%; animation: lp-drift 12s ease-in-out infinite alternate; }
+.lp-hero-visual::before { width: 62%; aspect-ratio: 1; left: 2%; top: -6%; background: radial-gradient(circle, color-mix(in srgb, var(--brand) 70%, transparent), transparent 68%); }
+.lp-hero-visual::after { width: 55%; aspect-ratio: 1; right: -4%; bottom: -8%; background: radial-gradient(circle, color-mix(in srgb, #f5b301 55%, #e4572e), transparent 66%); animation-delay: -6s; }
+@keyframes lp-drift { to { transform: translate(18px, -14px) scale(1.06); } }
+:host-context([data-theme='dark']) :is(.mk-tablet, .mk-toast) { border-color: rgba(255, 255, 255, .1); }
+@media (prefers-reduced-motion: reduce) { .lp-hero-visual::before, .lp-hero-visual::after { animation: none; } }

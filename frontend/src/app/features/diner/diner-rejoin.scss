@@ -1,0 +1,6 @@
+// «¿Eres tú?»: alguien con el mismo nombre ya está en la mesa.
+.dn-same-name { display: grid; gap: 8px; padding: 14px; border-radius: 18px; text-align: center; background: color-mix(in srgb, var(--brand) 10%, transparent); animation: dn-same-in .25s ease-out; }
+.dn-same-name b { font-size: .95rem; }
+.dn-same-name small { margin-bottom: 4px; color: var(--muted); font-size: .8rem; line-height: 1.4; }
+.dn-same-other { height: 44px; border: 0; border-radius: 999px; color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); font-weight: 750; }
+@keyframes dn-same-in { from { opacity: 0; transform: translateY(-4px); } }

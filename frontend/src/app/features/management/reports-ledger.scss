@@ -1,0 +1,36 @@
+// Historial de cobros y comparativo de sucursales.
+.rp-ledger { display: flex; flex-direction: column; }
+.rp-toolbar { display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; }
+.rp-toolbar h3 { margin-right: auto; }
+.rp-toolbar .rp-muted { margin: 0 0 0 auto; }
+.rp-switch { display: inline-flex; align-items: center; gap: 9px; height: 38px; padding: 0 14px 0 6px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--text) 6%, transparent); color: var(--text); font-weight: 700; font-size: .8rem; }
+.rp-switch i { position: relative; width: 38px; height: 24px; border-radius: 999px; background: color-mix(in srgb, var(--text) 18%, transparent); transition: background .25s; }
+.rp-switch i::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .25); transition: transform .35s var(--ease-spring); }
+.rp-switch[aria-checked='true'] i { background: var(--warn); }
+.rp-switch[aria-checked='true'] i::after { transform: translateX(14px); }
+.rp-table-wrap { margin: 14px -24px 0; padding: 0 24px; overflow: auto; max-height: max(280px, calc(100dvh - 480px)); scrollbar-width: thin; }
+.rp-table-wrap table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.rp-table-wrap th { padding: 8px 12px 10px; text-align: left; color: var(--muted); font-size: .72rem; font-weight: 750; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+.rp-table-wrap td { padding: 11px 12px; white-space: nowrap; }
+.rp-table-wrap tbody tr { animation: rp-rise .35s var(--ease-out) var(--d) backwards; transition: background .15s; }
+.rp-table-wrap tbody tr:hover { background: color-mix(in srgb, var(--text) 5%, transparent); }
+.rp-table-wrap td:first-child, .rp-table-wrap th:first-child { border-radius: 12px 0 0 12px; }
+.rp-table-wrap td:last-child, .rp-table-wrap th:last-child { border-radius: 0 12px 12px 0; }
+.rp-table-wrap .num { text-align: right; } .rp-table-wrap .muted { color: var(--muted); }
+.rp-table-wrap b { font-family: var(--font-display); }
+.rp-table-wrap td .rp-track { margin-top: 6px; min-width: 120px; }
+.rp-table-wrap tr.total td { padding-top: 14px; }
+.rp-method { display: inline-flex; align-items: center; gap: 7px; font-weight: 700; font-size: .82rem; }
+.rp-method i, .rp-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--tone); }
+.rp-dot { display: inline-block; margin-right: 6px; }
+.rp-tag { padding: 3px 9px; border-radius: 999px; font-size: .74rem; font-weight: 750; color: var(--ok); background: var(--ok-soft); }
+.rp-tag.warn { color: var(--warn); background: var(--warn-soft); }
+.rp-pager { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 14px; color: var(--muted); font-size: .84rem; }
+.rp-pager b { color: var(--text); }
+.rp-compare b { display: inline-flex; align-items: baseline; gap: 8px; }
+.rp-compare em { min-width: 52px; text-align: right; font-style: normal; font-size: .74rem; font-weight: 800; color: var(--ok); }
+.rp-compare em.down { color: var(--bad); } .rp-compare em.flat { color: var(--muted); }
+.rp-hint { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; margin-top: 12px; color: var(--brand); text-decoration: none; font-weight: 750; font-size: .84rem; }
+.rp-hint span { display: grid; gap: 1px; color: var(--text); }
+.rp-hint small { color: var(--muted); font-size: .72rem; font-weight: 600; }
+.rp-hint:hover span { color: var(--brand); }

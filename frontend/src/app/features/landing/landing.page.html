@@ -1,0 +1,214 @@
+@if (ready()) {
+  <div class="lp">
+    <header class="lp-nav">
+      <a class="lp-logo" routerLink="/"><span>R</span>Rest<b>OS</b></a>
+      <nav>
+        <button (click)="scrollTo('funciones')">Funciones</button>
+        <button (click)="scrollTo('como')">Cómo funciona</button>
+        <button (click)="scrollTo('precios')">Precios</button>
+        <button (click)="scrollTo('preguntas')">Preguntas</button>
+      </nav>
+      <div class="lp-nav-actions">
+        <a class="lp-link" routerLink="/login">Ingresar</a>
+        <button class="lp-btn small" (click)="scrollTo('demo')">Probar demo</button>
+      </div>
+    </header>
+
+    <section class="lp-hero">
+      <div class="lp-hero-copy">
+        <span class="lp-pill"
+          ><app-icon name="sparkles" [size]="14" /> Hecho para restaurantes del Perú</span
+        >
+        <h1>Tu restaurante, <em>en orden</em> y en tiempo real.</h1>
+        <p>
+          Carta QR, pedidos a cocina, salón en vivo, caja, inventario y reportes en un solo sistema.
+          Sin instalar nada y listo en una tarde.
+        </p>
+        <div class="lp-hero-actions">
+          <button class="lp-btn" (click)="startDemo('ADMIN')" [disabled]="!!starting()">
+            {{ starting() === 'ADMIN' ? 'Abriendo la demo…' : 'Probar la demo gratis' }}
+            <app-icon name="play" [size]="16" />
+          </button>
+          <button class="lp-btn ghost" (click)="openDinerDemo()" [disabled]="!!starting()">
+            <app-icon name="phone" [size]="16" />
+            {{ starting() === 'DINER' ? 'Abriendo…' : 'Ver la carta como cliente' }}
+          </button>
+        </div>
+        <ul class="lp-proof">
+          <li><app-icon name="check" [size]="15" /> Sin tarjeta ni registro</li>
+          <li><app-icon name="check" [size]="15" /> Funciona en celular, tablet y PC</li>
+          <li><app-icon name="check" [size]="15" /> Soporte en español</li>
+        </ul>
+      </div>
+
+      <div class="lp-hero-visual" aria-hidden="true">
+        <div class="mk-tablet">
+          <div class="mk-bar"><i></i><i></i><i></i><span>Salón en vivo</span></div>
+          <div class="mk-goal">
+            <span>🎯 Llevamos S/ 3,240 de S/ 4,500</span><b><i></i></b>
+          </div>
+          <div class="mk-floor">
+            <span class="mk-table free">M1</span>
+            <span class="mk-table busy">M2<small>S/ 86</small></span>
+            <span class="mk-table call">M3<em>!</em></span>
+            <span class="mk-table ready round">M4<em>✓</em></span>
+            <span class="mk-table busy">M5<small>S/ 142</small></span>
+            <span class="mk-table bill round">M6<em>S/</em></span>
+            <span class="mk-bar-element">Barra</span>
+          </div>
+        </div>
+        <div class="mk-phone">
+          <div class="mk-notch"></div>
+          <p class="mk-phone-title">🔥 Lo más pedido hoy</p>
+          <div class="mk-dish hero">
+            <span>🐟</span><b>#1 Ceviche clásico</b><small>S/ 39 · 18 pedidos hoy</small>
+          </div>
+          <div class="mk-dish">
+            <span>🥩</span>
+            <div><b>Lomo saltado</b><small>S/ 42 · 👨‍🍳 Del chef</small></div>
+          </div>
+          <div class="mk-dish">
+            <span>🍹</span>
+            <div><b>Pisco sour</b><small>S/ 24</small></div>
+          </div>
+          <div class="mk-track">
+            <span>👨‍🍳</span>
+            <div>
+              <b>Preparando tu pedido</b><i><em></em></i>
+            </div>
+          </div>
+        </div>
+        <div class="mk-toast">
+          <span>✓</span>
+          <div><b>Plato listo</b><small>Mesa 4 · 2× Ceviche</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lp-section" id="funciones">
+      <p class="lp-eyebrow">Todo en un solo lugar</p>
+      <h2>Lo que necesita tu restaurante, sin papelitos ni gritos a la cocina</h2>
+      <div class="lp-features">
+        @for (feature of features; track feature.title; let index = $index) {
+          <article class="lp-feature" [style.--i]="index">
+            <span class="lp-feature-icon"><app-icon [name]="feature.icon" [size]="22" /></span>
+            <h3>{{ feature.title }}</h3>
+            <p>{{ feature.text }}</p>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section class="lp-section lp-demo" id="demo">
+      <p class="lp-eyebrow">Demo interactiva</p>
+      <h2>Entra a un restaurante funcionando ahora mismo</h2>
+      <p class="lp-sub">
+        «Sabores de Lima» tiene mesas ocupadas, pedidos en cocina, una cuenta por cobrar y cinco
+        semanas de historia. Elige cómo quieres verlo:
+      </p>
+      <div class="lp-roles">
+        <button class="lp-role" (click)="startDemo('ADMIN')" [disabled]="!!starting()">
+          <span>👩‍💼</span><strong>Como dueña</strong
+          ><small>Modo TV, metas, reportes, inventario y mapa de calor</small>
+          <b>{{ starting() === 'ADMIN' ? 'Abriendo…' : 'Entrar →' }}</b>
+        </button>
+        <button class="lp-role" (click)="startDemo('WAITER')" [disabled]="!!starting()">
+          <span>🧑‍🍳</span><strong>Como mesero</strong
+          ><small>Plano en vivo, alertas, cobro y cuenta dividida</small>
+          <b>{{ starting() === 'WAITER' ? 'Abriendo…' : 'Entrar →' }}</b>
+        </button>
+        <button class="lp-role" (click)="startDemo('KITCHEN')" [disabled]="!!starting()">
+          <span>👨‍🍳</span><strong>Como cocina</strong
+          ><small>Pedidos con prioridad, estaciones y demoras</small>
+          <b>{{ starting() === 'KITCHEN' ? 'Abriendo…' : 'Entrar →' }}</b>
+        </button>
+        <button class="lp-role" (click)="openDinerDemo()" [disabled]="!!starting()">
+          <span>📱</span><strong>Como cliente</strong
+          ><small>Carta QR, pedido, seguimiento y calificación</small>
+          <b>{{ starting() === 'DINER' ? 'Abriendo…' : 'Abrir carta →' }}</b>
+        </button>
+      </div>
+      @if (error()) {
+        <p class="lp-error">{{ error() }}</p>
+      }
+      <p class="lp-note">
+        Los datos son ficticios y se renuevan solos. Puedes tocar todo sin miedo.
+      </p>
+    </section>
+
+    <section class="lp-section" id="como">
+      <p class="lp-eyebrow">Cómo funciona</p>
+      <h2>Listo para atender en una tarde</h2>
+      <div class="lp-steps">
+        @for (step of steps; track step.title; let index = $index) {
+          <article class="lp-step">
+            <b>{{ index + 1 }}</b>
+            <h3>{{ step.title }}</h3>
+            <p>{{ step.text }}</p>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section class="lp-section" id="precios">
+      <p class="lp-eyebrow">Precios</p>
+      <h2>Un plan para cada tamaño de restaurante</h2>
+      <div class="lp-plans">
+        @for (plan of plans; track plan.name) {
+          <article class="lp-plan" [class.featured]="plan.featured">
+            @if (plan.featured) {
+              <span class="lp-plan-badge">Más elegido</span>
+            }
+            <h3>{{ plan.name }}</h3>
+            <p class="lp-plan-note">{{ plan.note }}</p>
+            <p class="lp-price">
+              <strong>{{ plan.price }}</strong
+              ><small>{{ plan.period }}</small>
+            </p>
+            <ul>
+              @for (item of plan.items; track item) {
+                <li><app-icon name="check" [size]="15" /> {{ item }}</li>
+              }
+            </ul>
+            <button class="lp-btn" [class.ghost]="!plan.featured" (click)="contact()">
+              {{ salesWhatsapp ? 'Quiero este plan' : 'Probar la demo' }}
+            </button>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section class="lp-section" id="preguntas">
+      <p class="lp-eyebrow">Preguntas frecuentes</p>
+      <h2>Lo que suelen preguntarnos</h2>
+      <div class="lp-faqs">
+        @for (faq of faqs; track faq.q) {
+          <details class="lp-faq">
+            <summary>{{ faq.q }}</summary>
+            <p>{{ faq.a }}</p>
+          </details>
+        }
+      </div>
+    </section>
+
+    <section class="lp-cta">
+      <h2>¿Listo para ordenar tu restaurante?</h2>
+      <p>Prueba la demo en un minuto o escríbenos para ponerlo en marcha en tu local.</p>
+      <div class="lp-hero-actions">
+        <button class="lp-btn light" (click)="startDemo('ADMIN')" [disabled]="!!starting()">
+          Probar la demo
+        </button>
+        @if (salesWhatsapp) {
+          <button class="lp-btn ghost light" (click)="contact()">
+            <app-icon name="send" [size]="16" /> Escríbenos por WhatsApp
+          </button>
+        }
+      </div>
+    </section>
+
+    <footer class="lp-footer">
+      <span>© {{ year }} RestOS · Gestión de restaurantes</span>
+      <a routerLink="/login">Ingreso del personal</a>
+    </footer>
+  </div>
+}

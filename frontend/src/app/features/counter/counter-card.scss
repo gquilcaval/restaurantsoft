@@ -1,0 +1,24 @@
+// Tarjeta del pedido: datos que se tocan para abrir y, abajo, la acción siguiente a un toque.
+.cn-card { display: grid; padding: 0; overflow: hidden; }
+.cn-card:hover { transform: none; }
+.cn-card-open { display: grid; gap: 6px; width: 100%; padding: 12px 12px 8px; border: 0; color: inherit; text-align: left; font: inherit; background: transparent; cursor: pointer; }
+.cn-dots { display: flex; align-items: center; gap: 4px; }
+.cn-dots i { width: 16px; height: 4px; border-radius: 999px; background: color-mix(in srgb, var(--text) 12%, transparent); transition: background .3s; }
+.cn-dots i.on { background: var(--brand); }
+.cn-dots small { margin-left: 6px; color: var(--muted); font-size: .68rem; font-weight: 800; }
+.cn-quick { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 42px; margin: 0 8px 8px; padding: 0 12px; border: 0; border-radius: 13px; color: var(--text); font-size: .82rem; font-weight: 800; background: color-mix(in srgb, var(--text) 9%, transparent); transition: transform .15s, filter .2s; }
+.cn-quick:hover:not(:disabled) { filter: brightness(1.08); }
+.cn-quick:active:not(:disabled) { transform: scale(.96); }
+.cn-quick:disabled { opacity: .6; }
+.cn-quick[data-kind='deliver'] { color: #0c1a08; background: #3fbf2a; box-shadow: 0 6px 16px rgba(63, 191, 42, .3); }
+.cn-quick[data-kind='pay'] { color: #fff; background: #a46bff; box-shadow: 0 6px 16px rgba(164, 107, 255, .3); }
+.cn-quick[data-kind='add'] { color: var(--brand-accent, var(--brand)); background: color-mix(in srgb, var(--brand) 15%, transparent); }
+.cn-quick.big { width: 100%; min-height: 52px; margin: 0; border-radius: 16px; font-size: .95rem; }
+.cn-wait { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 34px; margin: 0 8px 8px; color: var(--muted); font-size: .74rem; font-weight: 700; }
+.cn-flow { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--muted); font-size: .78rem; font-weight: 700; }
+.cn-flow b { opacity: .5; }
+.cn-stage-tabs { display: none; }
+.cn-stage-tabs button i { width: 8px; height: 8px; border-radius: 50%; background: #4f8cff; }
+.cn-stage-tabs button[data-tone='green'] i { background: #3fbf2a; } .cn-stage-tabs button[data-tone='violet'] i { background: #a46bff; }
+.cn-fab { display: none; }
+.cn-sheet-backdrop { display: none; }

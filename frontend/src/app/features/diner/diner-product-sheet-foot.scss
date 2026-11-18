@@ -1,0 +1,30 @@
+// Ficha del plato: notas para cocina y barra de cantidad + botón.
+.ps-note-pill { display: flex; align-items: center; gap: 8px; width: 100%; height: 40px; margin-bottom: 10px; padding: 0 12px; border: 0; border-radius: 12px; color: var(--muted); background: var(--surface-2); font: 650 .82rem inherit; text-align: left; }
+.ps-note-pill .ps-note-text { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ps-note-pill small { flex-shrink: 0; color: var(--muted); font-size: .72rem; font-weight: 700; }
+.ps-note-pill.filled { color: var(--text); background: var(--brand-soft); }
+.ps-note-pill.filled small { color: var(--brand); }
+.ps-notes { display: grid; gap: 10px; margin-bottom: 12px; animation: ps-in .22s ease-out; }
+.ps-notes header { display: flex; align-items: center; justify-content: space-between; }
+.ps-notes header strong { font-size: .92rem; font-weight: 800; }
+.ps-notes-done { height: 32px; padding: 0 14px; border: 0; border-radius: 999px; color: var(--brand); background: var(--brand-soft); font: 800 .8rem inherit; }
+.ps-note-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ps-note-chips button { display: inline-flex; align-items: center; gap: 5px; height: 34px; padding: 0 12px; border: 0; border-radius: 999px; color: var(--text); background: var(--surface-2); font: 700 .8rem inherit; transition: background .18s, color .18s, transform .2s; }
+.ps-note-chips button:active { transform: scale(.94); }
+.ps-note-chips button.on { color: var(--brand); background: var(--brand-soft); box-shadow: inset 0 0 0 1.5px var(--brand); }
+.ps-note-chips button i { font-style: normal; font-size: .75rem; }
+.ps-note-custom { position: relative; }
+.ps-note-custom textarea { width: 100%; min-height: 52px; padding: 10px 40px 10px 12px; border: 0; border-radius: 14px; outline: none; resize: none; color: var(--text); background: var(--surface-2); font: 500 .9rem inherit; }
+.ps-note-custom textarea:focus { box-shadow: 0 0 0 2px var(--brand); }
+.ps-note-custom button { position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; display: grid; place-items: center; border: 0; border-radius: 50%; color: var(--muted); background: var(--surface); font-size: 1rem; }
+.ps-foot-row { display: flex; gap: 10px; }
+.ps-foot { position: sticky; bottom: 0; z-index: 2; display: block; margin-top: auto; padding: 12px 18px calc(12px + env(safe-area-inset-bottom)); background: var(--surface); box-shadow: 0 -8px 20px color-mix(in srgb, var(--text) 7%, transparent); }
+.ps-qty { flex-shrink: 0; display: flex; align-items: center; gap: 2px; height: 52px; padding: 4px; border-radius: 16px; background: var(--surface-2); }
+.ps-qty button { width: 40px; height: 44px; border: 0; border-radius: 12px; color: var(--text); background: var(--surface); font: 800 1.2rem inherit; }
+.ps-qty button:disabled { opacity: .35; }
+.ps-qty strong { min-width: 26px; text-align: center; font-size: 1.05rem; }
+.ps-submit { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 10px; height: 52px; padding: 0 16px; border: 0; border-radius: 16px; color: #fff; background: var(--brand); font: 800 .95rem inherit; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 8px 20px color-mix(in srgb, var(--brand) 32%, transparent); transition: background .2s, color .2s, transform .2s; }
+.ps-submit:active { transform: scale(.98); }
+.ps-submit span { opacity: .92; }
+.ps-submit.dn-pending { color: var(--text); background: var(--surface-2); box-shadow: none; }
+@keyframes ps-in { from { opacity: 0; transform: translateY(-4px); } }

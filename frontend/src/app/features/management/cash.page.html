@@ -1,0 +1,241 @@
+<app-shell title="Caja" eyebrow="Control de efectivo">
+  <button shell-actions class="cs-pill" [disabled]="loading() || saving()" (click)="load()"><app-icon name="refresh" [size]="16" />Actualizar</button>
+
+  <div class="cs">
+    @if (error()) {
+      <div class="lg cs-alert danger" role="alert"><span><app-icon name="alert" [size]="22" /></span><div><strong>No se pudo actualizar la caja</strong><small>{{ error() }}</small></div><button class="cs-pill" (click)="load()">Reintentar</button></div>
+    }
+    @if (overview()?.unassignedToday?.count; as count) {
+      <div class="lg cs-alert warn"><span><app-icon name="receipt" [size]="22" /></span><div><strong>{{ count }} {{ count === 1 ? 'cobro de hoy no está' : 'cobros de hoy no están' }} en ningún turno</strong><small>{{ money(overview()!.unassignedToday.amount) }} figuran en reportes pero no entran en el arqueo.</small></div><a class="cs-pill" routerLink="/reports" [queryParams]="{ unassigned: true }">Revisar</a></div>
+    }
+
+    <!-- Navegación del módulo -->
+    <nav class="cs-nav">
+      <div class="cs-tabs" role="tablist" aria-label="Secciones de caja">
+        <button role="tab" [attr.aria-selected]="tab() === 'NOW'" (click)="showTab('NOW')"><app-icon name="money" [size]="16" />Caja actual</button>
+        <button role="tab" [attr.aria-selected]="tab() === 'HISTORY'" (click)="showTab('HISTORY')"><app-icon name="archive" [size]="16" />Historial <small>{{ overview()?.history?.length || 0 }}</small></button>
+      </div>
+      <p class="cs-purpose">{{ tab() === 'NOW' ? 'El dinero del turno: cuánto debe haber, entradas, salidas y cierre.' : 'Turnos anteriores: quién abrió, cuánto se contó y si cuadró.' }}</p>
+      <p class="cs-keys">Atajos: @if (detail()) {<kbd>S</kbd> salida <kbd>E</kbd> entrada <kbd>C</kbd> cerrar} <kbd>H</kbd> historial <kbd>Esc</kbd> volver</p>
+    </nav>
+
+    @if (loading()) {
+      <div class="cs-grid"><div class="lg cs-card cs-hero cs-skeleton"><i class="ui-skeleton"></i><i class="ui-skeleton"></i><i class="ui-skeleton"></i></div><div class="lg cs-card cs-work cs-skeleton"><i class="ui-skeleton"></i><i class="ui-skeleton"></i></div></div>
+    } @else if (overview(); as data) {
+      @if (tab() === 'NOW') {
+        <section class="cs-grid cs-view">
+          @if (detail(); as current) {
+            <!-- Efectivo esperado y acciones rápidas -->
+            <article class="lg cs-card cs-hero">
+              <div class="cs-head">
+                <span class="cs-status"><i></i>Caja abierta</span>
+                <small>{{ current.shift.openedBy }} · desde {{ timestamp(current.shift.openedAt) }} · {{ duration(current.shift.openedAt, null) }}</small>
+              </div>
+              <p class="cs-label">Efectivo que debe haber en caja</p>
+              <strong class="cs-big">{{ money(current.expectedCash) }}</strong>
+              <div class="cs-formula">
+                <span><small>Fondo</small><b>{{ money(current.shift.openingAmount) }}</b></span><i>+</i>
+                <button class="cs-fx" (click)="action.set('NONE'); pane.set('METHODS')"><small>Cobros efectivo</small><b>{{ money(current.cashPayments) }}</b></button><i>+</i>
+                <button class="cs-fx" (click)="action.set('NONE'); pane.set('MOVES')"><small>Entradas</small><b class="in">{{ money(current.cashIn) }}</b></button><i>−</i>
+                <button class="cs-fx" (click)="action.set('NONE'); pane.set('MOVES')"><small>Salidas</small><b class="out">{{ money(current.cashOut) }}</b></button>
+              </div>
+              @if (current.shift.openingNote) { <p class="cs-note"><app-icon name="edit" [size]="14" /> {{ current.shift.openingNote }}</p> }
+              <div class="cs-tiles">
+                <button class="cs-tile" data-tone="out" [class.on]="action() === 'MOVEMENT' && movementKind === 'OUT'" [disabled]="saving() || !!error()" (click)="showMovement('OUT')"><span><app-icon name="arrow-down" [size]="20" /></span><b>Salida</b><small>Compras, pagos</small><kbd>S</kbd></button>
+                <button class="cs-tile" data-tone="in" [class.on]="action() === 'MOVEMENT' && movementKind === 'IN'" [disabled]="saving() || !!error()" (click)="showMovement('IN')"><span><app-icon name="arrow-up" [size]="20" /></span><b>Entrada</b><small>Sencillo, aporte</small><kbd>E</kbd></button>
+                <button class="cs-tile" data-tone="close" [class.on]="action() === 'CLOSE'" [disabled]="saving() || !!error()" (click)="showClose()"><span><app-icon name="lock" [size]="19" /></span><b>Cerrar caja</b><small>Contar y arquear</small><kbd>C</kbd></button>
+              </div>
+            </article>
+
+            <!-- Panel de trabajo: cambia de contenido sin mover la página -->
+            <article class="lg cs-card cs-work" [attr.data-action]="action()">
+              @switch (action()) {
+                @case ('MOVEMENT') {
+                  <div class="cs-head"><button class="cs-back" [disabled]="saving()" (click)="action.set('NONE')">←</button><h3>{{ movementKind === 'OUT' ? 'Registrar salida' : 'Registrar entrada' }}</h3></div>
+                  <form class="cs-form" (ngSubmit)="movement()"><fieldset [disabled]="saving() || !!error()">
+                    <div class="cs-toggle" role="radiogroup" aria-label="Tipo de movimiento" [attr.data-kind]="movementKind">
+                      <i class="cs-thumb"></i>
+                      <button type="button" role="radio" [attr.aria-checked]="movementKind === 'OUT'" (click)="showMovement('OUT')"><app-icon name="arrow-down" [size]="16" />Salida</button>
+                      <button type="button" role="radio" [attr.aria-checked]="movementKind === 'IN'" (click)="showMovement('IN')"><app-icon name="arrow-up" [size]="16" />Entrada</button>
+                    </div>
+                    <label class="cs-money"><span>Monto</span><div><b>S/</b><input data-autofocus name="amount" type="number" inputmode="decimal" min="0.01" max="9999999999.99" step="0.01" required [(ngModel)]="movementAmount" placeholder="0.00"></div></label>
+                    <div class="cs-chips">
+                      @for (value of quickAmounts; track value) { <button type="button" class="cs-chip" (click)="addAmount(value)">+ {{ value }}</button> }
+                      @if (movementAmount) { <button type="button" class="cs-chip ghost" (click)="movementAmount = null">Borrar</button> }
+                    </div>
+                    <div class="cs-field"><span>Motivo</span>
+                      <div class="cs-chips">
+                        @for (reason of movementKind === 'OUT' ? outReasons : inReasons; track reason) { <button type="button" class="cs-chip" [class.on]="movementReason === reason" (click)="movementReason = reason">{{ reason }}</button> }
+                      </div>
+                      <textarea name="reason" rows="2" required maxlength="300" [(ngModel)]="movementReason" placeholder="Detalle: compra de limones en el mercado"></textarea>
+                    </div>
+                    <button class="cs-pill primary cs-submit" [disabled]="!validAmount(movementAmount, true) || !movementReason.trim()">{{ saving() ? 'Guardando…' : 'Guardar ' + (movementKind === 'OUT' ? 'salida' : 'entrada') + (validAmount(movementAmount, true) ? ' de ' + money(movementAmount) : '') }}</button>
+                  </fieldset></form>
+                }
+                @case ('CLOSE') {
+                  <div class="cs-head"><button class="cs-back" [disabled]="saving()" (click)="action.set('NONE')">←</button><h3>Arqueo de cierre</h3>
+                    <div class="cs-seg"><button type="button" [class.on]="countMode() === 'BILLS'" (click)="setCountMode('BILLS')">Billetes y monedas</button><button type="button" [class.on]="countMode() === 'TOTAL'" (click)="setCountMode('TOTAL')">Monto total</button></div>
+                  </div>
+                  <form class="cs-form" (ngSubmit)="close()"><fieldset [disabled]="saving() || !!error()">
+                    @if (countMode() === 'BILLS') {
+                      <div class="cs-denoms">
+                        @for (item of denominations; track item.value; let index = $index) {
+                          <div class="cs-denom" [class.coin]="item.coin" [class.has]="item.qty > 0">
+                            <span class="cs-face">{{ item.label }}</span>
+                            <button type="button" aria-label="Quitar uno" (click)="step(item, -1)" [disabled]="!item.qty">−</button>
+                            <input [attr.data-autofocus]="index === 0 ? '' : null" type="number" inputmode="numeric" min="0" step="1" [attr.aria-label]="'Cantidad de S/ ' + item.label" [ngModel]="item.qty || null" (ngModelChange)="setQty(item, $event)" [ngModelOptions]="{ standalone: true }" placeholder="0">
+                            <button type="button" aria-label="Agregar uno" (click)="step(item, 1)">+</button>
+                          </div>
+                        }
+                      </div>
+                      <p class="cs-subtotals"><span>Billetes <b>{{ money(billsTotal(false)) }}</b></span><span>Monedas <b>{{ money(billsTotal(true)) }}</b></span></p>
+                    } @else {
+                      <label class="cs-money big"><span>Efectivo contado en caja</span><div><b>S/</b><input data-autofocus name="counted" type="number" inputmode="decimal" min="0" max="9999999999.99" step="0.01" required [(ngModel)]="counted" placeholder="0.00"></div></label>
+                    }
+                    <div class="cs-live" [attr.data-state]="counted === null ? 'none' : resultState(liveDifference(current))">
+                      <span><app-icon [name]="counted === null ? 'coins' : diffIcon(liveDifference(current))" [size]="22" /></span>
+                      <div>
+                        <strong>{{ counted === null ? 'Cuenta el efectivo' : liveDifference(current) === 0 ? '¡Cuadra exacto!' : (liveDifference(current) || 0) > 0 ? 'Sobran ' + money(liveDifference(current)) : 'Faltan ' + money(-(liveDifference(current) || 0)) }}</strong>
+                        <small>Contado {{ money(counted) }} · esperado {{ money(current.expectedCash) }}</small>
+                      </div>
+                    </div>
+                    @if (liveDifference(current)) {
+                      <label class="cs-field"><span>¿Por qué hay diferencia? (obligatorio)</span><textarea name="note" rows="2" maxlength="300" [(ngModel)]="closingNote" placeholder="Se dio vuelto de más a la mesa 4"></textarea></label>
+                    }
+                    <button class="cs-pill primary cs-submit" [disabled]="!validAmount(counted) || (counted !== current.expectedCash && !closingNote.trim())"><app-icon name="lock" [size]="17" />{{ saving() ? 'Procesando…' : 'Cerrar caja con ' + money(counted) }}</button>
+                  </fieldset></form>
+                }
+                @default {
+                  <div class="cs-head">
+                    <div class="cs-seg"><button [class.on]="pane() === 'METHODS'" (click)="pane.set('METHODS')">Cobros <small>{{ money(totalCollected(current)) }}</small></button><button [class.on]="pane() === 'MOVES'" (click)="pane.set('MOVES')">Entradas y salidas <small>{{ current.movements.length }}</small></button></div>
+                  </div>
+                  <div class="cs-scroll">
+                    <ng-container *ngTemplateOutlet="pane() === 'METHODS' ? methodsTpl : movesTpl; context: { $implicit: current }" />
+                  </div>
+                }
+              }
+            </article>
+          } @else {
+            <!-- Caja cerrada: abrir turno -->
+            <article class="lg cs-card cs-hero">
+              <div class="cs-head"><span class="cs-status closed"><i></i>Caja cerrada</span></div>
+              <p class="cs-label">Abre la caja para empezar a cobrar</p>
+              <form class="cs-form" (ngSubmit)="open()"><fieldset [disabled]="saving() || !!error()">
+                <label class="cs-money big"><span>Fondo inicial</span><div><b>S/</b><input type="number" inputmode="decimal" name="opening" min="0" max="9999999999.99" step="0.01" required [(ngModel)]="openingAmount" placeholder="0.00"></div></label>
+                <div class="cs-chips">
+                  @if (data.history[0]; as last) { <button type="button" class="cs-chip" [class.on]="openingAmount === last.openingAmount" (click)="openingAmount = last.openingAmount">Igual que el último · {{ money(last.openingAmount) }}</button> }
+                  @for (value of [100, 200, 300]; track value) { <button type="button" class="cs-chip" [class.on]="openingAmount === value" (click)="openingAmount = value">S/ {{ value }}</button> }
+                </div>
+                <label class="cs-field"><span>Nota de apertura (opcional)</span><textarea name="openingNote" rows="2" maxlength="300" [(ngModel)]="openingNote" placeholder="Fondo en billetes de 10 y monedas"></textarea></label>
+                <button class="cs-pill primary cs-submit" [disabled]="!validAmount(openingAmount)"><app-icon name="unlock" [size]="17" />{{ saving() ? 'Abriendo…' : 'Abrir caja con ' + money(openingAmount) }}</button>
+              </fieldset></form>
+            </article>
+            <article class="lg cs-card cs-work">
+              <div class="cs-head"><h3>Último cierre</h3></div>
+              @if (lastClosed(); as last) {
+                <div class="cs-result" [attr.data-state]="resultState(historyDifference(last))">
+                  <span><app-icon [name]="diffIcon(historyDifference(last))" [size]="28" /></span>
+                  <div><strong>{{ resultText(historyDifference(last)) }}</strong><small>{{ last.closedBy || last.openedBy }} · {{ timestamp(last.closedAt!) }}</small></div>
+                </div>
+                <div class="cs-formula"><span><small>Esperado</small><b>{{ money(last.expectedAmount) }}</b></span><i>→</i><span><small>Contado</small><b>{{ money(last.countedAmount) }}</b></span></div>
+                <button class="cs-pill cs-submit" (click)="openInHistory(last.id)">Ver detalle en el historial →</button>
+              } @else {
+                <div class="cs-empty"><span><app-icon name="archive" [size]="22" /></span><div><strong>Aún no hay cierres</strong><small>Cuando cierres tu primera caja verás aquí su resultado.</small></div></div>
+              }
+            </article>
+          }
+        </section>
+      } @else {
+        <!-- Historial: lista y detalle lado a lado -->
+        <section class="cs-grid cs-view">
+          <article class="lg cs-card cs-history">
+            <div class="cs-head"><h3>Turnos</h3><small>últimos 30</small></div>
+            <div class="cs-shifts">
+              @for (shift of data.history; track shift.id) {
+                <button class="cs-shift" [class.selected]="past()?.shift?.id === shift.id" (click)="selectPast(shift.id)">
+                  <span class="cs-shift-dot" [attr.data-state]="!shift.closedAt ? 'open' : resultState(historyDifference(shift)) === 'ok' ? 'ok' : historyDifference(shift) === null ? 'none' : 'diff'"></span>
+                  <div><strong>{{ timestamp(shift.openedAt) }}</strong><small>{{ shift.openedBy }}</small></div>
+                  <span class="cs-shift-meta">
+                    @if (!shift.closedAt) { <b class="open">Abierta</b> }
+                    @else if (historyDifference(shift); as diff) { <b [class.over]="diff > 0" [class.short]="diff < 0">{{ diff > 0 ? '+' : '−' }}{{ money(diff > 0 ? diff : -diff) }}</b> }
+                    @else { <b class="ok">Cuadró</b> }
+                    @if (shift.countedAmount !== null) { <small>{{ money(shift.countedAmount) }}</small> }
+                  </span>
+                </button>
+              } @empty {
+                <p class="cs-muted">Aquí aparecerán las aperturas y cierres de caja.</p>
+              }
+            </div>
+          </article>
+
+          <article class="lg cs-card cs-past">
+            @if (pastLoading()) {
+              <div class="cs-skeleton"><i class="ui-skeleton"></i><i class="ui-skeleton"></i><i class="ui-skeleton"></i></div>
+            } @else if (past(); as shift) {
+              <div class="cs-head">
+                <span class="cs-status" [class.closed]="!!shift.shift.closedAt"><i></i>{{ shift.shift.closedAt ? 'Turno cerrado' : 'Caja abierta' }}</span>
+                <small>{{ shift.shift.openedBy }} · {{ timestamp(shift.shift.openedAt) }} · {{ duration(shift.shift.openedAt, shift.shift.closedAt) }}</small>
+              </div>
+              @if (shift.shift.closedAt) {
+                <div class="cs-result" [attr.data-state]="resultState(shift.difference)">
+                  <span><app-icon [name]="diffIcon(shift.difference)" [size]="28" /></span>
+                  <div><strong>{{ resultText(shift.difference) }}</strong><small>Cerró {{ shift.shift.closedBy }} · {{ timestamp(shift.shift.closedAt) }}</small></div>
+                </div>
+              } @else {
+                <div class="cs-result" data-state="ok"><span><app-icon name="money" [size]="28" /></span><div><strong>Es la caja actual</strong><small>Debe haber {{ money(shift.expectedCash) }} en efectivo.</small></div>
+                  <button class="cs-pill primary" (click)="showTab('NOW')">Ir a la caja</button></div>
+              }
+              <div class="cs-stats">
+                <span><small>Fondo</small><b>{{ money(shift.shift.openingAmount) }}</b></span>
+                <span><small>Cobros efectivo</small><b>{{ money(shift.cashPayments) }}</b></span>
+                <span><small>Entradas</small><b class="in">{{ money(shift.cashIn) }}</b></span>
+                <span><small>Salidas</small><b class="out">{{ money(shift.cashOut) }}</b></span>
+                <span><small>Esperado</small><b>{{ money(shift.expectedCash) }}</b></span>
+                <span><small>Contado</small><b>{{ shift.shift.countedAmount === null ? '—' : money(shift.shift.countedAmount) }}</b></span>
+              </div>
+              @if (shift.shift.openingNote || shift.shift.closingNote) {
+                <p class="cs-note">@if (shift.shift.openingNote) {<app-icon name="edit" [size]="14" /> Apertura: {{ shift.shift.openingNote }}<br>}@if (shift.shift.closingNote) {<app-icon name="edit" [size]="14" /> Cierre: {{ shift.shift.closingNote }}}</p>
+              }
+              <div class="cs-split">
+                <div><h4>Cobros · {{ money(totalCollected(shift)) }}</h4><ng-container *ngTemplateOutlet="methodsTpl; context: { $implicit: shift }" /></div>
+                <div><h4>Entradas y salidas · {{ shift.movements.length }}</h4><ng-container *ngTemplateOutlet="movesTpl; context: { $implicit: shift }" /></div>
+              </div>
+            } @else {
+              <div class="cs-empty"><span><app-icon name="archive" [size]="22" /></span><div><strong>Elige un turno</strong><small>Verás su arqueo, cobros y movimientos.</small></div></div>
+            }
+          </article>
+        </section>
+      }
+    }
+  </div>
+
+  <ng-template #methodsTpl let-d>
+    <div class="cs-methods">
+      @for (method of d.methods; track method.method; let index = $index) {
+        <div class="cs-method" [style.--d]="index * 70 + 'ms'">
+          <span class="cs-icon" [attr.data-tone]="methodTone(method.method)"><app-icon [name]="methodIcon(method.method)" [size]="20" /></span>
+          <div><strong>{{ methodLabel(method.method) }}</strong><small>{{ method.count }} {{ method.count === 1 ? 'pago' : 'pagos' }}</small>
+            <i class="cs-bar" [attr.data-tone]="methodTone(method.method)"><b [style.width.%]="methodRatio(d, method.amount)"></b></i></div>
+          <b>{{ money(method.amount) }}</b>
+        </div>
+      } @empty {
+        <p class="cs-muted">Todavía no hay cobros en este turno.</p>
+      }
+    </div>
+    <p class="cs-muted">Digitales (tarjeta, Yape, Plin): <b>{{ money(d.digitalPayments) }}</b> · no suman al efectivo.@if (d.tips > 0) { Propinas: <b>{{ money(d.tips) }}</b>. }</p>
+  </ng-template>
+
+  <ng-template #movesTpl let-d>
+    <div class="cs-timeline">
+      @for (entry of d.movements; track entry.id; let index = $index) {
+        <div class="cs-move" [attr.data-kind]="entry.kind" [style.--d]="index * 50 + 'ms'">
+          <span><app-icon [name]="entry.kind === 'IN' ? 'arrow-up' : 'arrow-down'" [size]="18" /></span>
+          <div><strong>{{ entry.reason }}</strong><small>{{ entry.registeredBy }} · {{ timestamp(entry.createdAt) }}</small></div>
+          <b>{{ entry.kind === 'IN' ? '+' : '−' }} {{ money(entry.amount) }}</b>
+        </div>
+      } @empty {
+        <div class="cs-empty"><span><app-icon name="coins" [size]="22" /></span><div><strong>Sin entradas ni salidas</strong><small>El dinero que sale para compras o entra como sencillo; nunca se edita ni se borra.</small></div></div>
+      }
+    </div>
+  </ng-template>
+</app-shell>

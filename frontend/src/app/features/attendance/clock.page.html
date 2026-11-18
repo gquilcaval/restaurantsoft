@@ -1,0 +1,102 @@
+<main class="ck">
+  <header class="ck-top">
+    <div class="ck-place">
+      <strong>{{ board()?.branchName || 'RestOS' }}</strong>
+      <small>Asistencia</small>
+    </div>
+    <div class="ck-actions">
+      <a class="ck-link" routerLink="/login">Ingresar al sistema</a>
+      <button class="ck-theme" appThemeToggle></button>
+    </div>
+  </header>
+
+  <section class="ck-clock" aria-live="off">
+    <p class="ck-time"><b>{{ clock().time }}</b><i>{{ clock().seconds }}</i><span>{{ clock().period }}</span></p>
+    <p class="ck-date">{{ dateLabel() }}</p>
+  </section>
+
+  @switch (status()) {
+    @case ('loading') { <p class="ck-note">Cargando…</p> }
+    @case ('no-device') {
+      <div class="lg ck-card">
+        <span class="ck-card-ico"><app-icon name="phone" [size]="26" /></span>
+        <h2>Este equipo no está autorizado</h2>
+        <p>Un encargado debe autorizarlo una sola vez en <b>Configuración → Tablets</b>. Después, todos podrán marcar aquí con su PIN.</p>
+        <a class="ck-btn" routerLink="/login">Ingresar como encargado</a>
+      </div>
+    }
+    @case ('offline') {
+      <div class="lg ck-card">
+        <span class="ck-card-ico"><app-icon name="x" [size]="26" /></span>
+        <h2>Sin conexión</h2>
+        <p>No se pudo conectar con el servidor. Revisa el wifi de la tablet.</p>
+        <button class="ck-btn" (click)="load()">Reintentar</button>
+      </div>
+    }
+    @case ('ready') {
+      @if (!board()!.enabled) {
+        <div class="lg ck-card">
+          <span class="ck-card-ico"><app-icon name="clock" [size]="26" /></span>
+          <h2>Asistencia no activada</h2>
+          <p>El módulo de asistencia no está activo para este restaurante.</p>
+        </div>
+      } @else {
+        <h1 class="ck-ask">Toca tu nombre para marcar</h1>
+        @if (board()!.staff.length > 12) {
+          <label class="ck-search"><app-icon name="search" [size]="17" /><input type="search" placeholder="Buscar mi nombre" [value]="query()" (input)="query.set($any($event.target).value)"></label>
+        }
+        <div class="ck-people">
+          @for (person of people(); track person.id) {
+            <button class="lg ck-person" [attr.data-state]="person.state" [disabled]="!person.hasPin" (click)="choose(person)">
+              <span class="ck-avatar">{{ initials(person.fullName) }}</span>
+              <strong>{{ person.fullName }}</strong>
+              <small>{{ stateLine(person) }}</small>
+            </button>
+          } @empty {
+            <p class="ck-note">{{ query() ? 'Nadie coincide con esa búsqueda.' : 'Todavía nadie tiene PIN. Un encargado los asigna en Personal.' }}</p>
+          }
+        </div>
+      }
+    }
+  }
+
+  @if (selected(); as person) {
+    <div class="ck-scrim" (click)="close()"></div>
+    <section class="ck-sheet" role="dialog" aria-modal="true" [attr.aria-label]="'Marcar asistencia de ' + person.fullName">
+      @if (receipt(); as done) {
+        <div class="ck-done">
+          <span class="ck-check"><app-icon name="check" [size]="42" /></span>
+          <h2>{{ receiptTitle(done.kind) }}</h2>
+          <p class="ck-done-time">{{ time(done.markedAt) }}</p>
+          <p class="ck-done-note">{{ receiptNote(done) }}</p>
+          <button class="ck-btn" (click)="close()">Listo</button>
+        </div>
+      } @else {
+        <header class="ck-sheet-head">
+          <button class="ck-round" (click)="back()" aria-label="Volver"><app-icon name="arrow-left" [size]="18" /></button>
+          <span class="ck-avatar">{{ initials(person.fullName) }}</span>
+          <div><strong>Hola, {{ firstName(person.fullName) }}</strong><small>{{ action() ? action()!.label : '¿Qué quieres marcar?' }}</small></div>
+        </header>
+        @if (!action()) {
+          <div class="ck-choices">
+            @for (option of actionsFor(person); track option.kind) {
+              <button [attr.data-kind]="option.kind" (click)="pick(option)"><app-icon [name]="option.icon" [size]="22" />{{ option.label }}</button>
+            }
+          </div>
+        } @else {
+          <div class="ck-dots" [class.error]="!!error()" [attr.aria-label]="pin().length + ' dígitos ingresados'">
+            @for (slot of slots; track slot) { <i [class.filled]="slot < pin().length" [class.optional]="slot >= 4"></i> }
+          </div>
+          <p class="ck-hint" [class.error]="!!error()" aria-live="polite">{{ error() || 'Escribe tu PIN' }}</p>
+          <div class="ck-pad">
+            @for (digit of digits; track digit) { <button (click)="press(digit)" [disabled]="sending()">{{ digit }}</button> }
+            <button class="soft" (click)="pin.set('')" [disabled]="sending()" aria-label="Borrar todo">C</button>
+            <button (click)="press('0')" [disabled]="sending()">0</button>
+            <button class="soft" (click)="backspace()" [disabled]="sending()" aria-label="Borrar último dígito">⌫</button>
+          </div>
+          <button class="ck-btn wide" [disabled]="pin().length < 4 || sending()" (click)="submit()">{{ sending() ? 'Registrando…' : action()!.label }}</button>
+        }
+      }
+    </section>
+  }
+</main>

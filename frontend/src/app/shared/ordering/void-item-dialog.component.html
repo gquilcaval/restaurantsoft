@@ -1,0 +1,57 @@
+@if (item(); as current) {
+  <div class="vd-backdrop" (mousedown)="cancelled.emit()">
+    <section class="vd" role="dialog" aria-modal="true" aria-labelledby="vd-title" (mousedown)="$event.stopPropagation()" [class.dragging]="dragging()" [style.transform]="dragY() ? 'translateY(' + dragY() + 'px)' : null">
+      <div class="vd-drag" (pointerdown)="dragStart($event)" (pointermove)="dragMove($event)" (pointerup)="dragEnd($event)" (pointercancel)="dragEnd($event)">
+      <span class="vd-grip" aria-hidden="true"></span>
+      <header class="vd-head">
+        <span class="vd-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m6 6 12 12"/></svg></span>
+        <div>
+          <small>Anular plato</small>
+          <h2 id="vd-title"><b>{{ current.quantity }}×</b> {{ current.name }}</h2>
+          @if (current.modifiers) { <p class="vd-mods">{{ current.modifiers }}</p> }
+        </div>
+        <button class="vd-close" type="button" (click)="cancelled.emit()" aria-label="Cerrar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+      </header>
+      </div>
+
+      <p class="vd-info"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Sale de la cuenta y cocina deja de prepararlo. Queda registrado quién lo anuló y por qué.</p>
+
+      @if (current.quantity > 1) {
+        <section class="vd-block">
+          <h3>¿Cuántas unidades?</h3>
+          <div class="vd-qty">
+            <div class="vd-stepper">
+              <button type="button" (click)="adjust(-1)" [disabled]="quantity() <= 1" aria-label="Menos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+              <strong>{{ quantity() }}<small>de {{ current.quantity }}</small></strong>
+              <button type="button" (click)="adjust(1)" [disabled]="quantity() >= current.quantity" aria-label="Más"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+            </div>
+            <button type="button" class="vd-all" [class.on]="quantity() === current.quantity" (click)="quantity.set(current.quantity)">Todas</button>
+          </div>
+        </section>
+      }
+
+      <section class="vd-block">
+        <h3>¿Por qué se anula?</h3>
+        <div class="vd-reasons" role="radiogroup" aria-label="Motivo">
+          @for (option of reasons; track option.label) {
+            <button type="button" role="radio" [attr.aria-checked]="choice() === option.label" [class.on]="choice() === option.label" (click)="choice.set(option.label)">
+              <span>{{ option.icon }}</span>{{ option.label }}
+            </button>
+          }
+        </div>
+        @if (choice() === OTHER) {
+          <textarea class="vd-text" [ngModel]="detail()" (ngModelChange)="detail.set($event)" maxlength="250" rows="2" placeholder="Escribe el motivo" aria-label="Motivo"></textarea>
+        }
+      </section>
+
+      <footer class="vd-foot">
+        <button type="button" class="vd-back" (click)="cancelled.emit()">Volver</button>
+        <button type="button" class="vd-confirm" [disabled]="!reason() || busy()" (click)="confirm()">
+          @if (busy()) { Anulando… } @else if (!choice()) { Elige un motivo } @else {
+            Anular {{ quantity() }} · <b>−{{ amount() | currency:'PEN':'S/ ' }}</b>
+          }
+        </button>
+      </footer>
+    </section>
+  </div>
+}

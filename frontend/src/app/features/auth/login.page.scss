@@ -1,0 +1,22 @@
+// Ingreso con PIN en tablets compartidas.
+.pin-card { width: min(460px, 100%); }
+.pin-staff { display: grid; gap: 8px; margin: 18px 0; }
+.pin-staff button { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); color: var(--text); text-align: left; }
+.pin-staff button:hover { border-color: var(--brand); }
+.pin-staff b { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; background: var(--brand-soft); color: var(--brand-accent); }
+.pin-staff span { display: grid; gap: 2px; }
+.pin-staff small { color: var(--muted); }
+.pin-dots { display: flex; justify-content: center; gap: 12px; margin: 22px 0 18px; }
+.pin-dots i { width: 14px; height: 14px; border: 2px solid var(--border); border-radius: 50%; }
+.pin-dots i.optional { opacity: .4; }
+.pin-dots i.filled { border-color: var(--brand); background: var(--brand); opacity: 1; }
+.pin-dots.error i { border-color: var(--danger); }
+.pin-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+.pin-pad button { height: 58px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-2); color: var(--text); font-size: 1.35rem; font-weight: 700; }
+.pin-pad button:active:not(:disabled) { background: var(--brand-soft); }
+.pin-pad .pin-muted { color: var(--muted); font-size: 1rem; }
+.pin-back { display: block; margin-bottom: 8px; }
+.pin-switch { display: block; margin: 18px auto 0; }
+// Acceso a la marcación de asistencia desde la tablet.
+.pin-clock { display: flex; align-items: center; justify-content: center; gap: 8px; height: 48px; margin-top: 4px; border-radius: 999px; color: var(--text); background: color-mix(in srgb, var(--text) 7%, transparent); font-weight: 750; font-size: .92rem; text-decoration: none; }
+.pin-clock svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }

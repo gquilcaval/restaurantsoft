@@ -1,0 +1,27 @@
+// Reservas en celular: resumen arriba, chips de días, agenda a pantalla completa y botón flotante para crear.
+.rv-days, .rv-fab, .rv-sheet-drag { display: none; }
+@media (max-width: 860px) {
+  .rv-new, .rv-purpose, .rv-stats, .rv-date, .rv-day .rv-chip { display: none !important; }
+  .rv-tabs { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+  .rv-tabs button { justify-content: center; }
+  .rv-day { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px; border-radius: 18px; }
+  .rv-day-title { flex: 1; justify-content: center; text-align: center; }
+  .rv-days { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin-top: -4px; }
+  .rv-days button { flex: 0 0 auto; display: grid; justify-items: center; gap: 1px; min-width: 54px; padding: 7px 6px; border: 0; border-radius: 16px; color: var(--muted); background: color-mix(in srgb, var(--text) 6%, transparent); transition: background .2s, color .2s; }
+  .rv-days small { font-size: .62rem; font-weight: 800; text-transform: capitalize; }
+  .rv-days b { color: var(--text); font: 800 1.05rem var(--font-display); }
+  .rv-days button.on { color: var(--on-brand, #fff); background: var(--brand); }
+  .rv-days button.on b { color: var(--on-brand, #fff); }
+  .rv-layout { display: block; }
+  .rv-agenda { padding: 6px; background: transparent !important; box-shadow: none !important; }
+  .rv-list { overflow: visible; padding: 0; }
+  .rv-row { grid-template-columns: 58px minmax(0, 1fr) auto; grid-template-areas: 'time main btn' 'time status btn'; align-items: center; gap: 2px 12px; padding: 12px; margin-bottom: 8px; border-radius: 18px; background: color-mix(in srgb, var(--text) 5%, transparent); }
+  .rv-row time { grid-area: time; align-self: center; padding-left: 0; border-left: 0; font-size: 1rem; }
+  .rv-row-main { grid-area: main; }
+  .rv-row-main small { flex-wrap: wrap; row-gap: 2px; }
+  .rv-row .rv-status { grid-area: status; justify-self: start; }
+  .rv-row > .rv-pill { grid-area: btn; height: 44px; padding: 0 16px; border-radius: 14px; }
+  .rv-row::before { content: ''; position: absolute; }
+  .rv-fab { position: fixed; right: 18px; bottom: calc(max(12px, env(safe-area-inset-bottom)) + 18px); z-index: 45; display: grid; place-items: center; width: 58px; height: 58px; border: 0; border-radius: 20px; color: var(--on-brand, #fff); background: var(--brand); box-shadow: 0 12px 28px color-mix(in srgb, var(--brand) 40%, transparent), 0 4px 10px rgba(0, 0, 0, .25); }
+  .rv-fab:active { transform: scale(.94); }
+}

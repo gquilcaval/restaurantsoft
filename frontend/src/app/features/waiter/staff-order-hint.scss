@@ -1,0 +1,16 @@
+// Ronda vacía (celular): solo una línea de ayuda, discreta y no tocable; la guía real es el ＋ del primer plato.
+@media (max-width: 860px) {
+  .so-cartbar-hint {
+    position: absolute; left: 50%; bottom: max(18px, env(safe-area-inset-bottom)); z-index: 2;
+    display: flex; align-items: center; gap: 6px; margin: 0; padding: 7px 14px; border-radius: 999px;
+    color: var(--muted); font-size: .78rem; font-weight: 650; white-space: nowrap;
+    background: color-mix(in srgb, var(--surface) 75%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    transform: translateX(-50%); pointer-events: none; animation: so-hint-in .4s ease-out;
+  }
+  .so-cartbar-hint span { display: inline-block; animation: so-nudge 1.8s ease-in-out infinite; }
+}
+.so-add.guide { animation: so-guide 1.6s ease-out infinite; }
+@keyframes so-hint-in { from { opacity: 0; transform: translate(-50%, 8px); } }
+@keyframes so-nudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes so-guide { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand) 60%, transparent), 0 6px 14px color-mix(in srgb, var(--brand) 40%, transparent); } 100% { box-shadow: 0 0 0 14px transparent, 0 6px 14px color-mix(in srgb, var(--brand) 40%, transparent); } }
+@media (prefers-reduced-motion: reduce) { .so-cartbar-hint, .so-cartbar-hint span, .so-add.guide { animation: none !important; } }

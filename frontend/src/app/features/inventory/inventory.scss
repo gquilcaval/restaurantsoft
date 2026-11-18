@@ -1,0 +1,30 @@
+// Inventario en Liquid Glass: pestañas, cifras y botones.
+.iv { display: flex; flex-direction: column; gap: 14px; flex: 1; min-height: 0; }
+.iv-pill { display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 40px; padding: 0 16px; border: 0; border-radius: 999px; font-weight: 750; font-size: .84rem; color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); transition: transform .35s var(--ease-spring), background .2s; }
+.iv-pill:hover:not(:disabled) { background: color-mix(in srgb, var(--text) 13%, transparent); transform: translateY(-1px); }
+.iv-pill:active:not(:disabled) { transform: scale(.95); }
+.iv-pill:disabled { opacity: .5; }
+.iv-pill.primary { color: var(--on-brand, #04110a); background: var(--brand); }
+.iv-pill.small { height: 34px; padding: 0 14px; font-size: .78rem; }
+.iv-pill.big { height: 46px; }
+.iv-navrow { display: flex; align-items: center; gap: 10px 16px; flex-wrap: wrap; flex-shrink: 0; }
+.iv-tabs { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: color-mix(in srgb, var(--surface) 55%, transparent); -webkit-backdrop-filter: blur(20px) saturate(170%); backdrop-filter: blur(20px) saturate(170%); box-shadow: var(--elev-1); }
+.iv-tabs button { display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 16px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-weight: 750; font-size: .85rem; transition: background .3s, color .25s, box-shadow .3s; }
+.iv-tabs button:hover { color: var(--text); }
+.iv-tabs button small { padding: 1px 7px; border-radius: 999px; font-size: .7rem; background: color-mix(in srgb, var(--text) 9%, transparent); }
+.iv-tabs button[aria-selected='true'] { color: var(--text); background: var(--surface); box-shadow: var(--elev-2); }
+:host-context([data-theme='dark']) .iv-tabs button[aria-selected='true'] { background: color-mix(in srgb, white 12%, transparent); }
+.iv-kpis { display: flex; gap: 8px; margin-left: auto; }
+.iv-kpis > * { display: grid; gap: 0; white-space: nowrap; padding: 5px 14px; border: 0; border-radius: 14px; text-align: left; color: var(--text); background: color-mix(in srgb, var(--text) 6%, transparent); }
+.iv-kpis small { color: var(--muted); font-size: .68rem; font-weight: 650; }
+.iv-kpis b { font: 800 1rem var(--font-display); }
+.iv-kpis button { height: auto; min-height: 0; line-height: 1.25; font: inherit; cursor: pointer; }
+.iv-kpis small, .iv-kpis b { display: block; }
+.iv-kpis .is-alert { background: color-mix(in srgb, var(--warn) 14%, transparent); } .iv-kpis .is-alert b { color: var(--warn); }
+.iv-switch { display: inline-flex; align-items: center; gap: 10px; justify-self: start; height: 36px; padding: 0 14px 0 6px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--text) 6%, transparent); color: var(--text); font-weight: 700; font-size: .8rem; }
+.iv-switch i { position: relative; width: 36px; height: 22px; border-radius: 999px; background: color-mix(in srgb, var(--text) 18%, transparent); transition: background .25s; }
+.iv-switch i::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .35s var(--ease-spring); }
+.iv-switch[aria-checked='true'] i { background: var(--ok); } .iv-switch[aria-checked='true'] i::after { transform: translateX(14px); }
+.iv-muted { margin: 0; color: var(--muted); font-size: .78rem; line-height: 1.45; }
+.iv-link { display: inline-flex; align-items: center; gap: 4px; border: 0; background: none; color: var(--brand); font-size: .74rem; font-weight: 750; }
+@keyframes iv-in { from { opacity: 0; transform: translateY(6px); } }

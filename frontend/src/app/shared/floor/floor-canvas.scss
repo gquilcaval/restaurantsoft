@@ -1,0 +1,36 @@
+// Lienzo del plano y mesas: compartido por el editor y la vista animada del salón.
+.fp-svg {
+  display: block; width: 100%; aspect-ratio: 3 / 2; touch-action: none; user-select: none;
+  border-radius: 18px; border: 1px solid var(--border);
+  background-color: color-mix(in srgb, var(--surface-2) 70%, var(--surface));
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--text) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--text) 6%, transparent) 1px, transparent 1px);
+  background-size: calc(100% / 30) calc(100% / 20);
+}
+.fp-floor { fill: transparent; }
+.fp-table { cursor: pointer; }
+.fp-body {
+  transform-box: fill-box; transform-origin: center;
+  animation: fp-pop .45s cubic-bezier(.2, 1.4, .4, 1) both; animation-delay: var(--delay, 0ms);
+}
+.fp-top {
+  fill: var(--surface); stroke: color-mix(in srgb, var(--zone-color, var(--muted)) 70%, var(--border)); stroke-width: 2.5;
+  filter: drop-shadow(0 4px 6px var(--shadow-color));
+  transition: fill .5s ease, stroke .5s ease, stroke-width .25s;
+}
+.fp-chair {
+  fill: var(--surface-3); stroke: color-mix(in srgb, var(--text) 18%, transparent); stroke-width: 1;
+  transition: fill .4s ease;
+}
+.fp-label, .fp-sub, .fp-meta {
+  text-anchor: middle; dominant-baseline: central; pointer-events: none; user-select: none; fill: var(--text);
+}
+.fp-label { font-size: 15px; font-weight: 800; }
+.fp-sub { font-size: 11px; font-weight: 650; fill: var(--muted); }
+.fp-meta { font-size: 11px; font-weight: 800; }
+.fe-table { cursor: grab; }
+.fe-table:active { cursor: grabbing; }
+.fe-table.selected .fp-top { stroke: var(--brand); stroke-width: 4; }
+@keyframes fp-pop { from { opacity: 0; transform: scale(.55); } }
+@media (prefers-reduced-motion: reduce) { .fp-body { animation: none; } }

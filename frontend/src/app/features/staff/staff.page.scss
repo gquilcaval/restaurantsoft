@@ -1,0 +1,14 @@
+// Personal: pestañas Equipo / Asistencia / Horarios.
+.pf { display: flex; flex-direction: column; gap: 14px; flex: 1; min-height: 0; }
+.pf-tabs { align-self: flex-start; display: flex; gap: 2px; padding: 4px; border-radius: 999px; background: color-mix(in srgb, var(--text) 6%, transparent); }
+.pf-tabs button { display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 16px; border: 0; border-radius: 999px; color: var(--muted); background: transparent; font: 750 .86rem inherit; }
+.pf-tabs button[aria-selected='true'] { color: var(--text); background: var(--surface); box-shadow: var(--elev-1); }
+:host-context([data-theme='dark']) .pf-tabs button[aria-selected='true'] { background: color-mix(in srgb, white 12%, transparent); }
+.pf-tabs small { min-width: 20px; padding: 1px 6px; border-radius: 999px; text-align: center; font-size: .7rem; font-weight: 800; background: color-mix(in srgb, var(--text) 9%, transparent); }
+@media (max-width: 760px) { .pf-tabs { align-self: stretch; } .pf-tabs button { flex: 1; min-width: 0; justify-content: center; padding: 0 8px; gap: 5px; } }
+@media (max-width: 440px) { .pf-tabs button app-icon { display: none; } .pf-tabs button { font-size: .82rem; } }
+.pf-view { align-self: flex-start; display: flex; gap: 4px; margin-bottom: -4px; }
+.pf-view button { height: 32px; padding: 0 14px; border: 0; border-radius: 999px; color: var(--muted); background: transparent; font-size: .8rem; font-weight: 750; }
+.pf-view button.on { color: var(--text); background: color-mix(in srgb, var(--text) 9%, transparent); }
+.pf-main { display: flex; flex-direction: column; gap: 14px; min-height: 0; animation: pf-in .3s var(--ease-out); }
+@keyframes pf-in { from { opacity: 0; transform: translateY(6px); } }

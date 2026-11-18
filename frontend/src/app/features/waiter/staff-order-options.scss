@@ -1,0 +1,21 @@
+// Ficha de opciones del plato: foto con nombre y precio, grupos con «Obligatorio/✓ Listo», notas y botón que guía.
+.so-opt-backdrop { position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, .55); animation: so-fade .2s ease-out; }
+.so-opt { position: relative; display: flex; flex-direction: column; width: min(480px, 100%); max-height: 100%; overflow: hidden; border-radius: 28px; background: var(--surface); box-shadow: 0 30px 70px rgba(0, 0, 0, .45); animation: so-in .3s cubic-bezier(.2, 1.2, .4, 1); }
+.so-opt-hero { position: relative; flex-shrink: 0; display: grid; place-items: center; height: 170px; overflow: hidden; background: linear-gradient(135deg, hsl(var(--h) 55% 42%), hsl(calc(var(--h) + 40) 60% 28%)); }
+.so-opt-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.so-opt-letter { color: rgba(255, 255, 255, .25); font: 800 6rem var(--font-display); }
+.so-opt-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 35%, rgba(0, 0, 0, .7)); }
+.so-opt-hero-text { position: absolute; left: 18px; right: 18px; bottom: 14px; z-index: 1; display: grid; gap: 1px; color: #fff; }
+.so-opt-hero-text small { font-size: .66rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
+.so-opt-hero-text h3 { margin: 0; font: 800 1.35rem var(--font-display); }
+.so-opt-hero-text span { font-weight: 800; opacity: .95; }
+.so-opt-body { display: grid; gap: 16px; padding: 16px 18px 18px; overflow-y: auto; }
+.so-opt-desc { margin: 0; color: var(--muted); font-size: .86rem; line-height: 1.45; }
+.so-mod { display: grid; gap: 10px; }
+.so-mod > header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.so-mod > header div { display: grid; gap: 1px; }
+.so-mod > header b { font-size: .95rem; }
+.so-mod > header small { color: var(--muted); font-size: .72rem; }
+.so-req { flex-shrink: 0; padding: 4px 10px; border-radius: 999px; color: #b45309; font-size: .68rem; font-weight: 800; background: rgba(245, 179, 1, .18); transition: background .2s, color .2s; }
+.so-req.ok { color: #16a34a; background: rgba(63, 191, 42, .16); }
+.so-req.optional { color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); }

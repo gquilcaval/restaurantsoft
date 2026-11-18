@@ -1,0 +1,31 @@
+// Formularios, estado vacío y tabla de movimientos.
+.iv-form { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; animation: iv-in .3s var(--ease-spring); }
+.iv-form .wide { grid-column: 1 / -1; }
+.iv-form label { display: grid; gap: 5px; font-size: .8rem; font-weight: 700; }
+.iv-form label small { color: var(--muted); font-weight: 600; font-size: .72rem; }
+.iv-form :is(input, select) { width: 100%; min-width: 0; height: 40px; padding: 0 12px; border: 0; border-radius: 12px; background: color-mix(in srgb, var(--text) 7%, transparent); color: var(--text); font: inherit; font-weight: 600; outline: none; }
+.iv-form :is(input, select):focus { box-shadow: 0 0 0 2px var(--brand); }
+.iv-form .iv-big-input { height: 56px; font: 800 1.6rem var(--font-display); }
+.iv-money { display: flex; align-items: center; gap: 6px; padding-left: 12px; border-radius: 12px; background: color-mix(in srgb, var(--text) 7%, transparent); }
+.iv-money b { color: var(--muted); } .iv-money input { background: transparent !important; padding-left: 0 !important; }
+.iv-result { display: flex; align-items: baseline; justify-content: space-between; margin: 0; padding: 10px 14px; border-radius: 14px; background: color-mix(in srgb, var(--ok) 10%, transparent); }
+.iv-result small { color: var(--muted); font-size: .76rem; } .iv-result b { font: 800 1.15rem var(--font-display); }
+.iv-result.bad { background: var(--bad-soft); } .iv-result.bad b { color: var(--bad); }
+.iv-panel-empty { display: grid; justify-items: center; align-content: center; gap: 6px; height: 100%; text-align: center; }
+.iv-panel-empty > span { width: 50px; height: 50px; display: grid; place-items: center; border-radius: 16px; color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); }
+.iv-panel-empty small { max-width: 260px; color: var(--muted); font-size: .8rem; line-height: 1.45; }
+.iv-steps { display: grid; gap: 8px; margin-top: 14px; text-align: left; }
+.iv-steps p { display: flex; align-items: center; gap: 10px; margin: 0; color: var(--muted); font-size: .78rem; }
+.iv-steps i { flex-shrink: 0; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 8px; font-style: normal; font-weight: 800; color: var(--on-brand, #04110a); background: var(--brand); }
+.iv-steps b { color: var(--text); }
+.iv-empty { display: flex; align-items: center; gap: 14px; padding: 24px 10px; }
+.iv-empty > span { width: 46px; height: 46px; display: grid; place-items: center; flex-shrink: 0; border-radius: 15px; color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); }
+.iv-empty div { display: grid; gap: 2px; } .iv-empty small { color: var(--muted); font-size: .8rem; line-height: 1.4; }
+.iv-moves { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 14px 16px; border-radius: 24px; }
+.iv-field { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: .76rem; font-weight: 700; }
+.iv-field :is(input, select) { height: 34px; padding: 0 10px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--text) 7%, transparent); color: var(--text); font: inherit; outline: none; }
+.iv-table { flex: 1; min-height: 0; overflow: auto; margin: 0 -16px; padding: 0 16px; scrollbar-width: thin; }
+.iv-table table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+.iv-table th { padding: 8px 10px; text-align: left; color: var(--muted); font-size: .7rem; font-weight: 750; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+.iv-table td { padding: 10px; white-space: nowrap; } .iv-table tbody tr:hover { background: color-mix(in srgb, var(--text) 5%, transparent); }
+.iv-table .num { text-align: right; } .iv-table .muted { color: var(--muted); } .iv-table .neg { color: var(--bad); }

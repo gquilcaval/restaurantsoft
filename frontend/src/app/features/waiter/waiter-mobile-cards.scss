@@ -1,0 +1,41 @@
+// Tarjeta de mesa en celular: número grande, color del estado y la acción siguiente a un toque.
+.mz-num, .mz-quick { display: none; }
+@media (max-width: 760px) {
+  .mz-table { border-radius: 22px; background: color-mix(in srgb, var(--tone) 11%, color-mix(in srgb, var(--surface) 72%, transparent)); transition: transform .2s var(--ease-spring), box-shadow .3s; }
+  .mz-table[data-state='free'] { background: color-mix(in srgb, var(--surface) 72%, transparent); }
+  .mz-table::before { display: none; }
+  .mz-table:hover { transform: none; }
+  .mz-table:has(.mz-open:active) { transform: scale(.97); }
+  .mz-table:is([data-state='ready'], [data-state='bill'], [data-state='call'], [data-state='review']) { animation: mz-in .4s var(--ease-spring) var(--d) backwards, mz-glow 2.4s ease-in-out infinite; }
+  .mz-open { gap: 7px; padding: 12px 13px 8px; -webkit-tap-highlight-color: transparent; }
+  .mz-top { min-height: 0; padding-right: 36px; }
+  .mz-top > strong { display: none; }
+  .mz-num { display: grid; gap: 1px; }
+  .mz-num small { color: var(--muted); font-size: .6rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  .mz-num b { font: 800 1.9rem/1 var(--font-display); letter-spacing: -.04em; }
+  .mz-zone { display: none; }
+  .mz-sub { flex-wrap: nowrap !important; gap: 6px; }
+  .mz-time app-icon { display: none; }
+  .mz-time { flex-shrink: 1; min-width: 0; overflow: hidden; font-size: .68rem; white-space: nowrap; text-overflow: ellipsis; }
+  .mz-state { padding: 3px 8px; }
+  .mz-free { display: none; }
+  .mz-table[data-state='free'] .mz-mid { justify-content: flex-start; }
+  .mz-state { padding: 3px 9px; font-size: .7rem; }
+  .mz-mid { min-height: 24px; }
+  .mz-total { font-size: .98rem; }
+  .mz-progress-row { min-height: 0; gap: 5px; }
+  .mz-progress-row .mz-stage { font-size: .7rem; }
+  .mz-qr { top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 11px; background: color-mix(in srgb, var(--text) 6%, transparent); }
+  .mz-quick {
+    display: flex; align-items: center; justify-content: center; gap: 7px; height: 44px; margin: 2px 9px 9px; padding: 0 10px; border: 0; border-radius: 15px;
+    color: var(--text); font-size: .86rem; font-weight: 800; white-space: nowrap; background: color-mix(in srgb, var(--text) 9%, transparent);
+    -webkit-tap-highlight-color: transparent; transition: transform .15s, filter .2s;
+  }
+  .mz-quick:active:not(:disabled) { transform: scale(.95); }
+  .mz-quick:disabled { opacity: .6; }
+  .mz-table:is([data-state='ready'], [data-state='call']) .mz-quick { color: #10170a; background: var(--tone); box-shadow: 0 6px 16px color-mix(in srgb, var(--tone) 35%, transparent); }
+  .mz-table:is([data-state='bill'], [data-state='review']) .mz-quick { color: #fff; background: var(--tone); box-shadow: 0 6px 16px color-mix(in srgb, var(--tone) 35%, transparent); }
+  .mz-table[data-state='free'] .mz-quick { color: var(--brand-accent, var(--brand)); background: color-mix(in srgb, var(--brand) 15%, transparent); }
+}
+@keyframes mz-glow { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--tone) 0%, transparent); } 50% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--tone) 45%, transparent), 0 8px 22px color-mix(in srgb, var(--tone) 22%, transparent); } }
+@media (prefers-reduced-motion: reduce) { .mz-table { animation: none !important; } }

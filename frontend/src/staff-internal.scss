@@ -1,0 +1,95 @@
+/* Reglas exclusivas del personal: nunca se activan en /diner ni en el login. */
+body:has(app-shell) {
+  overflow: hidden;
+  background: var(--surface-3);
+}
+
+/* Las listas operativas usan el alto del marco compartido, no el del viewport. */
+app-shell .shell > main > .page-content:has(.waiter-layout),
+app-shell .shell > main > .page-content:has(.kds) {
+  height: auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 24px;
+}
+app-shell .waiter-layout { grid-template-columns: minmax(0, 1fr) 310px; gap: 20px; }
+app-shell .waiter-tables-panel { min-width: 0; }
+app-shell .waiter-table-grid { grid-template-columns: repeat(auto-fill, minmax(min(175px, 100%), 1fr)); }
+app-shell .waiter-alerts-panel { overflow-y: auto; }
+app-shell .content-grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); }
+app-shell .content-grid > .panel { min-width: 0; }
+
+/* Una entrada breve por elemento, sin rebotes, escalados ni saltos de las tarjetas. */
+body:has(app-shell) :is(.waiter-table-card, .kitchen-order-card, .waiter-alerts-panel .alert) {
+  animation: staff-fade-in 180ms ease-out;
+  transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+}
+body:has(app-shell) :is(.waiter-table-card:hover, .kitchen-order-card:hover) { transform: none; }
+body:has(app-shell) :is(.waiter-qr-button:active, .kitchen-action:active, .waiter-detail-close:active) { transform: none; }
+body:has(app-shell) :is(.waiter-top-connection i, .kitchen-connection i, .kitchen-waiter-status i) { animation: none; }
+body:has(app-shell) :is(.app-dialog, .qr-dialog, .admin-appearance-dialog, .notification-drawer, .app-toast) {
+  animation: staff-surface-in 240ms cubic-bezier(.22,.61,.36,1);
+}
+body:has(app-shell) :is(.app-dialog-backdrop, .modal-backdrop, .admin-appearance-backdrop, .waiter-detail-backdrop) {
+  animation: staff-fade-in 180ms ease-out;
+}
+body:has(app-shell) .waiter-detail-panel:not(.dragging):not(.closing) {
+  animation: staff-surface-in 240ms cubic-bezier(.22,.61,.36,1);
+}
+body:has(app-shell) .waiter-detail-panel.closing {
+  animation: none;
+  transition: transform 240ms cubic-bezier(.22,.61,.36,1);
+}
+body:has(app-shell) .page-content > :is(.panel, .metrics, .content-grid, article, section, div) {
+  animation: staff-surface-in 420ms cubic-bezier(.2,.8,.3,1) backwards;
+}
+body:has(app-shell) .page-content > :nth-child(2) { animation-delay: 60ms; }
+body:has(app-shell) .page-content > :nth-child(3) { animation-delay: 120ms; }
+body:has(app-shell) .page-content > :nth-child(n+4) { animation-delay: 180ms; }
+body:has(app-shell) .kds-column.kitchen-column.mobile-active { animation: staff-fade-in 180ms ease-out; }
+
+@keyframes staff-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes staff-surface-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Conserva espacio útil al incorporar el menú lateral y los márgenes del marco. */
+@media (max-width: 1240px) {
+  app-shell .kitchen-mobile-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 12px; padding: 4px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+  app-shell .kitchen-mobile-tabs button { min-width: 0; min-height: 42px; display: flex; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); font-size: .7rem; }
+  app-shell .kitchen-mobile-tabs button.active { background: var(--surface-2); color: var(--text); }
+  app-shell .kds { display: block; height: 100%; }
+  app-shell .kds-column.kitchen-column { display: none; }
+  app-shell .kds-column.kitchen-column.mobile-active { display: flex; }
+}
+@media (max-width: 1100px) {
+  app-shell .content-grid { grid-template-columns: minmax(0, 1fr); }
+  app-shell .waiter-mobile-tabs { display: grid; grid-template-columns: 1fr 1fr; flex-shrink: 0; gap: 4px; margin: 0 0 16px; padding: 4px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+  app-shell .waiter-mobile-tabs button { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); }
+  app-shell .waiter-mobile-tabs button.active { color: var(--text); background: var(--surface-2); }
+  app-shell .waiter-layout { display: block; }
+  app-shell .waiter-alerts-panel { display: none; position: static; }
+  app-shell .waiter-layout.show-mobile-alerts .waiter-tables-panel { display: none; }
+  app-shell .waiter-layout.show-mobile-alerts .waiter-alerts-panel { display: block; animation: staff-fade-in 180ms ease-out; }
+}
+@media (max-width: 900px) {
+  app-shell .shell > main > .page-content:has(.waiter-layout),
+  app-shell .shell > main > .page-content:has(.kds) { padding: 16px; }
+}
+@media (max-width: 620px) {
+  app-shell .table-row { flex-wrap: wrap; gap: 10px; }
+  app-shell .table-row > div { min-width: 0; overflow-wrap: anywhere; flex: 1 1 45%; }
+  app-shell .organization-table { overflow-x: auto; }
+  app-shell :is(.organization-row, .table-header) { min-width: 560px; }
+  app-shell :is(.waiter-top-connection, .kitchen-connection) { width: 30px; height: 30px; justify-content: center; padding: 0; }
+  app-shell :is(.waiter-top-connection, .kitchen-connection) b { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .admin-shell-actions .admin-refresh b, .admin-brand-button { display: none; }
+  .admin-refresh { width: 36px; justify-content: center; padding: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body:has(app-shell) *, body:has(app-shell) *::before, body:has(app-shell) *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition: none !important;
+  }
+}

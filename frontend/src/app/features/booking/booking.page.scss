@@ -1,0 +1,25 @@
+// Página pública de reservas: clara, móvil primero y con el color del local.
+:host { display: block; min-height: 100dvh; background: radial-gradient(circle at 15% 0%, color-mix(in srgb, var(--brand) 22%, transparent), transparent 45%), radial-gradient(circle at 90% 20%, rgba(79, 140, 255, .14), transparent 40%), var(--bg); color: var(--text); }
+.bk { width: min(760px, 100%); margin: 0 auto; padding: 24px 16px 40px; display: grid; gap: 14px; }
+.bk-head { display: flex; align-items: center; gap: 14px; padding: 6px 4px 8px; }
+.bk-head img, .bk-logo { width: 56px; height: 56px; flex-shrink: 0; border-radius: 18px; object-fit: cover; }
+.bk-logo { display: grid; place-items: center; font: 800 1.5rem var(--font-display); color: var(--on-brand, #fff); background: var(--brand); }
+.bk-head h1 { margin: 0; font: 800 1.5rem var(--font-display); letter-spacing: -.02em; }
+.bk-head p { margin: 2px 0 0; color: var(--muted); font-size: .86rem; }
+.bk-card { display: grid; gap: 12px; padding: 20px; border-radius: 26px; background: color-mix(in srgb, var(--surface) 72%, transparent); -webkit-backdrop-filter: blur(24px) saturate(170%); backdrop-filter: blur(24px) saturate(170%); box-shadow: var(--elev-2); animation: bk-in .45s var(--ease-spring, ease) backwards; }
+.bk-card:nth-of-type(2) { animation-delay: 60ms; } .bk-card:nth-of-type(3) { animation-delay: 120ms; }
+.bk-card h2 { display: flex; align-items: center; gap: 10px; margin: 0; font: 800 1.1rem var(--font-display); }
+.bk-card h2 i { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 10px; font-style: normal; font-size: .85rem; color: var(--on-brand, #fff); background: var(--brand); }
+.bk-card h2 small { color: var(--muted); font-weight: 600; font-size: .74rem; }
+.bk-center { justify-items: center; text-align: center; padding: 36px 20px; }
+.bk-center h1, .bk-center h2 { margin: 6px 0 0; font: 800 1.35rem var(--font-display); }
+.bk-center p { margin: 0; line-height: 1.5; }
+.bk-ico { width: 64px; height: 64px; display: grid; place-items: center; border-radius: 22px; color: var(--muted); background: color-mix(in srgb, var(--text) 8%, transparent); }
+.bk-ico.ok { color: #fff; background: var(--ok, #3fbf2a); animation: bk-pop .6s var(--ease-spring, ease); }
+.bk-muted { margin: 0; color: var(--muted); font-size: .82rem; line-height: 1.45; }
+.bk-center-text { text-align: center; }
+.bk-foot { text-align: center; color: var(--muted); font-size: .74rem; }
+.bk-loader { width: 28px; height: 28px; border: 3px solid color-mix(in srgb, var(--text) 15%, transparent); border-top-color: var(--brand); border-radius: 50%; animation: bk-spin .8s linear infinite; }
+@keyframes bk-in { from { opacity: 0; transform: translateY(12px); } }
+@keyframes bk-pop { from { transform: scale(.4); opacity: 0; } }
+@keyframes bk-spin { to { transform: rotate(360deg); } }

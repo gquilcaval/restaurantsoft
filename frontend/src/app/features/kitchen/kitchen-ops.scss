@@ -1,0 +1,39 @@
+// Estado de estaciones, alertas proactivas y prioridad automática del KDS.
+.ops-strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; margin-bottom: 12px; }
+.ops-station {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px 8px; padding: 10px 12px; border-radius: 14px;
+  background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--green); opacity: .6; transition: opacity .3s;
+}
+.ops-station.mine { opacity: 1; }
+.ops-station header { grid-column: 1 / -1; display: flex; align-items: center; gap: 7px; }
+.ops-station header i { width: 9px; height: 9px; border-radius: 50%; background: var(--green); }
+.ops-station div { display: grid; }
+.ops-station b { font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.ops-station small { font-size: .62rem; color: var(--muted); }
+.ops-station[data-status='BUSY'] { border-left-color: var(--orange); }
+.ops-station[data-status='BUSY'] header i { background: var(--orange); }
+.ops-station[data-status='LATE'] { border-left-color: var(--danger); animation: ops-late 1.6s ease-in-out infinite; }
+.ops-station[data-status='LATE'] header i { background: var(--danger); animation: ops-blink 1s steps(2, start) infinite; }
+.ops-alert {
+  display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 8px; margin-bottom: 6px; padding: 7px 10px;
+  border-radius: 13px; background: var(--orange-soft); border: 1px solid color-mix(in srgb, var(--orange) 40%, transparent);
+  animation: ops-drop .4s cubic-bezier(.2, 1.3, .4, 1);
+}
+.ops-alert[data-tone='error'] { background: var(--danger-soft); border-color: color-mix(in srgb, var(--danger) 40%, transparent); }
+.ops-alert > app-icon { justify-self: center; color: var(--warn); }
+.ops-alert[data-tone='error'] > app-icon { color: var(--bad); }
+.ops-alert p { margin: 0; display: grid; gap: 2px; }
+.ops-alert small { color: var(--muted); }
+.ops-alert button { border: 0; background: transparent; color: var(--muted); font-size: 1.3rem; }
+.kds .kitchen-order-card.priority { border-left-color: #f5b301; box-shadow: 0 0 0 2px #f5b30166, 0 10px 24px var(--shadow-color); }
+.kds-priority {
+  position: absolute; top: 8px; right: 10px; z-index: 1; padding: 2px 9px; border-radius: 999px; background: #f5b301; color: #3b2a00;
+  display: inline-flex; align-items: center; gap: 3px; font-size: .64rem; font-weight: 900; letter-spacing: .04em; animation: ops-bump 1.4s ease-in-out 3;
+}
+.kds-sync { margin: 0 12px 6px !important; padding: 7px 9px; border-radius: 9px; background: var(--info-soft); color: var(--info); font-size: .72rem; font-weight: 700; line-height: 1.35; }
+.kds-sync.wait { background: var(--orange-soft); color: var(--orange); }
+@keyframes ops-late { 50% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 30%, transparent); } }
+@keyframes ops-blink { to { opacity: .2; } }
+@keyframes ops-drop { from { opacity: 0; transform: translateY(-10px); } }
+@keyframes ops-bump { 50% { transform: scale(1.08); } }
+.kitchen-goal { margin-bottom: 12px; }

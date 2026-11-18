@@ -1,0 +1,32 @@
+// Lista de horarios: una fila por persona con su semana a la vista.
+:host { display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+.sc-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px 18px; flex-wrap: wrap; }
+.sc-head > div:first-child { flex: 1 1 300px; min-width: 0; }
+.sc-head h2 { margin: 0; font: 800 1.3rem var(--font-display); letter-spacing: -.02em; }
+.sc-head p { margin: 3px 0 0; color: var(--muted); font-size: .84rem; line-height: 1.4; }
+.sc-tol { display: grid; gap: 4px; }
+.sc-tol > span, .sc-tol small { color: var(--muted); font-size: .72rem; font-weight: 750; }
+.sc-tol b { font: 800 1.1rem var(--font-display); }
+.sc-seg { display: flex; gap: 2px; padding: 4px; border-radius: 999px; background: color-mix(in srgb, var(--text) 6%, transparent); }
+.sc-seg button { height: 34px; padding: 0 11px; border: 0; border-radius: 999px; color: var(--muted); background: transparent; font-size: .78rem; font-weight: 750; white-space: nowrap; }
+.sc-seg button.on { color: var(--text); background: var(--surface); box-shadow: var(--elev-1); }
+:host-context([data-theme='dark']) .sc-seg button.on { background: color-mix(in srgb, white 12%, transparent); }
+.sc-list { min-height: 0; display: grid; align-content: start; gap: 6px; overflow-y: auto; padding: 12px; border-radius: 24px; scrollbar-width: thin; }
+.sc-row { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto minmax(0, 1.3fr); align-items: center; gap: 12px; width: 100%; padding: 10px 12px; border: 0; border-radius: 16px; color: var(--text); background: color-mix(in srgb, var(--text) 4%, transparent); text-align: left; font: inherit; cursor: pointer; transition: background .2s; }
+.sc-row:hover { background: color-mix(in srgb, var(--text) 8%, transparent); }
+.sc-avatar { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 13px; font: 800 .8rem var(--font-display); background: color-mix(in srgb, var(--text) 9%, transparent); }
+.sc-main { display: grid; min-width: 0; } .sc-main strong { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: .92rem; }
+.sc-main small { color: var(--muted); font-size: .74rem; }
+.sc-week { display: flex; gap: 3px; }
+.sc-week i { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 7px; color: var(--muted); background: color-mix(in srgb, var(--text) 6%, transparent); font-size: .66rem; font-style: normal; font-weight: 800; }
+.sc-week i.on { color: var(--on-brand, #04110a); background: var(--brand); }
+.sc-summary { display: grid; justify-items: end; gap: 2px; min-width: 0; font-size: .8rem; font-weight: 650; text-align: right; }
+.sc-summary span { overflow: hidden; max-width: 100%; white-space: nowrap; text-overflow: ellipsis; }
+.sc-none { display: inline-flex; align-items: center; gap: 4px; color: var(--brand); font-weight: 750; }
+.sc-row.empty .sc-week { opacity: .5; }
+.sc-muted { margin: 0; color: var(--muted); font-size: .8rem; }
+@media (max-width: 760px) {
+  .sc-tol { width: 100%; } .sc-seg button { flex: 1; padding: 0 4px; }
+  .sc-row { grid-template-columns: 40px minmax(0, 1fr); }
+  .sc-week, .sc-summary { grid-column: 2; justify-items: start; text-align: left; }
+}

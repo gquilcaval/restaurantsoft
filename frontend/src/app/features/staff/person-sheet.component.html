@@ -1,0 +1,114 @@
+<div class="as-scrim" [class.out]="closing()" (click)="close()"></div>
+<section class="as-sheet ps-sheet" role="dialog" aria-modal="true" [attr.aria-label]="person() ? 'Datos de ' + person()!.fullName : 'Agregar persona'"
+  [class.out]="closing()" [class.dragging]="dragging()" [style.--drag.px]="dragY()">
+  <div class="as-grab" (touchstart)="onTouchStart($event)" (touchmove)="onTouchMove($event)" (touchend)="onTouchEnd()">
+    <i></i>
+    <header class="as-head">
+      @if (person(); as current) { <span class="as-avatar">{{ initials(current.fullName) }}</span> }
+      <div><h3>{{ person() ? person()!.fullName : 'Agregar persona' }}</h3><small>{{ person() ? (person()!.active ? 'Datos de la persona' : 'Ya no trabaja aquí') : 'Solo necesitas su nombre y su puesto' }}</small></div>
+      <button class="as-round" (click)="close()" aria-label="Cerrar"><app-icon name="x" [size]="16" /></button>
+    </header>
+  </div>
+
+  <form class="as-body" (ngSubmit)="save()" autocomplete="off">
+    <label class="ps-field">
+      <span>Nombre y apellido</span>
+      <input name="personName" [ngModel]="name()" (ngModelChange)="name.set($event)" maxlength="120" placeholder="Ej. Carlos Medina" autocapitalize="words" enterkeyhint="next">
+    </label>
+
+    <div class="ps-field">
+      <span>Puesto</span>
+      <div class="ps-posts" role="radiogroup" aria-label="Puesto">
+        @for (option of posts; track option.key) {
+          <button type="button" role="radio" [attr.aria-checked]="post() === option.key" [class.on]="post() === option.key" [style.--tone]="option.tone" (click)="choosePost(option.key)">
+            <i><app-icon [name]="option.icon" [size]="18" /></i><b>{{ option.label }}</b><small>{{ option.hint }}</small>
+          </button>
+        }
+      </div>
+      @if (post() === 'STAFF') {
+        <div class="ps-chips">
+          @for (option of otherJobs; track option) { <button type="button" [class.on]="job() === option" (click)="job.set(job() === option ? '' : option)">{{ option }}</button> }
+        </div>
+        <input class="ps-input" name="personJob" [ngModel]="job()" (ngModelChange)="job.set($event)" maxlength="60" placeholder="O escribe su puesto" aria-label="Puesto">
+      }
+    </div>
+
+    @if (post()) {
+      <div class="ps-field">
+        <span>PIN <em [class.need]="pinRequired()">{{ pinRequired() ? 'Necesario' : 'Opcional' }}</em></span>
+        @if (showPinField()) {
+          <div class="ps-pin">
+            <input name="personPin" [ngModel]="pin()" (ngModelChange)="pin.set($event)" inputmode="numeric" maxlength="6" placeholder="4 números" aria-label="PIN">
+            <button type="button" (click)="suggestPin()">Generar</button>
+          </div>
+          <small class="ps-hint">{{ access() ? 'Con su PIN entra en la tablet del local y marca asistencia.' : 'Con su PIN marca asistencia en la tablet.' }} Díselo en persona.</small>
+        } @else {
+          <div class="ps-set">
+            <b><app-icon name="check" [size]="15" />Ya tiene PIN</b>
+            <button type="button" (click)="changingPin.set(true)">Cambiar</button>
+            @if (!access() || person()!.hasPassword) { <button type="button" (click)="removePin()">Quitar</button> }
+          </div>
+        }
+      </div>
+    }
+
+    @if (access()) {
+      <div class="ps-fold" [class.open]="section() === 'phone'">
+        <button type="button" class="ps-fold-head" (click)="toggleSection('phone')" [attr.aria-expanded]="section() === 'phone'">
+          <app-icon name="smartphone" [size]="17" /><span><b>Entrar desde su celular</b><small>{{ withEmail() ? email() : 'Correo y contraseña' }}</small></span><em>Opcional</em><app-icon name="chevron-down" [size]="16" />
+        </button>
+        @if (section() === 'phone') {
+          <div class="ps-fold-body">
+            <label class="ps-field"><span>Correo</span><input type="email" name="personEmail" [ngModel]="email()" (ngModelChange)="email.set($event)" maxlength="180" placeholder="carlos@correo.com" autocomplete="off" autocapitalize="none"></label>
+            <label class="ps-field"><span>{{ person()?.hasPassword ? 'Nueva contraseña' : 'Contraseña' }} @if (person()?.hasPassword) {<em>Opcional</em>}</span><input type="password" name="personPassword" [ngModel]="password()" (ngModelChange)="password.set($event)" maxlength="72" placeholder="8 caracteres o más" autocomplete="new-password"></label>
+          </div>
+        }
+      </div>
+    }
+
+    @if (post()) {
+      <div class="ps-fold" [class.open]="section() === 'more'">
+        <button type="button" class="ps-fold-head" (click)="toggleSection('more')" [attr.aria-expanded]="section() === 'more'">
+          <app-icon name="edit" [size]="17" /><span><b>Más datos</b><small>DNI, celular, fecha de ingreso</small></span><em>Opcional</em><app-icon name="chevron-down" [size]="16" />
+        </button>
+        @if (section() === 'more') {
+          <div class="ps-fold-body">
+            <div class="ps-two">
+              <label class="ps-field"><span>DNI</span><input name="personDocument" [ngModel]="document()" (ngModelChange)="document.set($event)" inputmode="numeric" maxlength="12" placeholder="8 números"></label>
+              <label class="ps-field"><span>Celular</span><input type="tel" name="personPhone" [ngModel]="phone()" (ngModelChange)="phone.set($event)" maxlength="30" placeholder="987 654 321"></label>
+            </div>
+            @if (access()) {
+              <label class="ps-field"><span>Cargo</span><input name="personJob" [ngModel]="job()" (ngModelChange)="job.set($event)" maxlength="60" placeholder="Ej. Jefe de salón"></label>
+            }
+            <div class="ps-field">
+              <span>Fecha de ingreso</span>
+              <div class="ps-date">
+                <input name="hireDay" [ngModel]="hireDay()" (ngModelChange)="hireDay.set($event)" inputmode="numeric" maxlength="2" placeholder="Día" aria-label="Día">
+                <input name="hireMonth" [ngModel]="hireMonth()" (ngModelChange)="hireMonth.set($event)" inputmode="numeric" maxlength="2" placeholder="Mes" aria-label="Mes">
+                <input name="hireYear" [ngModel]="hireYear()" (ngModelChange)="hireYear.set($event)" inputmode="numeric" maxlength="4" placeholder="Año" aria-label="Año">
+                <button type="button" (click)="setToday()">Hoy</button>
+              </div>
+            </div>
+            @if (post() === 'WAITER') {
+              <div class="ps-field">
+                <span>También puede</span>
+                <button type="button" class="ps-switch" role="switch" [attr.aria-checked]="canCounter()" (click)="canCounter.set(!canCounter())"><span><b>Tomar pedidos de mostrador</b><small>Para llevar y delivery</small></span><i></i></button>
+                <button type="button" class="ps-switch" role="switch" [attr.aria-checked]="canReservations()" (click)="canReservations.set(!canReservations())"><span><b>Gestionar reservas</b><small>Crear, cambiar y cancelar</small></span><i></i></button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <div class="ps-foot">
+      @if (error()) { <p class="ps-error">{{ error() }}</p> }
+      @else if (missing()) { <p class="ps-missing">{{ missing() }}</p> }
+      <button class="as-btn" [disabled]="!!missing() || saving()">{{ saving() ? 'Guardando…' : person() ? 'Guardar cambios' : 'Agregar al equipo' }}</button>
+      @if (person(); as current) {
+        @if (current.active) { <button type="button" class="ps-link danger" [disabled]="saving()" (click)="setActive(false)">Ya no trabaja aquí</button> }
+        @else { <button type="button" class="ps-link" [disabled]="saving()" (click)="setActive(true)">Volvió a trabajar aquí</button> }
+      }
+    </div>
+  </form>
+</section>

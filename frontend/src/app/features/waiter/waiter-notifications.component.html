@@ -1,0 +1,44 @@
+<button
+  class="notification-bell"
+  (click)="toggleNotificationCenter()"
+  [attr.aria-expanded]="notificationCenterOpen()"
+  aria-label="Abrir notificaciones"
+>
+  <svg class="service-icon" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />
+  </svg>
+  @if (unreadNotifications()) {
+    <span>{{ unreadNotifications() > 9 ? '9+' : unreadNotifications() }}</span>
+  }
+</button>
+@if (notificationCenterOpen()) {
+  <section class="notification-drawer">
+    <header>
+      <div>
+        <p class="eyebrow">Actividad del turno</p>
+        <h2>Notificaciones</h2>
+      </div>
+      @if (notifications().length) {
+        <button class="notification-clear" (click)="clearNotificationHistory()">Limpiar</button>
+      }
+    </header>
+    <div class="notification-list">
+      @for (notification of notifications(); track notification.id) {
+        <article class="notification-item" [class.unread]="notification.unread">
+          <span [class]="'notification-symbol ' + notification.tone">{{ notification.icon }}</span>
+          <div>
+            <strong>{{ notification.title }}</strong>
+            <p>{{ notification.body }}</p>
+            <small>{{ notificationTime(notification.createdAt) }}</small>
+          </div>
+        </article>
+      }
+      @if (!notifications().length) {
+        <div class="notification-empty">
+          <span>🔔</span><strong>Sin notificaciones</strong>
+          <p>La actividad del turno aparecerá aquí.</p>
+        </div>
+      }
+    </div>
+  </section>
+}

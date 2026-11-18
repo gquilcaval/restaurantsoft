@@ -1,0 +1,24 @@
+// Lista de insumos con nivel frente al mínimo, y tabla de movimientos.
+.iv-layout { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(330px, 1fr); gap: 16px; }
+.iv-list { min-height: 0; display: flex; flex-direction: column; padding: 12px; border-radius: 24px; }
+.iv-toolbar { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; flex-shrink: 0; padding: 2px 2px 10px; }
+.iv-search { display: flex; align-items: center; gap: 8px; flex: 1 1 160px; min-width: 0; height: 38px; padding: 0 14px; border-radius: 999px; color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); }
+.iv-search:focus-within { box-shadow: 0 0 0 2px var(--brand); }
+.iv-search input { flex: 1; width: 100%; min-width: 0; height: 100%; border: 0; background: transparent; color: var(--text); font: inherit; font-weight: 600; outline: none; }
+.iv-chip { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border: 0; border-radius: 999px; color: var(--muted); font-size: .78rem; font-weight: 750; background: color-mix(in srgb, var(--text) 7%, transparent); }
+.iv-chip i { width: 8px; height: 8px; border-radius: 50%; background: var(--warn); }
+.iv-chip.on { color: var(--text); background: color-mix(in srgb, var(--warn) 18%, transparent); box-shadow: inset 0 0 0 1.5px var(--warn); }
+.iv-rows { flex: 1; min-height: 0; display: grid; align-content: start; gap: 2px; overflow-y: auto; padding: 0 2px; scrollbar-width: thin; }
+.iv-row { --tone: #3fbf2a; display: grid; grid-template-columns: minmax(0, 1fr) 110px 110px 74px; align-items: center; gap: 12px; width: 100%; padding: 9px 12px; border: 0; border-radius: 14px; text-align: left; color: var(--text); font: inherit; background: transparent; cursor: pointer; animation: iv-in .35s var(--ease-out) var(--d) backwards; transition: background .2s; }
+.iv-row.low { --tone: #f5b301; } .iv-row.negative { --tone: #ef5d55; } .iv-row.inactive { opacity: .55; }
+.iv-row:hover { background: color-mix(in srgb, var(--text) 5%, transparent); }
+.iv-row.selected { background: color-mix(in srgb, var(--brand) 13%, transparent); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--brand) 60%, transparent); }
+.iv-row-main { display: grid; gap: 1px; min-width: 0; }
+.iv-row-main strong { font: 750 .9rem var(--font-display); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.iv-row-main small, .iv-stock small { color: var(--muted); font-size: .7rem; }
+.iv-level { position: relative; display: block; height: 6px; border-radius: 9px; background: color-mix(in srgb, var(--text) 9%, transparent); overflow: hidden; }
+.iv-level i { display: block; height: 100%; border-radius: 9px; background: var(--tone); transition: width .6s var(--ease-out); }
+.iv-stock { display: grid; justify-items: end; gap: 0; } .iv-stock b { font: 750 .88rem var(--font-display); white-space: nowrap; }
+.iv-tag { justify-self: end; padding: 2px 9px; border-radius: 999px; font-style: normal; font-size: .68rem; font-weight: 800; }
+.iv-tag.ok { color: var(--ok); background: var(--ok-soft); } .iv-tag.warn { color: var(--warn); background: var(--warn-soft); } .iv-tag.bad { color: var(--bad); background: var(--bad-soft); }
+@media (max-width: 1100px) { .iv-layout { grid-template-columns: minmax(0, 1fr); } .iv-row { grid-template-columns: minmax(0, 1fr) 90px 70px; } .iv-level { display: none; } }

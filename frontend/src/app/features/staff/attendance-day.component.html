@@ -1,0 +1,43 @@
+@if (day(); as current) {
+  @if (!current.enabled) {
+    <div class="lg pf-off">
+      <span><app-icon name="clock" [size]="24" /></span>
+      <strong>El módulo de asistencia no está activo</strong>
+      <small>Es un adicional de tu plan. Cuando esté activo, tu personal marcará entrada y salida con su PIN en la tablet del local.</small>
+    </div>
+  } @else {
+    <header class="ad-head">
+      <div class="ad-nav">
+        <button class="ad-arrow" (click)="go(-1)" aria-label="Día anterior"><app-icon name="arrow-left" [size]="18" /></button>
+        <button class="ad-title" (click)="goToday()" [disabled]="isToday()"><h2>{{ dayTitle() }}</h2>@if (!isToday()) {<small>Volver a hoy</small>}</button>
+        <button class="ad-arrow next" (click)="go(1)" [disabled]="isToday()" aria-label="Día siguiente"><app-icon name="arrow-left" [size]="18" /></button>
+      </div>
+      @if (isToday()) { <a class="ad-pill" routerLink="/asistencia" target="_blank"><app-icon name="maximize" [size]="15" />Pantalla de marcación</a> }
+    </header>
+    <div class="pf-stats">
+      @for (stat of stats(); track stat.label) { <div class="lg" [attr.data-tone]="stat.tone"><b>{{ stat.value }}</b><span>{{ stat.label }}</span></div> }
+    </div>
+    <div class="lg ad-list">
+      @for (item of rows(); track item.row.id) {
+        @let row = item.row;
+        <button class="pf-row" [class.dim]="item.badge.tone === 'muted' && row.state === 'ABSENT'" [class.selected]="selectedId() === row.id" (click)="selectedId.set(row.id)">
+          <span class="ad-avatar">{{ initials(row.fullName) }}</span>
+          <span class="pf-row-main"><strong>{{ row.fullName }}</strong><small>{{ row.jobTitle || roleLabel(row.role) }}</small></span>
+          <span class="pf-badges"><span class="pf-state" [attr.data-tone]="item.badge.tone">{{ item.badge.text }}</span>@if (row.verdict === 'LATE') {<span class="pf-state" data-tone="warn">Tarde {{ row.lateMinutes }} min</span>}</span>
+          <span class="pf-times">
+            @if (row.firstIn) { <span><small>Entrada</small><b>{{ time(row.firstIn) }}</b></span> }
+            @if (row.lastOut) { <span><small>Salida</small><b>{{ time(row.lastOut) }}</b></span> }
+            @if (row.firstIn) { <span><small>Trabajado</small><b>{{ duration(row.workedMinutes) }}</b></span> }
+          </span>
+        </button>
+      } @empty { <p class="ad-muted">Todavía no hay personas en el equipo.</p> }
+    </div>
+    <p class="ad-tip">Toca a una persona para ver sus marcas{{ current.canCorrect ? ' o corregirlas' : '' }}. Tolerancia de tardanza: {{ current.toleranceMinutes }} min.</p>
+  }
+  @if (selected(); as row) {
+    <app-attendance-sheet [row]="row" [date]="current.date" [canCorrect]="current.canCorrect" [isToday]="isToday()"
+      (changed)="load()" (closed)="selectedId.set(null)" />
+  }
+} @else {
+  <div class="lg ad-list"><p class="ad-muted">{{ failed() ? 'No se pudo cargar la asistencia. Revisa tu conexión.' : 'Cargando asistencia…' }}</p></div>
+}

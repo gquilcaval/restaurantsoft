@@ -1,0 +1,30 @@
+// Anular un plato: encabezado claro, motivos como tarjetas, cantidad con «Todas» y botón con el monto que baja.
+:host { display: contents; }
+svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.vd-backdrop { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 16px; background: rgba(5, 7, 6, .55); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); animation: vd-fade .2s ease-out; }
+.vd { display: grid; gap: 16px; width: min(460px, 100%); max-height: calc(100dvh - 32px); overflow-y: auto; padding: 20px; border-radius: 28px; color: var(--text); background: var(--surface); box-shadow: 0 30px 80px rgba(0, 0, 0, .45); animation: vd-in .32s cubic-bezier(.2, 1.2, .4, 1); }
+.vd-grip { display: none; }
+.vd-head { display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; align-items: start; gap: 12px; }
+.vd-icon { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 15px; color: #ef4444; background: rgba(239, 68, 68, .14); }
+.vd-icon svg { width: 22px; height: 22px; }
+.vd-head small { color: #ef4444; font-size: .68rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.vd-head h2 { margin: 2px 0 0; font: 800 1.15rem var(--font-display); line-height: 1.25; }
+.vd-head h2 b { color: var(--muted); }
+.vd-mods { margin: 3px 0 0; color: var(--brand-accent, var(--brand)); font-size: .78rem; font-weight: 700; }
+.vd-close { width: 38px; height: 38px; display: grid; place-items: center; border: 0; border-radius: 50%; color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); }
+.vd-info { display: flex; gap: 8px; margin: 0; padding: 10px 12px; border-radius: 14px; color: var(--muted); font-size: .76rem; line-height: 1.4; background: color-mix(in srgb, var(--text) 5%, transparent); }
+.vd-info svg { flex-shrink: 0; width: 16px; height: 16px; margin-top: 1px; }
+.vd-block { display: grid; gap: 10px; }
+.vd-block h3 { margin: 0; font-size: .9rem; font-weight: 800; }
+@media (max-width: 620px) {
+  .vd-backdrop { align-items: end; padding: 0; }
+  .vd { width: 100%; max-height: 92dvh; padding: 8px 16px max(16px, env(safe-area-inset-bottom)); border-radius: 28px 28px 0 0; animation: vd-up .35s cubic-bezier(.2, 1, .3, 1); }
+  .vd-foot { position: sticky; bottom: calc(-1 * max(16px, env(safe-area-inset-bottom))); z-index: 1; margin: 0 -16px; padding: 12px 16px max(16px, env(safe-area-inset-bottom)); background: var(--surface); box-shadow: 0 -10px 22px rgba(0, 0, 0, .14); }
+  .vd { transition: transform .3s cubic-bezier(.2, 1, .3, 1); }
+  .vd.dragging { transition: none; animation: none; }
+  .vd-drag { display: grid; gap: 10px; touch-action: none; cursor: grab; }
+  .vd-grip { display: block; width: 42px; height: 5px; margin: 0 auto; border-radius: 999px; background: color-mix(in srgb, var(--text) 20%, transparent); }
+}
+@keyframes vd-fade { from { opacity: 0; } }
+@keyframes vd-in { from { opacity: 0; transform: translateY(12px) scale(.97); } }
+@keyframes vd-up { from { transform: translateY(100%); } }

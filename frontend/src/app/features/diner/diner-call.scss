@@ -1,0 +1,15 @@
+// Llamar al mesero: motivos de un toque y la pregunta «¿Ya te atendió?».
+.dn-reasons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.dn-reasons button { display: grid; justify-items: start; gap: 6px; min-height: 76px; padding: 12px 14px; border: 0; border-radius: 18px; color: var(--text); background: var(--surface-2); font: 750 .86rem inherit; text-align: left; transition: background .2s, box-shadow .2s, transform .2s; }
+.dn-reasons button span { font-size: 1.3rem; }
+.dn-reasons button:active { transform: scale(.97); }
+.dn-reasons button.on { color: var(--brand); background: var(--brand-soft); box-shadow: inset 0 0 0 2px var(--brand); }
+.dn-reasons button.urgent.on { color: #b23a31; background: #fdecea; box-shadow: inset 0 0 0 2px #d64036; }
+.dn-call-send { height: 54px; border: 0; border-radius: 18px; color: #fff; background: var(--brand); font: 800 1rem inherit; box-shadow: 0 10px 24px color-mix(in srgb, var(--brand) 34%, transparent); }
+.dn-call-hint { justify-self: center; color: var(--muted); font-size: .74rem; }
+.dn-ask { position: fixed; z-index: 30; left: 50%; bottom: calc(150px + env(safe-area-inset-bottom)); display: grid; gap: 10px; width: min(360px, calc(100vw - 32px)); padding: 14px 16px; border-radius: 22px; background: var(--surface); box-shadow: 0 16px 40px rgba(0, 0, 0, .22); translate: -50% 0; animation: dn-ask-in .4s cubic-bezier(.2, 1.2, .4, 1); }
+@keyframes dn-ask-in { from { opacity: 0; transform: translateY(16px) scale(.96); } }
+.dn-ask b { font-size: .98rem; }
+.dn-ask div { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.dn-ask button { height: 44px; border: 0; border-radius: 14px; color: var(--text); background: var(--surface-2); font: 800 .88rem inherit; }
+.dn-ask button.yes { color: #fff; background: var(--brand); }

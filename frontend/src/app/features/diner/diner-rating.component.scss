@@ -1,0 +1,26 @@
+:host { display: block; margin: 18px 0 16px; }
+.rating-card { display: grid; gap: 10px; justify-items: center; padding: 18px; border-radius: 20px; background: var(--surface-2); border: 1px solid var(--border); animation: rt-in .5s cubic-bezier(.2, 1.2, .4, 1) .2s backwards; }
+.rating-card > strong { font-size: 1.05rem; }
+.rating-stars { display: flex; gap: 6px; }
+.rating-stars button {
+  border: 0; background: transparent; padding: 2px; font-size: 2.4rem; line-height: 1; color: var(--surface-3);
+  transition: transform .2s cubic-bezier(.3, 1.8, .5, 1), color .2s; animation: rt-star .5s cubic-bezier(.3, 1.8, .5, 1) backwards;
+  animation-delay: calc(var(--i) * 70ms + .3s);
+}
+.rating-stars button.on { color: #f5b301; transform: scale(1.15) rotate(-6deg); text-shadow: 0 4px 14px #f5b30166; }
+.rating-stars button:active { transform: scale(.9); }
+.rating-label { min-height: 1.2em; font-weight: 800; color: var(--muted); }
+.rating-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; animation: rt-in .35s ease-out; }
+.rating-chips button { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 999px; padding: 7px 12px; font-weight: 700; font-size: .8rem; transition: transform .15s, background .2s; }
+.rating-chips button.on { border-color: var(--brand); background: var(--brand-soft); transform: scale(1.05); }
+.rating-card textarea { width: 100%; border: 1px solid var(--border); border-radius: 12px; padding: 10px; background: var(--surface); color: var(--text); font: inherit; resize: none; }
+.rating-thanks { position: relative; display: grid; gap: 4px; justify-items: center; padding: 22px 16px; border-radius: 20px; background: var(--green-soft); animation: rt-in .5s cubic-bezier(.2, 1.3, .4, 1); }
+.rating-thanks small { color: var(--muted); }
+.rating-confetti { position: absolute; left: 50%; top: 40%; pointer-events: none; }
+.rating-confetti i { position: absolute; width: 8px; height: 12px; border-radius: 2px; background: var(--c); animation: rt-confetti 1.3s cubic-bezier(.2, .7, .4, 1) var(--d) both; }
+@keyframes rt-in { from { opacity: 0; transform: translateY(10px) scale(.97); } }
+@keyframes rt-star { from { opacity: 0; transform: scale(0) rotate(-90deg); } }
+@keyframes rt-confetti {
+  0% { transform: translate(0, 0) rotate(0); opacity: 1; }
+  100% { transform: translate(var(--x), 120px) rotate(540deg); opacity: 0; }
+}

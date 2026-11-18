@@ -1,0 +1,85 @@
+<div class="as-scrim" [class.out]="closing()" (click)="close()"></div>
+<section class="as-sheet" role="dialog" aria-modal="true" [attr.aria-label]="'Asistencia de ' + row().fullName"
+  [class.out]="closing()" [class.dragging]="dragging()" [style.--drag.px]="dragY()">
+  <div class="as-grab" (touchstart)="onTouchStart($event)" (touchmove)="onTouchMove($event)" (touchend)="onTouchEnd()">
+    <i></i>
+    <header class="as-head">
+      @if (mode() !== 'list') {
+        <button class="as-round" (click)="back()" aria-label="Volver"><app-icon name="arrow-left" [size]="17" /></button>
+      } @else {
+        <span class="as-avatar">{{ initials(row().fullName) }}</span>
+      }
+      <div><h3>{{ mode() === 'list' ? row().fullName : formTitle() }}</h3><small>{{ mode() === 'list' ? stateLine() : row().fullName }}</small></div>
+      <button class="as-round" (click)="close()" aria-label="Cerrar"><app-icon name="x" [size]="16" /></button>
+    </header>
+  </div>
+
+  <div class="as-body">
+    @if (mode() === 'list') {
+      @if (shift()) {
+        <p class="as-shift"><app-icon name="clock" [size]="14" />Horario {{ shift() }}@if (row().verdict === 'LATE') {<b>Tarde {{ row().lateMinutes }} min</b>}</p>
+      }
+      @if (row().firstIn) {
+        <div class="as-sum">
+          <span><small>Entrada</small><b>{{ limaTime(row().firstIn!) }}</b></span>
+          <span><small>Salida</small><b>{{ row().lastOut ? limaTime(row().lastOut!) : '—' }}</b></span>
+          <span><small>Trabajado</small><b>{{ duration(row().workedMinutes) }}</b></span>
+        </div>
+      }
+      @if (row().needsReview) { <p class="as-warn">Las marcas no están en orden. Agrega la que falta o anula la que sobra.</p> }
+      @else if (row().state === 'NO_OUT') { <p class="as-warn">No marcó su salida. Agrégala con la hora en que se fue.</p> }
+
+      <ol class="as-marks">
+        @for (mark of row().marks; track mark.id) {
+          <li [class.void]="!!mark.voidedAt" [class.open]="openId() === mark.id">
+            <button class="as-mark" [attr.data-kind]="mark.kind" [class.fixed]="!!mark.voidedAt || !canCorrect()" (click)="toggle(mark)">
+              <i></i>
+              <b>{{ limaTime(mark.at) }}@if (isNextDay(mark)) {<em>día sig.</em>}</b>
+              <span>{{ kindLabels[mark.kind] }}</span>
+              <small>{{ sourceLine(mark) }}</small>
+            </button>
+            @if (openId() === mark.id) {
+              <div class="as-mark-actions">
+                <button (click)="startChange(mark)"><app-icon name="clock" [size]="15" />Cambiar hora</button>
+                <button class="danger" (click)="startVoid(mark)"><app-icon name="x" [size]="15" />Anular</button>
+              </div>
+            }
+          </li>
+        } @empty { <li class="as-empty">No marcó este día.</li> }
+      </ol>
+
+      @if (canCorrect()) {
+        <button class="as-btn" (click)="startAdd()"><app-icon name="plus" [size]="17" />Agregar marca</button>
+      } @else {
+        <p class="as-note">Este día ya no se puede corregir: solo se corrigen los últimos 31 días.</p>
+      }
+    } @else {
+      @if (mode() === 'add') {
+        <div class="as-seg" role="radiogroup" aria-label="Tipo de marca">
+          @for (option of kinds; track option) {
+            <button type="button" role="radio" [attr.aria-checked]="kind() === option" [class.on]="kind() === option" (click)="kind.set(option)">{{ kindLabels[option] }}</button>
+          }
+        </div>
+      }
+      @if (mode() === 'void') {
+        <p class="as-void-info"><b>{{ kindLabels[kind()] }} · {{ twelveHour(time()) }}</b>No se borra: queda tachada y se deja de contar.</p>
+      } @else {
+        <p class="as-clock">{{ twelveHour(time()) }}@if (nextDay()) {<small>madrugada del día siguiente</small>}</p>
+        <app-time-wheel [(value)]="time" />
+      }
+      <span class="as-label">Motivo</span>
+      <div class="as-chips">
+        @for (option of reasons(); track option) {
+          <button type="button" [class.on]="reason() === option" (click)="reason.set(option); error.set('')">{{ option }}</button>
+        }
+      </div>
+      @if (reason() === 'Otro') {
+        <input class="as-input" [ngModel]="otherReason()" (ngModelChange)="otherReason.set($event); error.set('')" maxlength="200" placeholder="Escribe el motivo" aria-label="Motivo">
+      }
+      @if (error()) { <p class="as-error">{{ error() }}</p> }
+      <button class="as-btn" [class.danger]="mode() === 'void'" [disabled]="saving() || unchanged() || finalReason().length < 3" (click)="save()">
+        {{ saving() ? 'Guardando…' : mode() === 'void' ? 'Anular marca' : mode() === 'change' ? 'Guardar nueva hora' : 'Guardar marca' }}
+      </button>
+    }
+  </div>
+</section>

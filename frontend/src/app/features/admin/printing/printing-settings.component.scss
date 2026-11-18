@@ -1,0 +1,27 @@
+// Configuración de impresoras: tarjetas, rutas por estación y ticketeras.
+:host { display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+.pr-head h2 { margin: 0; font: 800 1.35rem var(--font-display); letter-spacing: -.02em; }
+.pr-head p { margin: 3px 0 0; color: var(--muted); font-size: .84rem; line-height: 1.4; }
+.pr-card { display: grid; gap: 10px; padding: 16px; border-radius: 22px; }
+.pr-card h3 { margin: 0; font: 800 1rem var(--font-display); }
+.pr-card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.pr-muted, .pr-note { margin: 0; color: var(--muted); font-size: .82rem; line-height: 1.45; }
+.pr-note { padding: 10px 12px; border-radius: 14px; background: color-mix(in srgb, var(--text) 5%, transparent); }
+.pr-warn { margin: 0; padding: 10px 12px; border-radius: 14px; color: var(--warn); background: color-mix(in srgb, var(--warn) 13%, transparent); font-size: .82rem; font-weight: 650; }
+.pr-route { display: grid; grid-template-columns: minmax(120px, 180px) minmax(0, 1fr); align-items: center; gap: 8px 14px; padding: 6px 0; }
+.pr-route b { font-size: .9rem; }
+.pr-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.pr-chips button { height: 36px; display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; border: 0; border-radius: 999px; color: var(--text); background: color-mix(in srgb, var(--text) 7%, transparent); font-size: .8rem; font-weight: 750; }
+.pr-chips button.on { color: var(--on-brand, #04110a); background: var(--brand); }
+.pr-printer { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 16px; background: color-mix(in srgb, var(--text) 4%, transparent); }
+.pr-ico { width: 38px; height: 38px; display: grid; place-items: center; flex-shrink: 0; border-radius: 12px; color: var(--muted); background: color-mix(in srgb, var(--text) 8%, transparent); }
+.pr-printer-main { flex: 1; min-width: 0; display: grid; }
+.pr-printer-main b { font-size: .92rem; } .pr-printer-main small { color: var(--muted); font-size: .76rem; }
+.pr-state { max-width: 40%; overflow: hidden; padding: 4px 10px; border-radius: 999px; font-size: .72rem; font-weight: 800; white-space: nowrap; text-overflow: ellipsis; color: var(--muted); background: color-mix(in srgb, var(--text) 8%, transparent); }
+.pr-state[data-tone='ok'] { color: var(--ok); background: var(--ok-soft); }
+.pr-state[data-tone='bad'] { color: var(--bad); background: var(--bad-soft); }
+.pr-actions { display: flex; gap: 6px; }
+@media (max-width: 640px) {
+  .pr-route { grid-template-columns: minmax(0, 1fr); }
+  .pr-printer { flex-wrap: wrap; } .pr-state { max-width: none; order: 3; } .pr-actions { margin-left: auto; }
+}

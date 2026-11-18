@@ -1,0 +1,9 @@
+// Cabecera del detalle: qué mesa es, su estado y cerrar.
+.mz-detail-head { --tone: #f08a3c; grid-column: 1 / -1; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; width: 100%; margin-bottom: 14px; }
+.mz-detail-head[data-state='ready'] { --tone: #3fbf2a; } .mz-detail-head[data-state='bill'] { --tone: #a46bff; } .mz-detail-head[data-state='call'] { --tone: #f5b301; } .mz-detail-head[data-state='review'] { --tone: #ef5d55; }
+.mz-detail-head h2 { display: flex; align-items: center; gap: 10px; margin: 0; font: 800 1.5rem var(--font-display); letter-spacing: -.02em; }
+.mz-detail-head h2 .mz-state { font-weight: 800; font-size: .72rem; letter-spacing: 0; }
+.mz-detail-head small { display: flex; align-items: center; gap: 6px; margin-top: 4px; color: var(--muted); font-size: .8rem; font-weight: 600; }
+.mz-detail-head small i { width: 8px; height: 8px; border-radius: 50%; }
+.mz-close { flex-shrink: 0; width: 40px; height: 40px; display: grid; place-items: center; border: 0; border-radius: 50%; color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); }
+.mz-close:hover { background: color-mix(in srgb, var(--text) 14%, transparent); }

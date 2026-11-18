@@ -1,0 +1,29 @@
+// Pendientes compactos: una fila por aviso, ordenados por urgencia.
+.mq-list .queue-group { display: flex; align-items: center; justify-content: space-between; margin: 14px 6px 6px; }
+.mq-list .queue-group:first-child { margin-top: 6px; }
+.mq-list .queue-group span { min-width: 20px; padding: 0 6px; border-radius: 999px; text-align: center; background: color-mix(in srgb, var(--text) 8%, transparent); }
+.mq-item { --tone: #f5b301; display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; align-items: center; gap: 10px; margin-bottom: 4px; padding: 8px 8px 8px 8px; border-radius: 14px; transition: background .2s; animation: mq-in .35s var(--ease-out) backwards; }
+.mq-item:hover { background: color-mix(in srgb, var(--text) 5%, transparent); }
+.mq-item[data-tone='bill'] { --tone: #a46bff; } .mq-item[data-tone='review'] { --tone: #ef5d55; } .mq-item[data-tone='ready'] { --tone: #3fbf2a; } .mq-item[data-tone='arrival'] { --tone: #2db8a5; }
+.mq-item[data-tone='transfer'] { --tone: #4f8cff; } .mq-item[data-tone='late'] { --tone: #f08a3c; }
+.mq-ico { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 11px; color: var(--tone); background: color-mix(in srgb, var(--tone) 16%, transparent); }
+.mq-body { display: grid; gap: 1px; min-width: 0; }
+.mq-body strong { display: flex; align-items: baseline; gap: 6px; font: 750 .86rem var(--font-display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mq-body strong small { color: var(--muted); font-weight: 600; font-size: .68rem; }
+.mq-body > small { color: var(--muted); font-size: .72rem; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mq-actions { display: flex; gap: 4px; }
+.mq-btn { height: 30px; padding: 0 11px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--text); font-size: .72rem; font-weight: 750; white-space: nowrap; transition: transform .3s var(--ease-spring), background .2s; }
+.mq-btn:hover:not(:disabled) { background: color-mix(in srgb, var(--text) 14%, transparent); }
+.mq-btn:active:not(:disabled) { transform: scale(.92); }
+.mq-btn.primary { color: var(--on-brand, #04110a); background: var(--brand); }
+.mq-btn.icon { width: 30px; padding: 0; display: grid; place-items: center; }
+.mq-item.compact { grid-template-columns: 26px minmax(0, 1fr); gap: 8px; padding: 6px 8px; }
+.mq-item.compact .mq-ico { width: 26px; height: 26px; border-radius: 9px; }
+.mq-item.compact strong { font-size: .8rem; }
+@keyframes mq-in { from { opacity: 0; transform: translateX(8px); } }
+.mq-note { color: var(--tone) !important; font-weight: 650; }
+@media (max-width: 1500px) { .mz-filters button { padding: 0 10px; gap: 5px; } .mz-filters button i { display: none; } .mz-tabs button { padding: 0 12px; } }
+.mz-table .service-avatars i:first-child { margin-left: 0; }
+.mz-list.floor-mode { display: flex; flex-direction: column; overflow: hidden; padding-bottom: 4px; }
+.mz-list.floor-mode > app-floor-view { flex: 1; min-height: 0; }
+.waiter-tables-panel:has(.floor-mode) .mz-zones { display: none; }

@@ -1,0 +1,116 @@
+@if (inline()) {
+  <section class="bd inline lg" aria-labelledby="bd-title"><ng-container [ngTemplateOutlet]="content" /></section>
+} @else {
+  <div class="bd-backdrop" (click)="requestClose(true)">
+    <section class="bd" role="dialog" aria-modal="true" aria-labelledby="bd-title" (click)="$event.stopPropagation()"><ng-container [ngTemplateOutlet]="content" /></section>
+  </div>
+}
+<ng-template #content>
+    <!-- Editor -->
+    <div class="bd-edit">
+      <header class="bd-head">
+        <span class="bd-head-ico"><app-icon name="palette" [size]="20" /></span>
+        <div><p class="bd-eyebrow">Marca del restaurante</p><h2 id="bd-title">Personaliza tu marca</h2></div>
+        @if (!inline()) { <button class="bd-close" (click)="requestClose()" aria-label="Cerrar"><app-icon name="x" [size]="18" /></button> }
+      </header>
+      <p class="bd-purpose">Se aplica a todo el equipo, la carta QR, las reservas online y los tickets.</p>
+
+      <div class="bd-scroll" [class.busy]="loading()">
+        <section class="bd-sec">
+          <h3><span>1</span>Identidad</h3>
+          <div class="bd-identity">
+            <label class="bd-logo" [class.drag]="dragging()" [class.has]="brand().logoUrl" (dragover)="$event.preventDefault(); dragging.set(true)" (dragleave)="dragging.set(false)" (drop)="dropLogo($event)">
+              @if (uploading()) { <i class="bd-spin"></i> }
+              @else if (brand().logoUrl) { <img [src]="brand().logoUrl" alt="Logotipo"> }
+              @else { <span class="bd-logo-empty"><app-icon name="upload" [size]="18" /><small>Logo</small></span> }
+              <input type="file" accept="image/png,image/jpeg,image/webp" (change)="pickLogo($event)" [disabled]="uploading()" hidden>
+            </label>
+            <div class="bd-identity-fields">
+              <label class="bd-field"><span>Nombre del restaurante</span>
+                <input [ngModel]="brand().name" (ngModelChange)="patch({ name: $event })" maxlength="120" placeholder="Ej. Sabores de Lima">
+              </label>
+              <p class="bd-hint">@if (brand().logoUrl) { <button class="bd-link" (click)="patch({ logoUrl: '' })">Quitar logotipo</button> · } Arrastra una imagen o toca el recuadro. PNG con fondo transparente se ve mejor.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="bd-sec">
+          <h3><span>2</span>Color de marca</h3>
+          <div class="bd-swatches" role="radiogroup" aria-label="Color de marca">
+            @for (color of swatches; track color) {
+              <button role="radio" class="bd-swatch" [style.--c]="color" [attr.aria-checked]="brand().color === color" [attr.aria-label]="color" (click)="patch({ color })"><app-icon name="check" [size]="14" /></button>
+            }
+            <label class="bd-swatch custom" [class.on]="!swatches.includes(brand().color)" [style.--c]="brand().color" title="Otro color">
+              <app-icon name="plus" [size]="14" /><input type="color" [ngModel]="brand().color" (ngModelChange)="patch({ color: $event.toLowerCase() })">
+            </label>
+          </div>
+          <div class="bd-hex">
+            <span class="bd-hex-dot" [style.background]="brand().color"></span>
+            <input [ngModel]="brand().color" (ngModelChange)="setHex($event)" maxlength="7" spellcheck="false" aria-label="Código del color">
+            <small>Texto sobre este color: <b [style.background]="brand().color" [style.color]="ink()">{{ ink() === '#ffffff' ? 'blanco' : 'oscuro' }}</b></small>
+          </div>
+        </section>
+
+        <section class="bd-sec">
+          <h3><span>3</span>Tema del equipo</h3>
+          <div class="bd-themes" role="radiogroup" aria-label="Tema predeterminado">
+            @for (option of themes; track option.value) {
+              <button role="radio" class="bd-card" [attr.aria-checked]="brand().theme === option.value" (click)="patch({ theme: option.value })">
+                <span class="bd-mini" [attr.data-look]="option.value"><i></i><b></b><b></b><em [style.background]="brand().color"></em></span>{{ option.label }}
+              </button>
+            }
+          </div>
+          <p class="bd-hint">Es el tema inicial. Cada persona puede cambiarlo en su menú → Apariencia.</p>
+        </section>
+
+        <section class="bd-sec">
+          <h3><span>4</span>Estilo de la carta QR</h3>
+          <div class="bd-menus" role="radiogroup" aria-label="Estilo de la carta">
+            @for (option of menuThemes; track option.value) {
+              <button role="radio" class="bd-card bd-menu" [attr.aria-checked]="brand().menu === option.value" (click)="patch({ menu: option.value }); previewTab.set('menu')">
+                <span class="bd-menu-swatch" [attr.data-menu]="option.value"><b [style.background]="brand().color"></b><b></b><b></b></span>
+                <strong>{{ option.label }}</strong><small>{{ option.hint }}</small>
+              </button>
+            }
+          </div>
+        </section>
+      </div>
+
+      <footer class="bd-foot" [class.nudge]="nudge()">
+        @if (dirty()) { <span class="bd-dirty"><i></i>Cambios sin guardar</span><button class="bd-btn ghost" (click)="discard()">Descartar</button> }
+        @else { <span class="bd-saved"><app-icon name="check" [size]="14" />Todo guardado</span> }
+        <button class="bd-btn primary" [disabled]="!dirty() || saving() || !brand().name.trim()" (click)="save()">{{ saving() ? 'Guardando…' : 'Guardar cambios' }}</button>
+      </footer>
+    </div>
+
+    <!-- Vista previa en vivo -->
+    <aside class="bd-preview" [style.--pv]="brand().color" [style.--pv-ink]="ink()">
+      <div class="bd-pv-tabs" role="tablist">
+        <button role="tab" [attr.aria-selected]="previewTab() === 'menu'" (click)="previewTab.set('menu')"><app-icon name="smartphone" [size]="14" />Carta QR</button>
+        <button role="tab" [attr.aria-selected]="previewTab() === 'team'" (click)="previewTab.set('team')"><app-icon name="grid" [size]="14" />Equipo</button>
+      </div>
+      @if (previewTab() === 'menu') {
+        <div class="bd-phone" [attr.data-menu]="brand().menu">
+          <div class="bd-ph-head">
+            <span class="bd-ph-logo">@if (brand().logoUrl) {<img [src]="brand().logoUrl" alt="">} @else { <span>{{ initial() }}</span> }</span>
+            <div><strong>{{ brand().name || 'Tu restaurante' }}</strong><small>Mesa 04 · Bienvenido</small></div>
+          </div>
+          <div class="bd-ph-chips"><span class="on">Entradas</span><span>Fondos</span><span>Bebidas</span></div>
+          @for (dish of sampleDishes; track dish.name) {
+            <div class="bd-ph-dish"><i></i><div><strong>{{ dish.name }}</strong><small>{{ dish.note }}</small><b>{{ dish.price }}</b></div><span class="bd-ph-add">+</span></div>
+          }
+          <div class="bd-ph-cart">Ver pedido · S/ 80</div>
+        </div>
+      } @else {
+        <div class="bd-app" [class.dark]="previewDark()">
+          <div class="bd-app-side"><span class="bd-ph-logo small">@if (brand().logoUrl) {<img [src]="brand().logoUrl" alt="">} @else { <span>{{ initial() }}</span> }</span><i class="on"></i><i></i><i></i><i></i></div>
+          <div class="bd-app-main">
+            <div class="bd-app-top"><b>{{ brand().name || 'Tu restaurante' }}</b><span>Resumen</span></div>
+            <div class="bd-app-card"><small>Ventas de hoy</small><strong>S/ 1,641</strong><div class="bd-app-bar"><i></i></div></div>
+            <div class="bd-app-row"><span class="bd-app-pill">Abrir caja</span><span class="bd-app-ghost">Ver mesas</span></div>
+          </div>
+        </div>
+      }
+      <p class="bd-pv-note">Vista previa · así lo verán tus clientes y tu equipo</p>
+    </aside>
+</ng-template>

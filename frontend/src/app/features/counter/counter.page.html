@@ -1,0 +1,186 @@
+<app-shell title="Mostrador" [eyebrow]="headerSummary()">
+  <div shell-actions class="cn-actions">
+    <button class="cn-pill primary cn-new" (click)="newOrder()"><app-icon name="plus" [size]="16" />Nuevo pedido</button>
+  </div>
+
+  <div class="cn">
+    <div class="cn-navrow">
+      <nav class="cn-tabs cn-channel-tabs" role="tablist" aria-label="Tipo de pedido">
+        <button role="tab" [attr.aria-selected]="channelFilter() === 'ALL'" (click)="channelFilter.set('ALL')">Todos<small>{{ channelCount('ALL') }}</small></button>
+        <button role="tab" [attr.aria-selected]="channelFilter() === 'TAKEAWAY'" (click)="channelFilter.set('TAKEAWAY')"><app-icon name="package" [size]="15" />Para llevar<small>{{ channelCount('TAKEAWAY') }}</small></button>
+        <button role="tab" [attr.aria-selected]="channelFilter() === 'DELIVERY'" (click)="channelFilter.set('DELIVERY')"><app-icon name="send" [size]="15" />Delivery<small>{{ channelCount('DELIVERY') }}</small></button>
+      </nav>
+      <nav class="cn-tabs cn-stage-tabs" role="tablist" aria-label="Etapa">
+        @for (column of columns(); track column.key) {
+          <button role="tab" [attr.data-tone]="column.tone" [attr.aria-selected]="stageTab() === column.key" (click)="stageTab.set(column.key)"><i></i>{{ column.short }}<small>{{ column.orders.length }}</small></button>
+        }
+      </nav>
+      <p class="cn-flow"><span>Toma</span><b>›</b><span>Cocina</span><b>›</b><span>Entrega</span><b>›</b><span>Cobra</span></p>
+      @if (dueTotal() > 0) { <span class="cn-due"><app-icon name="money" [size]="15" />Por cobrar <b>{{ money(dueTotal()) }}</b></span> }
+    </div>
+
+    @if (loading()) {
+      <div class="service-empty" role="status"><span class="service-loader"></span><p>Cargando pedidos…</p></div>
+    } @else {
+      <div class="cn-layout" [class.has-detail]="!!detail()">
+        <section class="cn-board">
+          @for (column of columns(); track column.key) {
+            <article class="lg cn-col" [attr.data-tone]="column.tone" [class.cn-col-off]="stageTab() !== column.key">
+              <header class="cn-col-head">
+                <span class="cn-col-ico"><app-icon [name]="column.icon" [size]="16" /></span>
+                <div><h3>{{ column.title }}</h3><small>{{ column.hint }}</small></div>
+                <b>{{ column.orders.length }}</b>
+              </header>
+              <div class="cn-col-list">
+                @for (order of column.orders; track order.sessionId; let index = $index) {
+                  <article class="cn-card" [class.selected]="detail()?.sessionId === order.sessionId" [class.late]="order.stage !== 'DELIVERED' && minutes(order.openedAt) >= 25" [style.--d]="index * 40 + 'ms'">
+                    <button class="cn-card-open" (click)="openDetail(order)" [attr.aria-label]="'Abrir pedido ' + order.label + ' de ' + order.customerName">
+                      <span class="cn-card-top">
+                        <span class="cn-channel" [class.delivery]="order.channel === 'DELIVERY'"><app-icon [name]="order.channel === 'DELIVERY' ? 'send' : 'package'" [size]="13" />{{ order.channel === 'DELIVERY' ? 'Delivery' : 'Para llevar' }} #{{ order.orderNumber }}</span>
+                        <span class="cn-time"><app-icon name="clock" [size]="12" />{{ elapsed(order.openedAt) }}</span>
+                      </span>
+                      <strong class="cn-name">{{ order.customerName }}</strong>
+                      @if (order.channel === 'DELIVERY' && order.deliveryAddress) { <small class="cn-addr"><app-icon name="map" [size]="12" />{{ order.deliveryAddress }}</small> }
+                      <span class="cn-dots" [attr.aria-label]="'Paso: ' + steps[stepIndex(order)]">@for (step of steps; track step; let i = $index) {<i [class.on]="i <= stepIndex(order)"></i>}<small>{{ steps[stepIndex(order)] }}</small></span>
+                      <span class="cn-card-foot">
+                        <small>{{ order.stage === 'NEW' ? 'Sin productos aún' : order.itemCount + (order.itemCount === 1 ? ' producto' : ' productos') }}</small>
+                        <span class="cn-money"><b>{{ money(order.total) }}</b>
+                          @if (order.remaining > 0 && order.total > 0) { <i class="due">Sin pagar</i> } @else if (order.total > 0) { <i class="paid">✓ Pagado</i> }
+                        </span>
+                      </span>
+                    </button>
+                    @if (quick(order); as action) {
+                      <button class="cn-quick" [attr.data-kind]="action.kind" [disabled]="busyId() === order.sessionId" (click)="runQuick(order)"><app-icon [name]="action.icon" [size]="16" />{{ busyId() === order.sessionId ? 'Un momento…' : action.label }}</button>
+                    } @else {
+                      <p class="cn-wait"><app-icon name="chef" [size]="14" />Cocina lo está preparando</p>
+                    }
+                  </article>
+                } @empty {
+                  <p class="cn-col-empty">{{ column.key === 'KITCHEN' ? 'Nada en preparación.' : column.key === 'READY' ? 'Nada esperando entrega.' : 'Nada por cobrar.' }}</p>
+                }
+              </div>
+            </article>
+          }
+        </section>
+
+        <!-- Detalle del pedido elegido -->
+        @if (detail()) { <button class="cn-sheet-backdrop" (click)="closeDetail()" aria-label="Cerrar pedido"></button> }
+        <aside class="lg cn-detail" [class.open]="!!detail()" [class.expanded]="sheetExpanded()" [class.sheet-dragging]="sheetDragging()"
+          [style.transform]="sheetY() > 0 ? 'translateY(' + sheetY() + 'px)' : null" [style.height]="sheetHeight() ? sheetHeight() + 'px' : null">
+          @if (detail(); as order) {
+            <div class="cn-sheet-drag" (pointerdown)="sheetStart($event)" (pointermove)="sheetMove($event)" (pointerup)="sheetEnd($event)" (pointercancel)="sheetEnd($event)">
+            <span class="cn-sheet-grip" aria-hidden="true"></span>
+            <header class="cn-detail-head">
+              <div>
+                <span class="cn-channel" [class.delivery]="order.channel === 'DELIVERY'"><app-icon [name]="order.channel === 'DELIVERY' ? 'send' : 'package'" [size]="13" />{{ order.channel === 'DELIVERY' ? 'Delivery' : 'Para llevar' }} #{{ order.orderNumber }}</span>
+                <h2>{{ order.customerName }}</h2>
+                <small>Pedido hace {{ elapsed(order.openedAt) }}</small>
+              </div>
+              <button class="cn-close" (click)="closeDetail()" aria-label="Cerrar detalle"><app-icon name="x" [size]="17" /></button>
+            </header>
+            </div>
+            <ol class="cn-stepper" aria-label="Avance del pedido">
+              @for (step of steps; track step; let i = $index) {
+                <li [class.done]="i < stepIndex(order)" [class.now]="i === stepIndex(order)"><i>@if (i < stepIndex(order)) {<app-icon name="check" [size]="11" />} @else { {{ i + 1 }} }</i><span>{{ step }}</span></li>
+              }
+            </ol>
+            @if (order.customerPhone || order.deliveryAddress) {
+              <div class="cn-contact">
+                @if (order.deliveryAddress) { <p class="cn-address"><app-icon name="map" [size]="15" /><span>{{ order.deliveryAddress }}@if (order.deliveryReference) {<small>{{ order.deliveryReference }}</small>}</span></p> }
+                <div class="cn-contact-actions">
+                  @if (order.customerPhone) {
+                    <a class="cn-chip" [href]="'tel:' + order.customerPhone"><app-icon name="phone" [size]="15" />Llamar</a>
+                    <a class="cn-chip wa" [href]="whatsapp(order)" target="_blank" rel="noopener"><app-icon name="message" [size]="15" />WhatsApp</a>
+                  }
+                  @if (order.deliveryAddress) { <a class="cn-chip" [href]="mapLink(order)" target="_blank" rel="noopener"><app-icon name="map" [size]="15" />Ver mapa</a> }
+                </div>
+              </div>
+            }
+            <div class="cn-items">
+              <h3>Productos <button class="cn-link" (click)="composer.set(order)"><app-icon name="plus" [size]="14" />Agregar</button></h3>
+              @for (item of snapshot()?.items || []; track item.id) {
+                <div class="cn-item" [class.voided]="item.status === 'CANCELLED'">
+                  <b>{{ item.quantity }}</b>
+                  <span><strong>{{ item.name }}</strong>@if (item.modifiers) {<small>{{ item.modifiers }}</small>}@if (item.notes) {<small>Nota: {{ item.notes }}</small>}@if (item.voidReason) {<small class="void">Anulado: {{ item.voidReason }}</small>}</span>
+                  <span class="cn-status" [attr.data-status]="item.status">{{ statusLabel(item.status) }}</span>
+                  @if (canVoid(item)) { <button class="cn-void" (click)="voiding.set(item)" [attr.aria-label]="'Anular ' + item.name"><app-icon name="x" [size]="13" /></button> }
+                </div>
+              } @empty {
+                <p class="cn-muted">{{ snapshot() ? 'Todavía no hay productos. Toca «Agregar».' : 'Cargando…' }}</p>
+              }
+            </div>
+            <div class="cn-totals">
+              @if (order.deliveryFee > 0) { <span><small>Envío</small><b>{{ money(order.deliveryFee) }}</b></span> }
+              <span><small>Total</small><b>{{ money(order.total) }}</b></span>
+              <span><small>Pagado</small><b>{{ money(order.paid) }}</b></span>
+              <span class="due"><small>Por cobrar</small><b>{{ money(order.remaining) }}</b></span>
+            </div>
+            <footer class="cn-detail-actions">
+              @if (quick(order); as action) {
+                <button class="cn-quick big" [attr.data-kind]="action.kind" [disabled]="busyId() === order.sessionId" (click)="runQuick(order)"><app-icon [name]="action.icon" [size]="18" />{{ busyId() === order.sessionId ? 'Un momento…' : action.label }}</button>
+              }
+              @if (order.remaining > 0 && order.total > 0 && quick(order)?.kind !== 'pay') {
+                <button class="cn-paybar" [class.secondary]="!!quick(order)" (click)="openCheckout(order)">
+                  <span class="cn-paybar-ico"><app-icon name="money" [size]="18" /></span>
+                  <span class="cn-paybar-text"><b>Cobrar ya</b><small>{{ order.paid > 0 ? 'Falta completar el pago' : 'Pago por adelantado' }}</small></span>
+                  <b class="cn-paybar-amount">{{ money(order.remaining) }}</b>
+                </button>
+              }
+              <div class="cn-detail-more">
+                <button class="cn-pill" (click)="editOrder(order)"><app-icon name="edit" [size]="15" />Datos del cliente</button>
+                @if (!order.itemCount && order.paid === 0) { <button class="cn-pill danger" (click)="cancelOrder(order)">Cancelar</button> }
+              </div>
+            </footer>
+          } @else {
+            <div class="cn-detail-empty">
+              <span><app-icon name="receipt" [size]="24" /></span>
+              <strong>Así funciona el mostrador</strong>
+              <div class="cn-steps">
+                <p><i>1</i>Toca <b>Nuevo pedido</b>, elige para llevar o delivery y agrega los productos.</p>
+                <p><i>2</i>Cocina lo prepara. Cuando termina, el pedido pasa a <b>Listos</b>.</p>
+                <p><i>3</i>Toca <b>Entregar</b> cuando el cliente o el repartidor lo recoja.</p>
+                <p><i>4</i>Toca <b>Cobrar</b>: al quedar pagado, el pedido se cierra.</p>
+              </div>
+            </div>
+          }
+        </aside>
+      </div>
+    }
+  </div>
+
+  <button class="cn-fab" (click)="newOrder()" aria-label="Nuevo pedido"><app-icon name="plus" [size]="24" /></button>
+
+  @if (formOpen()) {
+    <div class="modal-backdrop cn-form-backdrop" (click)="formOpen.set(false)">
+      <section class="qr-dialog counter-form" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="counter-form-title">
+        <button class="modal-close" (click)="formOpen.set(false)" aria-label="Cerrar">×</button>
+        <p class="eyebrow">{{ editing() ? editing()!.label : 'Nuevo pedido' }}</p>
+        <h2 id="counter-form-title">{{ editing() ? 'Datos del cliente' : '¿Cómo recibe su pedido?' }}</h2>
+        @if (!editing()) {
+          <div class="cn-pick" role="radiogroup" aria-label="Tipo de pedido">
+            <button type="button" role="radio" [attr.aria-checked]="channel === 'TAKEAWAY'" (click)="channel = 'TAKEAWAY'; deliveryFee = 0"><span><app-icon name="package" [size]="22" /></span><b>Para llevar</b><small>El cliente recoge en el local</small></button>
+            <button type="button" role="radio" class="delivery" [attr.aria-checked]="channel === 'DELIVERY'" (click)="channel = 'DELIVERY'; deliveryFee = deliveryFee || 5"><span><app-icon name="send" [size]="22" /></span><b>Delivery</b><small>Lo llevamos a su dirección</small></button>
+          </div>
+        }
+        <form class="settings-form" (ngSubmit)="save()">
+          <label>Nombre del cliente<input name="customerName" [(ngModel)]="customerName" maxlength="120" required autocomplete="off"></label>
+          <label>Teléfono @if (channel === 'TAKEAWAY') {<small>opcional</small>}<input name="customerPhone" type="tel" [(ngModel)]="customerPhone" maxlength="30" [required]="channel === 'DELIVERY'"></label>
+          @if (channel === 'DELIVERY') {
+            <label>Dirección de entrega<input name="deliveryAddress" [(ngModel)]="deliveryAddress" maxlength="250" required></label>
+            <label>Referencia <small>opcional</small><input name="deliveryReference" [(ngModel)]="deliveryReference" maxlength="250" placeholder="Ej. frente al parque, timbre 3"></label>
+            <label>Costo de envío<div class="money-input"><b>S/</b><input name="deliveryFee" type="number" min="0" step="0.50" [(ngModel)]="deliveryFee"></div></label>
+          }
+          <button class="primary" [disabled]="!canSave()">{{ saving() ? 'Guardando…' : editing() ? 'Guardar cambios' : 'Elegir productos →' }}</button>
+        </form>
+      </section>
+    </div>
+  }
+
+  @if (composer(); as order) {
+    <app-staff-order [sessionId]="order.sessionId" [tableLabel]="order.label + ' · ' + order.customerName" (sent)="onRoundSent(order)" (closed)="composer.set(null)" />
+  }
+  @if (paying(); as order) {
+    <app-checkout-dialog [sessionId]="order.sessionId" [label]="order.label" [order]="snapshot()" [channel]="order.channel" (closed)="paying.set(null); load()" (paid)="paying.set(null); closeDetail(); load()" (sessionClosed)="onSessionClosed(order)" />
+  }
+  <app-void-item-dialog [item]="voiding()" [busy]="voidBusy()" (confirmed)="confirmVoid($event)" (cancelled)="voiding.set(null)" />
+</app-shell>

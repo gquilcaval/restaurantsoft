@@ -1,0 +1,32 @@
+// Lista de clientes: buscador, grupos, orden y filas con avatar.
+.ct-search { display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 16px; border-radius: 999px; color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); transition: box-shadow .2s; }
+.ct-search:focus-within { box-shadow: 0 0 0 2px var(--brand); }
+.ct-search input { flex: 1; min-width: 0; height: 100%; border: 0; background: transparent; color: var(--text); font: inherit; font-weight: 600; outline: none; }
+.ct-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+.ct-chips button { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--text) 7%, transparent); color: var(--muted); font-weight: 750; font-size: .78rem; transition: background .2s, color .2s, transform .3s var(--ease-spring); }
+.ct-chips button:hover { color: var(--text); }
+.ct-chips button:active { transform: scale(.94); }
+.ct-chips button small { padding: 0 6px; border-radius: 999px; font-size: .7rem; background: color-mix(in srgb, var(--text) 9%, transparent); }
+.ct-chips button[aria-checked='true'] { color: var(--on-brand, #04110a); background: var(--brand); }
+.ct-chips button[aria-checked='true'] small { background: color-mix(in srgb, var(--on-brand, #04110a) 18%, transparent); }
+.ct-chips button[data-key='AT_RISK'][aria-checked='false'] small { color: #ef5d55; }
+.ct-chips.mini { margin-top: 0; }
+.ct-chips.mini button { height: 28px; font-size: .72rem; }
+.ct-sort { display: flex; align-items: center; gap: 2px; margin-top: 10px; color: var(--muted); font-size: .74rem; font-weight: 650; }
+.ct-sort span { margin-right: 6px; }
+.ct-sort button { height: 28px; padding: 0 10px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-weight: 700; font-size: .76rem; }
+.ct-sort button.on { color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); }
+.ct-rows { flex: 1; display: grid; align-content: start; gap: 2px; margin: 12px -10px 0; padding: 0 10px; max-height: max(320px, calc(100dvh - 470px)); overflow: auto; scrollbar-width: thin; }
+.ct-row { display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 9px 10px; border: 0; border-radius: 16px; background: transparent; color: var(--text); text-align: left; font: inherit; animation: ct-rise .4s var(--ease-out) var(--d) backwards; transition: background .2s, transform .3s var(--ease-spring); }
+.ct-row:hover { background: color-mix(in srgb, var(--text) 6%, transparent); }
+.ct-row:active { transform: scale(.985); }
+.ct-row.selected { background: color-mix(in srgb, var(--brand) 15%, transparent); }
+.ct-row-main, .ct-row-side { display: grid; gap: 2px; min-width: 0; }
+.ct-row-main strong { display: flex; align-items: center; gap: 7px; font-size: .9rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ct-row small { color: var(--muted); font-size: .74rem; }
+.ct-row-side { justify-items: end; }
+.ct-row-side b { font: 700 .88rem var(--font-display); }
+.ct-ghost { grid-template-columns: 1fr; gap: 6px; } .ct-ghost i { height: 14px; } .ct-ghost i:last-child { width: 60%; }
+.ct-avatar { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; font: 800 .86rem var(--font-display); color: var(--tone); background: color-mix(in srgb, var(--tone) 18%, transparent); }
+.ct-avatar.big { width: 64px; height: 64px; font-size: 1.3rem; }
+.ct-skeleton { display: grid; gap: 14px; } .ct-skeleton i { height: 22px; } .ct-skeleton i:first-child { height: 64px; width: 60%; }

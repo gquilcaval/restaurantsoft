@@ -1,0 +1,27 @@
+<app-shell title="Personal" [eyebrow]="headerSummary()">
+  <div class="pf">
+    <nav class="pf-tabs" role="tablist" aria-label="Personal">
+      <button role="tab" [attr.aria-selected]="tab() === 'TEAM'" (click)="tab.set('TEAM')"><app-icon name="users" [size]="16" />Equipo <small>{{ activeCount() }}</small></button>
+      <button role="tab" [attr.aria-selected]="tab() === 'ATTENDANCE'" (click)="tab.set('ATTENDANCE')"><app-icon name="clock" [size]="16" />Asistencia @if (presentCount()) {<small>{{ presentCount() }}</small>}</button>
+      @if (today()?.enabled) {
+        <button role="tab" [attr.aria-selected]="tab() === 'SCHEDULES'" (click)="tab.set('SCHEDULES')"><app-icon name="calendar" [size]="16" />Horarios</button>
+      }
+    </nav>
+
+    <section class="pf-main">
+      @switch (tab()) {
+        @case ('TEAM') { <app-team (counted)="activeCount.set($event)" /> }
+        @case ('ATTENDANCE') {
+          @if (today()?.enabled) {
+            <div class="pf-view" role="radiogroup" aria-label="Vista de asistencia">
+              <button role="radio" [attr.aria-checked]="attendanceView() === 'DAY'" [class.on]="attendanceView() === 'DAY'" (click)="attendanceView.set('DAY')">Por día</button>
+              <button role="radio" [attr.aria-checked]="attendanceView() === 'PERIOD'" [class.on]="attendanceView() === 'PERIOD'" (click)="attendanceView.set('PERIOD')">Mes y Excel</button>
+            </div>
+          }
+          @if (attendanceView() === 'DAY') { <app-attendance-day (loadedToday)="today.set($event)" /> } @else { <app-attendance-report /> }
+        }
+        @case ('SCHEDULES') { <app-schedules /> }
+      }
+    </section>
+  </div>
+</app-shell>

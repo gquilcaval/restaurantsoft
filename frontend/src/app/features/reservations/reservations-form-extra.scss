@@ -1,0 +1,14 @@
+// «Mesa, notas y más»: grupos con título claro.
+.rf-more { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 44px; padding: 0 14px; border: 0; border-radius: 14px; color: var(--text); background: color-mix(in srgb, var(--text) 5%, transparent); font: 700 .86rem inherit; text-align: left; }
+.rf-more span { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.rf-more small { margin-left: 6px; color: var(--muted); font-weight: 600; }
+.rf-more app-icon { flex-shrink: 0; color: var(--muted); transition: transform .3s var(--ease-spring); }
+.rf-more.open app-icon { transform: rotate(180deg); }
+.rf-extra { display: grid; gap: 10px; min-width: 0; animation: rv-in .25s var(--ease-spring); }
+.rf-group { display: grid; gap: 10px; min-width: 0; padding: 12px 14px; border-radius: 18px; background: color-mix(in srgb, var(--text) 4%, transparent); }
+.rf-group h4 { margin: 0; font-size: .82rem; font-weight: 800; }
+.rf-group h4 small { margin-left: 4px; color: var(--muted); font-weight: 600; }
+.rf-group .rf-scroll { margin: 0 -14px; padding: 2px 14px; }
+.rf-seg { display: flex; gap: 2px; padding: 3px; overflow-x: auto; scrollbar-width: none; border-radius: 12px; background: color-mix(in srgb, var(--text) 7%, transparent); }
+.rf-seg button { flex: 1 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 32px; padding: 0 12px; border: 0; border-radius: 9px; color: var(--muted); background: none; font: 700 .8rem inherit; }
+.rf-seg button.on { color: var(--text); background: var(--surface); box-shadow: 0 2px 8px rgba(0, 0, 0, .18); }

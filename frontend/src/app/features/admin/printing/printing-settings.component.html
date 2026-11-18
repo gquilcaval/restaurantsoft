@@ -1,0 +1,117 @@
+<header class="pr-head">
+  <h2>Impresoras</h2>
+  <p>Imprime las comandas en cocina y barra. Las estaciones sin impresora siguen con la pantalla de cocina.</p>
+</header>
+
+@if (data(); as current) {
+  <!-- 1. Qué imprime cada estación -->
+  <section class="lg pr-card">
+    <h3>¿Dónde llega cada pedido?</h3>
+    @if (!current.printers.length) {
+      <p class="pr-muted">Primero agrega una impresora abajo. Mientras tanto, todo llega a la pantalla de cocina.</p>
+    }
+    @for (route of current.stations; track route.stationId ?? 'none') {
+      <div class="pr-route">
+        <b>{{ route.stationName }}</b>
+        <div class="pr-chips" role="radiogroup" [attr.aria-label]="'Dónde llega ' + route.stationName">
+          <button role="radio" [attr.aria-checked]="!route.printerId" [class.on]="!route.printerId" (click)="setRoute(route, null)">
+            <app-icon name="grid" [size]="14" />Pantalla
+          </button>
+          @for (printer of current.printers; track printer.id) {
+            <button role="radio" [attr.aria-checked]="route.printerId === printer.id" [class.on]="route.printerId === printer.id" (click)="setRoute(route, printer.id)">
+              <app-icon name="receipt" [size]="14" />{{ printer.name }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+    @if (printsSomething()) {
+      <p class="pr-note">Lo que se imprime no aparece en la pantalla de cocina. El mesero lo marca como servido cuando lo recoge (avisa el timbre de cocina).</p>
+    }
+  </section>
+
+  <!-- 2. Ticketeras -->
+  <section class="lg pr-card">
+    <div class="pr-card-head">
+      <h3>Ticketeras</h3>
+      @if (editing() !== 'new') { <button class="pr-btn" (click)="newPrinter()"><app-icon name="plus" [size]="15" />Agregar</button> }
+    </div>
+    @for (printer of current.printers; track printer.id) {
+      @if (editing() === printer.id) {
+        <ng-container *ngTemplateOutlet="form" />
+      } @else {
+        <div class="pr-printer">
+          <span class="pr-ico"><app-icon name="receipt" [size]="18" /></span>
+          <span class="pr-printer-main"><b>{{ printer.name }}</b><small>{{ printer.host }}:{{ printer.port }} · papel {{ printer.paperWidth }} mm</small></span>
+          <span class="pr-state" [attr.data-tone]="printerState(printer).tone" [title]="printerState(printer).text">{{ printerState(printer).text }}</span>
+          <span class="pr-actions">
+            <button class="pr-btn" (click)="test(printer)">Probar</button>
+            <button class="pr-icon-btn" (click)="editPrinter(printer)" [attr.aria-label]="'Editar ' + printer.name"><app-icon name="edit" [size]="15" /></button>
+          </span>
+        </div>
+      }
+    } @empty {
+      @if (editing() !== 'new') { <p class="pr-muted">Aún no hay ticketeras. Necesitas su IP: sale en la hoja de configuración que imprime la ticketera (mantén presionado el botón de avance de papel al encenderla).</p> }
+    }
+    @if (editing() === 'new') { <ng-container *ngTemplateOutlet="form" /> }
+  </section>
+
+  <!-- 3. PC de impresión -->
+  <section class="lg pr-card">
+    <h3>PC de impresión</h3>
+    <p class="pr-muted">Una PC del local (la de caja, por ejemplo), en la misma red que las ticketeras, recibe las comandas y las imprime. Debe quedarse encendida durante el servicio.</p>
+    @for (agent of linked(); track agent.id) {
+      <div class="pr-agent" [class.online]="agent.online">
+        <i></i>
+        <span><b>{{ agent.name }}</b><small>{{ agent.online ? 'Conectada' : 'Desconectada · última vez ' + ago(agent.lastSeenAt) }}</small></span>
+        <button class="pr-link" (click)="unlink(agent)">Desvincular</button>
+      </div>
+      @if (!agent.online) { <p class="pr-warn">Mientras esté desconectada no salen comandas. En la PC, abre el programa de impresión de RestOS.</p> }
+    }
+    @if (pairing(); as agent) {
+      <div class="pr-pair">
+        <small>Código para vincular (vale 15 minutos)</small>
+        <b class="pr-code">{{ formatCode(agent.pairingCode!) }}</b>
+        <ol>
+          <li>En la PC instala Java (gratis en <a href="https://adoptium.net" target="_blank" rel="noopener">adoptium.net</a>) y descarga
+            <a href="/descargas/RestosPrintAgent.java" download>el programa de impresión</a> (<a href="/descargas/LEEME-impresion.md" target="_blank">instrucciones</a>).</li>
+          <li>En esa carpeta abre una ventana de comandos y escribe:
+            <button class="pr-cmd" (click)="copy(pairCommand(agent.pairingCode!))" title="Copiar"><code>{{ pairCommand(agent.pairingCode!) }}</code><app-icon name="copy" [size]="14" /></button></li>
+          <li>Luego, para dejarlo funcionando: <code>java RestosPrintAgent.java</code></li>
+        </ol>
+        <button class="pr-link" (click)="unlink(agent)">Cancelar</button>
+      </div>
+    } @else {
+      <button class="pr-btn wide" (click)="linkPc()"><app-icon name="link" [size]="15" />{{ linked().length ? 'Vincular otra PC' : 'Vincular una PC' }}</button>
+    }
+  </section>
+} @else {
+  <section class="lg pr-card"><p class="pr-muted">{{ failed() ? 'No se pudo cargar. Revisa tu conexión.' : 'Cargando…' }}</p></section>
+}
+
+<ng-template #form>
+  <form class="pr-form" (ngSubmit)="savePrinter()">
+    <div class="pr-two">
+      <label>Nombre<input name="printerName" [(ngModel)]="formName" maxlength="60" placeholder="Cocina, Barra…" required></label>
+      <label>IP de la ticketera<input name="printerHost" [(ngModel)]="formHost" maxlength="120" placeholder="192.168.1.100" inputmode="decimal" autocomplete="off" required></label>
+    </div>
+    <div class="pr-two">
+      <div class="pr-field"><span>Papel</span>
+        <div class="pr-chips">
+          <button type="button" [class.on]="formWidth === 80" (click)="formWidth = 80">80 mm</button>
+          <button type="button" [class.on]="formWidth === 58" (click)="formWidth = 58">58 mm</button>
+        </div>
+      </div>
+      <label>Puerto<input name="printerPort" type="number" [(ngModel)]="formPort" min="1" max="65535"></label>
+    </div>
+    <div class="pr-form-actions">
+      @if (editing() !== 'new') {
+        @for (printer of data()?.printers || []; track printer.id) {
+          @if (printer.id === editing()) { <button type="button" class="pr-link danger" (click)="removePrinter(printer)">Quitar</button> }
+        }
+      }
+      <button type="button" class="pr-btn" (click)="editing.set(null)">Cancelar</button>
+      <button class="pr-btn primary" [disabled]="saving() || !formName.trim() || !formHost.trim()">{{ saving() ? 'Guardando…' : 'Guardar' }}</button>
+    </div>
+  </form>
+</ng-template>

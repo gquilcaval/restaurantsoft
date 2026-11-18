@@ -1,0 +1,25 @@
+// Tablas de datos de administración (inventario, clientes, puesta en marcha).
+.inventory-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
+.inventory-metrics .metric-card.alert > span { background: var(--danger-soft); color: var(--danger); }
+.inventory-toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; margin-bottom: 14px; }
+.inventory-toolbar input[type='search'] { flex: 1; min-width: 200px; }
+.inventory-toolbar input, .inventory-toolbar select { padding: 10px 11px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); }
+.inventory-toolbar label { display: grid; gap: 5px; font-size: .76rem; font-weight: 700; }
+.inventory-toolbar label.inline-check { display: inline-flex; }
+.inventory-table { display: grid; }
+.inventory-row { display: grid; grid-template-columns: 1.6fr .9fr .8fr .8fr .8fr auto; gap: 12px; align-items: center; padding: 12px 6px; border-bottom: 1px solid var(--border); font-size: .84rem; }
+.inventory-row.head { color: var(--muted); font-size: .72rem; font-weight: 700; padding-top: 0; }
+.inventory-row > span:first-child { display: grid; gap: 2px; }
+.inventory-row small { color: var(--muted); font-size: .72rem; }
+.inventory-row.low .stock-cell b { color: var(--orange); }
+.inventory-row.negative .stock-cell b { color: var(--danger); }
+.inventory-row.inactive { opacity: .55; }
+.stock-cell em { margin-left: 6px; padding: 2px 7px; border-radius: 999px; background: var(--orange-soft); color: var(--orange); font-size: .66rem; font-style: normal; font-weight: 800; }
+.inventory-actions { display: flex; gap: 5px; justify-content: flex-end; flex-wrap: wrap; }
+.inventory-table.movements .inventory-row { grid-template-columns: .8fr 1fr 1.2fr .8fr 1.2fr .9fr; }
+@media (max-width: 900px) {
+  .inventory-metrics { grid-template-columns: 1fr; }
+  .inventory-row, .inventory-table.movements .inventory-row { grid-template-columns: 1fr 1fr; }
+  .inventory-row.head { display: none; }
+  .inventory-actions { grid-column: 1 / -1; justify-content: flex-start; }
+}

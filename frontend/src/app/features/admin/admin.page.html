@@ -1,0 +1,139 @@
+<app-shell title="Resumen" [eyebrow]="restaurantName">
+  <div shell-actions class="rs-actions">
+    <button class="rs-pill" (click)="go('/reservations', 'reservations')">＋ Reserva</button>
+    <button class="rs-pill primary" (click)="go('/live')">▣ Modo TV</button>
+  </div>
+
+  <div class="rs">
+    <header class="rs-hello">
+      <p>
+        <span class="rs-date">{{ todayLabel }}</span> ·
+        @if (inService()) { <span class="rs-live"><i></i>Servicio en curso</span> } @else { <span class="rs-idle">Sin servicio en este momento</span> }
+      </p>
+      <h2>{{ greeting }}, {{ firstName }}</h2>
+    </header>
+
+    <section class="rs-grid">
+      <!-- Ventas: la protagonista -->
+      <article class="lg rs-card rs-hero">
+        <div class="rs-head">
+          <span>{{ heroLabel() }}</span>
+          <div class="rs-seg" role="tablist" aria-label="Período">
+            <i class="rs-seg-thumb" [attr.data-pos]="period()"></i>
+            <button role="tab" [class.on]="period() === 'today'" (click)="setPeriod('today')">Hoy</button>
+            <button role="tab" [class.on]="period() === 'week'" (click)="setPeriod('week')">Semana</button>
+            <button role="tab" [class.on]="period() === 'month'" (click)="setPeriod('month')">Mes</button>
+          </div>
+        </div>
+        <div class="rs-hero-body">
+          <div>
+            <strong class="rs-big" [appCountUp]="heroValue()" countUpFormat="currency"></strong>
+            @if (trend() !== null) {
+              <span class="rs-trend" [class.down]="trend()! < 0">{{ trend()! >= 0 ? '↗ +' : '↘ ' }}{{ trend() }}% vs {{ weekdayShort }}. pasado</span>
+            }
+            @if (period() === 'today') {
+              @if (goal()?.goal) {
+                <p class="rs-sub">
+                  @if (goal()!.reached) { ¡Meta cumplida! 🎉 Todo lo que entre ahora es extra. }
+                  @else {
+                    Meta <b>{{ money(goal()!.goal) }}</b> · faltan {{ money(goal()!.goal - goal()!.revenue) }}
+                    @if (goal()!.projected) { · al ritmo actual cierras en <b>{{ money(goal()!.projected!) }}</b> {{ goal()!.projected! >= goal()!.goal ? '🔥' : '' }} }
+                  }
+                </p>
+              } @else if (!heroValue()) {
+                <p class="rs-sub">Aún no hay ventas hoy. Las verás aparecer con el primer cobro.</p>
+              }
+              @if (!goal()?.goal) { <app-goal-bar class="rs-goal-cta" /> }
+            } @else if (bestDay(); as best) {
+              <p class="rs-sub">Mejor {{ period() === 'week' ? 'día' : 'fecha' }}: <b>{{ best.label }}</b> con {{ money(best.value) }}</p>
+            }
+            <div class="rs-bars" [class.many]="bars().length > 14">
+              @for (bar of bars(); track bar.label; let index = $index) {
+                <span [class.now]="bar.current" [style.--h]="bar.ratio" [style.--d]="index * 40 + 'ms'" [title]="bar.label + ': ' + money(bar.value)"><i></i>@if (bars().length <= 14) {<small>{{ bar.label }}</small>}</span>
+              }
+            </div>
+          </div>
+          @if (period() === 'today' && goal()?.goal) {
+            <div class="rs-ring" [style.--p]="goalPercent()">
+              <svg viewBox="0 0 200 200" aria-hidden="true"><circle class="track" cx="100" cy="100" r="84" /><circle class="fill" cx="100" cy="100" r="84" /></svg>
+              <div><strong>{{ goal()!.percent || 0 }}%</strong><small>de la meta</small></div>
+            </div>
+          }
+        </div>
+      </article>
+
+      <!-- Cifras compactas -->
+      <div class="rs-kpis">
+        <article class="lg rs-kpi"><span class="rs-dot blue">🪑</span><div><b>{{ summary()?.busyTables || 0 }} / {{ summary()?.tables || 0 }}</b><small>Mesas ocupadas</small></div><em>{{ occupancy() }}%</em></article>
+        <article class="lg rs-kpi"><span class="rs-dot green">🧾</span><div><b>{{ money(summary()?.averageTicket || 0) }}</b><small>Ticket promedio</small></div>
+          @if (ticketTrend() !== null) { <em [class.up]="ticketTrend()! >= 0" [class.down]="ticketTrend()! < 0">{{ ticketTrend()! >= 0 ? '+' : '' }}{{ ticketTrend() }}%</em> }</article>
+        <article class="lg rs-kpi"><span class="rs-dot amber">⏱️</span><div><b>{{ summary()?.kitchenMinutes !== null && summary()?.kitchenMinutes !== undefined ? summary()!.kitchenMinutes + ' min' : '—' }}</b><small>Tiempo de cocina</small></div>
+          <em [class.warn]="(summary()?.kitchenMinutes || 0) >= 20">{{ summary()?.inKitchen || 0 }} en cocina</em></article>
+        <article class="lg rs-kpi"><span class="rs-dot violet">⭐</span><div><b>{{ summary()?.ratingAverage ?? '—' }}</b><small>Calificación (7 días)</small></div>
+          @if (summary()?.ratingsToday) { <em class="up">+{{ summary()!.ratingsToday }} hoy</em> }</article>
+      </div>
+
+      <!-- Necesita tu atención -->
+      <article class="lg rs-card rs-attention">
+        <div class="rs-head"><h3>Necesita tu atención</h3>@if (urgentCount()) { <span class="rs-badge">{{ urgentCount() }}</span> }</div>
+        <div class="rs-tasks">
+          @for (item of attention(); track item.key; let index = $index) {
+            <div class="rs-task" [attr.data-tone]="item.tone" [style.--d]="index * 70 + 'ms'">
+              <span class="rs-task-icon">{{ item.icon }}</span>
+              <div><strong>{{ item.title }}</strong><small>{{ item.detail }}</small></div>
+              <button class="rs-pill small" (click)="item.go()">{{ item.action }}</button>
+            </div>
+          } @empty {
+            <div class="rs-calm"><span>✨</span><div><strong>Todo en orden</strong><small>No hay nada urgente. Aquí aparecerán llamadas, demoras, stock y lista de espera.</small></div></div>
+          }
+        </div>
+      </article>
+
+      <!-- Salón en vivo -->
+      <article class="lg rs-card rs-floor-card">
+        <div class="rs-head"><h3>Salón en vivo</h3><button class="rs-link" (click)="go('/waiter')">Ver mesas →</button></div>
+        <div class="rs-floor">
+          @for (table of floor(); track table.id) {
+            <button class="rs-table" [attr.data-state]="table.state" (click)="go('/waiter')" [title]="table.label + (table.servedName ? ' · atiende ' + table.servedName : '')">{{ table.label }}@if (table.servedInitials) {<i class="rs-waiter" [class.none]="table.servedInitials === '?'" [style.--hue]="table.hue">{{ table.servedInitials }}</i>}</button>
+          } @empty { <p class="rs-muted">Aún no hay mesas creadas.</p> }
+        </div>
+        <p class="rs-muted">{{ floorSummary() }}</p>
+        <app-waiter-load class="rs-load" [tables]="tables()" />
+        <div class="rs-legend"><span data-s="busy"><i></i>Ocupada</span><span data-s="call"><i></i>Llama</span><span data-s="ready"><i></i>Plato listo</span><span data-s="bill"><i></i>Cuenta</span></div>
+      </article>
+
+      <!-- Cocina -->
+      <article class="lg rs-card rs-third">
+        <div class="rs-head"><h3>Cocina</h3><button class="rs-link" (click)="go('/kitchen')">Abrir →</button></div>
+        <div class="rs-pipe">
+          <div><b>{{ dashboard().itemStates.queued }}</b><small>Nuevos</small></div>
+          <div class="prep"><b>{{ dashboard().itemStates.preparing }}</b><small>Preparando</small></div>
+          <div class="done"><b>{{ dashboard().itemStates.ready }}</b><small>Listos</small></div>
+        </div>
+        <p class="rs-muted">{{ lateStation() || (summary()?.kitchenMinutes ? 'Promedio de ' + summary()!.kitchenMinutes + ' min por plato hoy' : 'Sin demoras') }}</p>
+      </article>
+
+      <!-- Lo más vendido -->
+      <article class="lg rs-card rs-third">
+        <div class="rs-head"><h3>Lo más vendido hoy</h3><span>🔥</span></div>
+        @for (item of (summary()?.topToday || []).slice(0, 4); track item.name) {
+          <div class="rs-top"><span>{{ item.name }}</span><i><b [style.width.%]="(item.quantity / maxTop()) * 100"></b></i><strong>{{ item.quantity }}</strong></div>
+        } @empty { <p class="rs-muted">Los platos aparecerán con el primer pedido del día.</p> }
+      </article>
+
+      <!-- Equipo -->
+      <article class="lg rs-card rs-third">
+        <div class="rs-head"><h3>Equipo de la semana</h3><button class="rs-link" (click)="go('/reports')">Ranking →</button></div>
+        @if (podium().length) {
+          <div class="rs-podium">
+            @for (item of podium(); track item.member.userId) {
+              <div [attr.data-place]="item.place"><span class="rs-avatar">{{ initials(item.member.name) }}</span><small>{{ item.member.name.split(' ')[0] }}</small>
+                <span class="rs-medals">@for (medal of item.member.medals.slice(0, 3); track medal) { <i [title]="medals[medal].title">{{ medals[medal].icon }}</i> }</span><b>{{ item.place }}</b></div>
+            }
+          </div>
+        } @else { <p class="rs-muted">El ranking aparece con los primeros cobros de la semana.</p> }
+      </article>
+    </section>
+  </div>
+
+</app-shell>

@@ -1,0 +1,33 @@
+// Formularios: apertura, movimientos, chips rápidos y selectores.
+.cs-form fieldset { display: grid; gap: 14px; margin: 14px 0 0; padding: 0; border: 0; min-width: 0; }
+.cs-work .cs-form, .cs-work .cs-scroll { animation: cs-slide .35s var(--ease-spring); }
+@keyframes cs-slide { from { opacity: 0; transform: translateX(18px); } }
+.cs-toggle { position: relative; display: grid; grid-template-columns: 1fr 1fr; padding: 4px; border-radius: 16px; background: color-mix(in srgb, var(--text) 6%, transparent); }
+.cs-toggle button { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 42px; border: 0; border-radius: 12px; background: transparent; color: var(--muted); font-weight: 800; transition: color .25s; }
+.cs-toggle button[aria-checked='true'] { color: #fff; }
+.cs-toggle .cs-thumb { position: absolute; inset: 4px auto 4px 4px; width: calc(50% - 4px); border-radius: 12px; background: var(--bad); box-shadow: var(--elev-2); transition: transform .45s var(--ease-spring), background .3s; }
+.cs-toggle[data-kind='IN'] .cs-thumb { transform: translateX(100%); background: var(--ok); }
+.cs-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.cs-chip { height: 32px; padding: 0 13px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--text) 7%, transparent); color: var(--text); font-weight: 700; font-size: .78rem; transition: transform .3s var(--ease-spring), background .2s; }
+.cs-chip:hover { background: color-mix(in srgb, var(--text) 12%, transparent); }
+.cs-chip:active { transform: scale(.92); }
+.cs-chip.on { background: var(--brand-soft); color: var(--brand-strong, var(--text)); box-shadow: inset 0 0 0 1.5px var(--brand); }
+.cs-chip.ghost { background: transparent; color: var(--muted); }
+.cs-money, .cs-field { display: grid; gap: 7px; font-weight: 700; font-size: .84rem; }
+.cs-money > div { display: flex; align-items: center; gap: 8px; padding: 0 16px; border-radius: 18px; background: color-mix(in srgb, var(--text) 7%, transparent); transition: box-shadow .2s; }
+.cs-money b { color: var(--muted); font-size: 1.2rem; }
+.cs-money input { flex: 1; min-width: 0; height: 54px; border: 0; background: transparent; color: var(--text); font: 800 1.6rem var(--font-display); outline: none; }
+.cs-money.big input { height: 66px; font-size: 2.2rem; }
+.cs-money > div:focus-within { box-shadow: 0 0 0 2px var(--brand); }
+.cs-field textarea { min-height: 54px; padding: 11px 14px; border: 0; border-radius: 16px; background: color-mix(in srgb, var(--text) 7%, transparent); color: var(--text); font: inherit; font-weight: 500; resize: vertical; outline: none; }
+.cs-field textarea:focus { box-shadow: 0 0 0 2px var(--brand); }
+.cs-submit { height: 50px; font-size: .95rem; width: 100%; margin-top: auto; }
+.cs-work > .cs-submit { margin-top: 18px; }
+.cs-live { display: flex; align-items: center; gap: 14px; padding: 4px 0; animation: cs-rise .3s var(--ease-out); }
+.cs-live > span { flex-shrink: 0; width: 46px; height: 46px; display: grid; place-items: center; border-radius: 16px; font-size: 1.3rem; font-weight: 900; color: var(--ok); background: var(--ok-soft); transition: background .3s, color .3s; }
+.cs-live[data-state='short'] > span { color: var(--bad); background: var(--bad-soft); }
+.cs-live[data-state='over'] > span { color: var(--warn); background: var(--warn-soft); }
+.cs-live[data-state='none'] > span { background: color-mix(in srgb, var(--text) 8%, transparent); }
+.cs-live div { display: grid; gap: 2px; }
+.cs-live strong { font: 800 1.2rem var(--font-display); }
+.cs-live small { color: var(--muted); font-size: .78rem; }

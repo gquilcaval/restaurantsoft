@@ -1,0 +1,134 @@
+<app-shell title="Inventario" eyebrow="Insumos de la sucursal">
+  <button shell-actions class="iv-pill primary" (click)="edit('NEW')"><app-icon name="plus" [size]="16" />Nuevo insumo</button>
+
+  <div class="iv">
+    <div class="iv-navrow">
+      <nav class="iv-tabs" role="tablist" aria-label="Vistas de inventario">
+        <button role="tab" [attr.aria-selected]="tab() === 'TODAY'" (click)="showTab('TODAY')"><app-icon name="hourglass" [size]="15" />Hoy · qué falta</button>
+        <button role="tab" [attr.aria-selected]="tab() === 'STOCK'" (click)="showTab('STOCK')"><app-icon name="package" [size]="15" />Stock<small>{{ ingredients().length }}</small></button>
+        <button role="tab" [attr.aria-selected]="tab() === 'MOVEMENTS'" (click)="showTab('MOVEMENTS')"><app-icon name="repeat" [size]="15" />Movimientos</button>
+      </nav>
+      <div class="iv-kpis">
+        <span><small>Valor en stock</small><b>{{ totalValue() | currency:'PEN':'S/ ':'1.0-0' }}</b></span>
+        <button [class.is-alert]="lowCount() > 0" (click)="showTab('STOCK'); onlyLow.set(true)"><small>Bajo el mínimo</small><b>{{ lowCount() }}</b></button>
+        @if (negativeCount()) { <button class="is-alert" (click)="showTab('STOCK')"><small>Stock negativo</small><b>{{ negativeCount() }}</b></button> }
+      </div>
+    </div>
+
+    @if (tab() === 'TODAY') {
+      <app-inventory-insights />
+    } @else if (tab() === 'STOCK') {
+      <div class="iv-layout">
+        <section class="lg iv-list">
+          <div class="iv-toolbar">
+            <label class="iv-search"><app-icon name="search" [size]="16" /><input type="search" placeholder="Buscar insumo" aria-label="Buscar insumo" [ngModel]="search()" (ngModelChange)="search.set($event)"></label>
+            <button class="iv-chip" [class.on]="onlyLow()" (click)="onlyLow.set(!onlyLow())"><i></i>Solo por reponer</button>
+          </div>
+          <div class="iv-rows">
+            @for (item of visible(); track item.id; let index = $index) {
+              <button class="iv-row" [class.low]="item.low" [class.negative]="item.stock < 0" [class.inactive]="!item.active" [class.selected]="selectedId() === item.id" [style.--d]="(index < 16 ? index * 25 : 0) + 'ms'" (click)="select(item)">
+                <span class="iv-row-main"><strong>{{ item.name }}</strong><small>{{ item.usedIn ? item.usedIn + (item.usedIn === 1 ? ' receta' : ' recetas') : 'Sin recetas' }}@if (!item.active) { · inactivo }</small></span>
+                <span class="iv-level"><i [style.width.%]="level(item)"></i></span>
+                <span class="iv-stock"><b>{{ item.stock | number:'1.0-2' }} {{ unitLabel(item.unit) }}</b><small>mín. {{ item.minStock | number:'1.0-2' }}</small></span>
+                @if (item.stock < 0) { <em class="iv-tag bad">Negativo</em> } @else if (item.low) { <em class="iv-tag warn">Reponer</em> } @else { <em class="iv-tag ok">OK</em> }
+              </button>
+            } @empty {
+              @if (ingredients().length) {
+                <div class="iv-empty"><span><app-icon name="search" [size]="22" /></span><div><strong>Ningún insumo coincide</strong><small>Cambia la búsqueda o quita el filtro.</small></div></div>
+              } @else {
+                <div class="iv-empty"><span><app-icon name="package" [size]="22" /></span><div><strong>Todavía no hay insumos</strong><small>Registra pescado, limón, arroz… y arma las recetas desde Menú: el stock se descontará solo con cada venta.</small></div></div>
+              }
+            }
+          </div>
+        </section>
+
+        <aside class="lg iv-panel">
+          @if (editing(); as current) {
+            <header class="iv-panel-head"><div><small>{{ current === 'NEW' ? 'Nuevo insumo' : 'Editar insumo' }}</small><h2>{{ current === 'NEW' ? '¿Qué compras?' : current.name }}</h2></div><button class="iv-close" (click)="editing.set(null)" aria-label="Cerrar"><app-icon name="x" [size]="17" /></button></header>
+            <form class="iv-form" (ngSubmit)="save()">
+              <label class="wide">Nombre<input name="name" [(ngModel)]="name" maxlength="100" required placeholder="Pescado (filete)"></label>
+              <label>Unidad<select name="unit" [(ngModel)]="unit">@for (entry of units; track entry[0]) { <option [value]="entry[0]">{{ entry[1] }}</option> }</select></label>
+              <label>Costo por {{ unitLabel(unit) }}<span class="iv-money"><b>S/</b><input name="cost" type="number" min="0" step="0.01" [(ngModel)]="costPerUnit"></span></label>
+              <label class="wide">Stock mínimo ({{ unitLabel(unit) }})<input name="min" type="number" min="0" step="0.001" [(ngModel)]="minStock"><small>Al llegar a este nivel aparece como «Reponer» y entra a la lista de compras.</small></label>
+              @if (current !== 'NEW') { <button type="button" class="iv-switch wide" role="switch" [attr.aria-checked]="active" (click)="active = !active"><i></i>Insumo activo</button> }
+              <p class="iv-muted wide">El costo se actualiza solo con cada compra (promedio ponderado).</p>
+              <button class="iv-pill primary wide big" [disabled]="!name.trim() || busy()">{{ busy() ? 'Guardando…' : 'Guardar insumo' }}</button>
+            </form>
+          } @else if (acting(); as current) {
+            <header class="iv-panel-head"><div><small>{{ current.ingredient.name }} · hay {{ current.ingredient.stock | number:'1.0-3' }} {{ unitLabel(current.ingredient.unit) }}</small><h2>{{ actionTitle(current.action) }}</h2></div><button class="iv-close" (click)="acting.set(null)" aria-label="Volver"><app-icon name="x" [size]="17" /></button></header>
+            <form class="iv-form" (ngSubmit)="submitAction()">
+              <label class="wide">{{ current.action === 'COUNT' ? 'Cantidad contada' : 'Cantidad' }} ({{ unitLabel(current.ingredient.unit) }})<input class="iv-big-input" name="quantity" type="number" min="0" step="0.001" [(ngModel)]="quantity" required></label>
+              @if (current.action === 'PURCHASE') {
+                <label class="wide">Costo por {{ unitLabel(current.ingredient.unit) }}<span class="iv-money"><b>S/</b><input name="unitCost" type="number" min="0" step="0.01" [(ngModel)]="unitCost"></span></label>
+                <p class="iv-result wide"><small>Total de la compra</small><b>{{ quantity * unitCost | currency:'PEN':'S/ ' }}</b></p>
+                <label class="wide">Comprobante o proveedor <small>opcional</small><input name="note" [(ngModel)]="note" maxlength="200" placeholder="Factura F001-123, Mercado Central"></label>
+              }
+              @if (current.action === 'WASTE') { <label class="wide">Motivo<input name="note" [(ngModel)]="note" maxlength="200" required placeholder="Vencido, se cayó, mala calidad"></label> }
+              @if (current.action === 'COUNT') {
+                <p class="iv-result wide" [class.bad]="quantity - current.ingredient.stock < 0"><small>Diferencia con el sistema</small><b>{{ quantity - current.ingredient.stock > 0 ? '+' : '' }}{{ quantity - current.ingredient.stock | number:'1.0-3' }} {{ unitLabel(current.ingredient.unit) }}</b></p>
+                <label class="wide">Nota <small>opcional</small><input name="note" [(ngModel)]="note" maxlength="200" placeholder="Conteo de cierre"></label>
+              }
+              <button class="iv-pill primary wide big" [disabled]="!canSubmitAction()">{{ busy() ? 'Guardando…' : actionTitle(current.action) }}</button>
+            </form>
+          } @else if (selected(); as item) {
+            <header class="iv-panel-head"><div><small>{{ item.usedIn ? 'Se usa en ' + item.usedIn + (item.usedIn === 1 ? ' receta' : ' recetas') : 'Sin recetas' }}</small><h2>{{ item.name }}</h2></div><button class="iv-close" (click)="closePanel()" aria-label="Cerrar"><app-icon name="x" [size]="17" /></button></header>
+            <div class="iv-hero" [class.low]="item.low" [class.negative]="item.stock < 0">
+              <small>Hay en stock</small>
+              <strong>{{ item.stock | number:'1.0-3' }} <span>{{ unitLabel(item.unit) }}</span></strong>
+              <span class="iv-level big"><i [style.width.%]="level(item)"></i><em [style.left.%]="50"></em></span>
+              <small>{{ item.stock < 0 ? 'Stock negativo: registra una compra o haz un conteo.' : item.low ? 'Está bajo el mínimo: entra a la lista de compras.' : 'Por encima del mínimo.' }}</small>
+            </div>
+            <div class="iv-facts">
+              <span><small>Mínimo</small><b>{{ item.minStock | number:'1.0-2' }} {{ unitLabel(item.unit) }}</b></span>
+              <span><small>Costo unit.</small><b>{{ item.costPerUnit | currency:'PEN':'S/ ':'1.2-2' }}</b></span>
+              <span><small>Valor</small><b>{{ item.stockValue | currency:'PEN':'S/ ' }}</b></span>
+            </div>
+            <div class="iv-actions">
+              <button class="iv-action" data-tone="ok" (click)="act('PURCHASE', item)"><app-icon name="cart" [size]="18" /><b>Compra</b><small>Entró mercadería</small></button>
+              <button class="iv-action" data-tone="bad" (click)="act('WASTE', item)"><app-icon name="trash" [size]="18" /><b>Merma</b><small>Se perdió o venció</small></button>
+              <button class="iv-action" data-tone="blue" (click)="act('COUNT', item)"><app-icon name="check" [size]="18" /><b>Conteo</b><small>Ajustar a lo real</small></button>
+            </div>
+            <div class="iv-history">
+              <h4>Últimos movimientos <button class="iv-link" (click)="edit(item)"><app-icon name="edit" [size]="13" />Editar insumo</button></h4>
+              @for (move of history(); track move.id) {
+                <div><span class="iv-kind" [attr.data-kind]="move.kind">{{ kindLabel(move.kind) }}</span><small>{{ timestamp(move.createdAt) }}</small><b [class.neg]="move.quantity < 0">{{ move.quantity > 0 ? '+' : '' }}{{ move.quantity | number:'1.0-3' }}</b></div>
+              } @empty { <p class="iv-muted">Sin movimientos en las últimas 2 semanas.</p> }
+            </div>
+          } @else {
+            <div class="iv-panel-empty">
+              <span><app-icon name="package" [size]="24" /></span>
+              <strong>Elige un insumo</strong>
+              <small>Registra compras, mermas o un conteo físico y mira su historial.</small>
+              <div class="iv-steps">
+                <p><i>1</i>Arma las <b>recetas</b> en Menú.</p>
+                <p><i>2</i>Cada venta <b>descuenta</b> el stock sola.</p>
+                <p><i>3</i>La pestaña <b>Hoy</b> te dice qué comprar.</p>
+              </div>
+            </div>
+          }
+        </aside>
+      </div>
+    } @else {
+      <section class="lg iv-moves">
+        <form class="iv-toolbar" (ngSubmit)="loadMovements()">
+          <label class="iv-field">Desde<input type="date" name="from" [(ngModel)]="from"></label>
+          <label class="iv-field">Hasta<input type="date" name="to" [(ngModel)]="to"></label>
+          <label class="iv-field">Insumo<select name="ingredient" [(ngModel)]="movementIngredient"><option value="">Todos</option>@for (item of ingredients(); track item.id) { <option [value]="item.id">{{ item.name }}</option> }</select></label>
+          <button class="iv-pill primary small">Consultar</button>
+          <small class="iv-muted">{{ movements().length }} movimientos</small>
+        </form>
+        <div class="iv-table">
+          <table>
+            <thead><tr><th>Fecha</th><th>Movimiento</th><th>Insumo</th><th class="num">Cantidad</th><th>Detalle</th><th>Responsable</th></tr></thead>
+            <tbody>
+              @for (move of movements(); track move.id) {
+                <tr><td class="muted">{{ timestamp(move.createdAt) }}</td><td><span class="iv-kind" [attr.data-kind]="move.kind">{{ kindLabel(move.kind) }}</span></td><td><strong>{{ move.ingredient }}</strong></td>
+                  <td class="num" [class.neg]="move.quantity < 0">{{ move.quantity > 0 ? '+' : '' }}{{ move.quantity | number:'1.0-3' }} {{ unitLabel(move.unit) }}</td><td class="muted">{{ move.reference || '—' }}</td><td>{{ move.userName }}</td></tr>
+              } @empty { <tr><td colspan="6"><p class="iv-muted">No hay movimientos en este período.</p></td></tr> }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+  </div>
+</app-shell>

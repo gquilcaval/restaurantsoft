@@ -1,0 +1,29 @@
+// Configuración de impresoras: botones, formulario y vinculación de la PC.
+.pr-btn { height: 36px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 14px; border: 0; border-radius: 999px; color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); font-size: .8rem; font-weight: 750; }
+.pr-btn.primary { color: var(--on-brand, #04110a); background: var(--brand); }
+.pr-btn.wide { height: 44px; justify-self: start; padding: 0 18px; }
+.pr-btn:disabled { opacity: .5; }
+.pr-icon-btn { width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 50%; color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); }
+.pr-link { padding: 6px 4px; border: 0; color: var(--muted); background: none; font-size: .8rem; font-weight: 750; }
+.pr-link.danger { margin-right: auto; color: var(--bad); }
+.pr-form { display: grid; gap: 10px; padding: 12px; border-radius: 16px; background: color-mix(in srgb, var(--text) 4%, transparent); }
+.pr-two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.pr-form label, .pr-field { display: grid; gap: 6px; font-size: .8rem; font-weight: 750; }
+.pr-field > span { font-size: .8rem; }
+.pr-form input { height: 44px; padding: 0 14px; border: 0; border-radius: 14px; outline: 2px solid transparent; color: var(--text); background: color-mix(in srgb, var(--text) 7%, transparent); font: inherit; font-size: .92rem; font-weight: 500; }
+.pr-form input:focus { outline-color: color-mix(in srgb, var(--brand) 70%, transparent); }
+.pr-form-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
+.pr-agent { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 16px; background: color-mix(in srgb, var(--text) 4%, transparent); }
+.pr-agent i { width: 10px; height: 10px; flex-shrink: 0; border-radius: 50%; background: var(--bad); }
+.pr-agent.online i { background: var(--ok); box-shadow: 0 0 0 4px color-mix(in srgb, var(--ok) 20%, transparent); }
+.pr-agent span { flex: 1; display: grid; } .pr-agent b { font-size: .9rem; } .pr-agent small { color: var(--muted); font-size: .76rem; }
+.pr-pair { display: grid; gap: 8px; padding: 14px; border-radius: 18px; background: color-mix(in srgb, var(--brand) 9%, transparent); }
+.pr-pair > small { color: var(--muted); font-size: .76rem; font-weight: 700; }
+.pr-code { font: 800 2.2rem var(--font-display); letter-spacing: .12em; font-variant-numeric: tabular-nums; }
+.pr-pair ol { display: grid; gap: 8px; margin: 0; padding-left: 18px; color: var(--text); font-size: .84rem; line-height: 1.45; }
+.pr-pair a { color: var(--brand); font-weight: 700; }
+.pr-pair code { padding: 2px 6px; border-radius: 6px; background: color-mix(in srgb, var(--text) 8%, transparent); font-size: .78rem; }
+.pr-cmd { display: flex; align-items: center; gap: 8px; max-width: 100%; margin-top: 6px; padding: 8px 10px; border: 0; border-radius: 12px; color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); text-align: left; }
+.pr-cmd code { overflow-x: auto; padding: 0; background: none; white-space: nowrap; }
+.pr-pair .pr-link { justify-self: start; }
+@media (max-width: 520px) { .pr-two { grid-template-columns: minmax(0, 1fr); } }

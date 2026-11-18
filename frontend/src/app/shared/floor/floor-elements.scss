@@ -1,0 +1,26 @@
+// Elementos del local dentro del plano SVG.
+.fp-el { transition: opacity .3s; }
+.fp-el.editable { cursor: grab; }
+.fp-el.editable:active { cursor: grabbing; }
+.fp-el-shape {
+  fill: var(--surface-3); stroke: color-mix(in srgb, var(--text) 25%, transparent); stroke-width: 1.5;
+  transition: fill .3s, stroke .3s;
+}
+.fp-el[data-kind='BAR'] .fp-el-shape { fill: color-mix(in srgb, #9a6b43 38%, var(--surface)); stroke: #9a6b43; }
+.fp-el[data-kind='WALL'] .fp-el-shape { fill: color-mix(in srgb, var(--text) 72%, transparent); stroke: none; }
+.fp-el[data-kind='DOOR'] .fp-el-shape { fill: var(--surface); stroke: var(--muted); stroke-dasharray: 4 3; }
+.fp-el[data-kind='WINDOW'] .fp-el-shape { fill: var(--info-soft); stroke: var(--info); }
+.fp-el[data-kind='KITCHEN'] .fp-el-shape { fill: var(--orange-soft); stroke: var(--orange); stroke-dasharray: 8 5; }
+.fp-el[data-kind='CASHIER'] .fp-el-shape { fill: var(--brand-soft); stroke: var(--brand); }
+.fp-el[data-kind='WC'] .fp-el-shape { fill: var(--info-soft); stroke: var(--info); }
+.fp-el[data-kind='STAIRS'] .fp-el-shape { fill: var(--surface-2); }
+.fp-el[data-kind='PLANT'] .fp-el-shape { fill: var(--green-soft); stroke: var(--green); }
+.fp-step { stroke: color-mix(in srgb, var(--text) 30%, transparent); stroke-width: 1.5; }
+.fp-door-arc { fill: none; stroke: var(--muted); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.fp-el-label, .fp-el-icon {
+  text-anchor: middle; dominant-baseline: central; font-size: 15px; font-weight: 750;
+  fill: color-mix(in srgb, var(--text) 75%, transparent); pointer-events: none; user-select: none;
+}
+.fp-el-icon { font-size: 20px; }
+.fp-el.selected .fp-el-shape { stroke: var(--brand); stroke-width: 3; stroke-dasharray: none; }
+.fp-handle { fill: var(--brand); stroke: var(--surface); stroke-width: 2; cursor: nwse-resize; }

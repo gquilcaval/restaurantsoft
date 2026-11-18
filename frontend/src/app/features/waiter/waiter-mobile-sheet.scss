@@ -1,0 +1,25 @@
+// Ficha de la mesa en celular: acciones grandes abajo y pedidos fáciles de leer.
+.mz-sheet-actions { display: none; }
+@media (max-width: 980px) {
+  .waiter-detail-primary-actions { display: none !important; }
+  .service-detail.waiter-detail-panel { background: var(--surface); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .mz-sheet-btn:only-child { grid-column: 1 / -1; }
+  .mz-sheet-actions {
+    position: sticky; bottom: 0; z-index: 3; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px;
+    margin: 0; padding: 12px 16px max(14px, env(safe-area-inset-bottom));
+    background: var(--surface); box-shadow: 0 -10px 24px rgba(0, 0, 0, .16);
+  }
+  .mz-sheet-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 14px; border: 0; border-radius: 18px; color: var(--text); font-size: .9rem; font-weight: 800; white-space: nowrap; background: color-mix(in srgb, var(--text) 8%, transparent); transition: transform .15s; }
+  .mz-sheet-btn.primary { color: var(--on-brand, #fff); background: var(--brand); box-shadow: 0 8px 20px color-mix(in srgb, var(--brand) 30%, transparent); }
+  .mz-sheet-btn:active { transform: scale(.97); }
+  .mz-sheet-btn:disabled { opacity: .5; }
+}
+@media (max-width: 760px) {
+  .service-detail .waiter-order-item { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: start; gap: 10px; padding: 12px 0; }
+  .service-detail .waiter-order-item > span { grid-column: 2; grid-row: 1; min-width: 0; }
+  .service-detail .waiter-order-item .item-state { grid-column: 3; grid-row: 1; display: grid; justify-items: end; gap: 6px; width: auto; margin: 0; }
+  .service-detail .waiter-order-item .item-state .status { width: auto; padding: 4px 9px; font-size: .66rem; white-space: nowrap; }
+  .service-detail .waiter-order-item .item-state .primary { width: auto; min-height: 36px; padding: 0 14px; border-radius: 999px; font-size: .78rem; }
+  .service-detail .waiter-order-item .item-void-action { padding: 2px 0; font-size: .72rem; }
+  .service-detail .waiter-order-quantity { width: 34px; height: 34px; }
+}

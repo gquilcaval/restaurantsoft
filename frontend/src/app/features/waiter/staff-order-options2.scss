@@ -1,0 +1,20 @@
+// Opciones del plato: botones de cada opción, nota y pie con cantidad y botón.
+.so-mod-opts { display: grid; gap: 6px; }
+.so-mod-opts.single { grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); }
+.so-mod-opt { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 14px; border: 0; border-radius: 14px; color: var(--text); font: inherit; font-size: .88rem; font-weight: 700; text-align: left; background: color-mix(in srgb, var(--text) 6%, transparent); transition: background .2s, box-shadow .2s, transform .12s; }
+.so-mod-opt:active:not(:disabled) { transform: scale(.97); }
+.so-mod-opt:disabled { opacity: .4; }
+.so-mod-opt span { flex: 1; }
+.so-mod-opt b { color: var(--muted); font-size: .8rem; }
+.so-mark { flex-shrink: 0; width: 22px; height: 22px; display: grid; place-items: center; border-radius: 7px; color: transparent; box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--text) 25%, transparent); transition: background .2s, color .2s, box-shadow .2s; }
+.so-mark svg { width: 14px; height: 14px; stroke-width: 3; }
+.single .so-mod-opt { justify-content: center; text-align: center; }
+.single .so-mark { display: none; }
+.so-mod-opt.on { background: color-mix(in srgb, var(--brand) 14%, transparent); box-shadow: inset 0 0 0 2px var(--brand); }
+.so-mod-opt.on .so-mark { color: var(--on-brand, #fff); background: var(--brand); box-shadow: none; }
+.so-mod-opt.on b { color: var(--brand-accent, var(--brand)); }
+.so-opt-note { width: 100%; padding: 10px 12px; border: 0; border-radius: 14px; color: var(--text); font: inherit; font-size: .84rem; background: color-mix(in srgb, var(--text) 6%, transparent); resize: none; outline: none; }
+.so-opt-note:focus { box-shadow: 0 0 0 2px var(--brand); }
+.so-opt-foot { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 10px; padding: 12px 18px max(18px, env(safe-area-inset-bottom)); box-shadow: 0 -10px 22px rgba(0, 0, 0, .12); }
+@media (max-width: 860px) { .so-opt-backdrop { align-items: end; padding: 0; } .so-opt { width: 100%; max-height: 92dvh; border-radius: 28px 28px 0 0; animation: so-sheet .35s cubic-bezier(.2, 1, .4, 1); } }
+@keyframes so-sheet { from { transform: translateY(100%); } }

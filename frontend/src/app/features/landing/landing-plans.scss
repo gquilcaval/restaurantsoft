@@ -1,0 +1,21 @@
+.lp-plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; max-width: 1080px; margin: 30px auto 0; text-align: left; align-items: stretch; }
+.lp-plan { position: relative; display: grid; grid-template-rows: auto auto auto 1fr auto; gap: 8px; padding: 26px; border-radius: 22px; background: var(--surface); border: 1px solid var(--border); }
+.lp-plan.featured { border: 2px solid var(--brand); box-shadow: var(--shadow-lg); transform: translateY(-6px); }
+.lp-plan-badge { position: absolute; top: -12px; right: 20px; padding: 4px 12px; border-radius: 999px; background: var(--brand); color: #fff; font-size: .74rem; font-weight: 850; }
+.lp-plan h3 { margin: 0; font-size: 1.2rem; }
+.lp-plan-note { margin: 0; color: var(--muted); font-size: .86rem; }
+.lp-price { margin: 6px 0; }
+.lp-price strong { font-size: 2.2rem; letter-spacing: -.02em; }
+.lp-price small { color: var(--muted); font-weight: 700; }
+.lp-plan ul { list-style: none; margin: 8px 0 14px; padding: 0; display: grid; gap: 8px; font-size: .9rem; }
+.lp-plan li { display: flex; gap: 8px; align-items: center; }
+.lp-plan li app-icon { color: var(--brand-accent); }
+.lp-faqs { display: grid; gap: 10px; max-width: 760px; margin: 26px auto 0; text-align: left; }
+.lp-faq { padding: 16px 20px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); }
+.lp-faq summary { cursor: pointer; font-weight: 800; }
+.lp-faq p { margin: 10px 0 0; color: var(--muted); line-height: 1.55; }
+.lp-cta { margin: 0 clamp(16px, 5vw, 64px) 40px; padding: clamp(36px, 6vw, 64px) 24px; border-radius: 28px; text-align: center; color: #fff; background: linear-gradient(135deg, #10140f, color-mix(in srgb, var(--brand) 55%, #10140f)); }
+.lp-cta p { margin: 0 0 22px; opacity: .85; }
+.lp-cta .lp-hero-actions { justify-content: center; }
+.lp-footer { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 24px clamp(16px, 5vw, 64px); border-top: 1px solid var(--border); color: var(--muted); font-size: .84rem; }
+.lp-footer a { color: var(--muted); }

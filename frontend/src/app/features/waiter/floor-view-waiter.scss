@@ -1,0 +1,8 @@
+// Mesero a cargo en el plano: círculo con sus iniciales en la esquina de la mesa.
+.fv-waiter { --hue: 210; pointer-events: none; }
+.fv-waiter circle { fill: hsl(var(--hue) 55% 48%); stroke: var(--surface); stroke-width: 2.5; }
+.fv-waiter text { fill: #fff; font: 800 9px var(--font-display); text-anchor: middle; dominant-baseline: central; }
+.fv-waiter.mine circle { fill: var(--brand); }
+.fv-waiter.mine text { fill: var(--on-brand, #04110a); }
+.fv-waiter.none circle { fill: var(--warn); }
+.fv-waiter.away { opacity: .55; }

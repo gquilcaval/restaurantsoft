@@ -1,0 +1,18 @@
+// Capas de pasillos y recorridos, y lista de meseros.
+.fe-aisle line { stroke: #ef5d55; stroke-width: 4; stroke-linecap: round; animation: fe-pulse 1.4s ease-in-out infinite; }
+.fe-aisle rect { fill: #ef5d55; } .fe-aisle text { fill: #fff; font-size: 12px; font-weight: 900; text-anchor: middle; dominant-baseline: central; }
+.fe-route line { stroke: color-mix(in srgb, #4f8cff 70%, transparent); stroke-width: 2.5; stroke-dasharray: 2 7; stroke-linecap: round; animation: fe-march 1s linear infinite; }
+.fe-route.far line { stroke: #f08a3c; stroke-width: 3.5; }
+.fe-route text { fill: var(--text); font-size: 12px; font-weight: 800; text-anchor: middle; paint-order: stroke; stroke: var(--surface); stroke-width: 4px; }
+.fe-origin circle { fill: #f5b301; stroke: var(--surface); stroke-width: 4; } .fe-origin text { fill: #3b2a00; font-size: 15px; text-anchor: middle; dominant-baseline: central; }
+@keyframes fe-pulse { 50% { opacity: .45; } }
+@keyframes fe-march { to { stroke-dashoffset: -18; } }
+.fe-waiters { display: grid; gap: 4px; }
+.fe-waiters button { display: grid; grid-template-columns: 34px 1fr; align-items: center; gap: 10px; padding: 8px 10px; border: 0; border-radius: 14px; text-align: left; color: var(--text); background: color-mix(in srgb, var(--text) 4%, transparent); transition: background .2s, transform .3s var(--ease-spring); }
+.fe-waiters button:hover:not(:disabled) { transform: translateX(3px); background: color-mix(in srgb, var(--text) 8%, transparent); }
+.fe-waiters button:disabled { opacity: .6; }
+.fe-waiters i { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; font-style: normal; font-weight: 900; font-size: .74rem; color: #fff; }
+.fe-waiters span { display: grid; } .fe-waiters strong { font-size: .86rem; } .fe-waiters small { color: var(--muted); font-size: .7rem; }
+.fe-stage.is-3d .fp-chair { filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .45)) drop-shadow(0 2px 0 rgba(0, 0, 0, .35)) drop-shadow(0 5px 4px rgba(0, 0, 0, .35)); }
+.fe-stage.is-3d .fp-label, .fe-stage.is-3d .fp-sub { transform: translateY(-6px); }
+.fe-stage.is-3d ::ng-deep g[appFloorElements] > g { filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .35)) drop-shadow(0 3px 0 rgba(0, 0, 0, .3)) drop-shadow(0 3px 0 rgba(0, 0, 0, .25)) drop-shadow(0 12px 10px rgba(0, 0, 0, .35)); }

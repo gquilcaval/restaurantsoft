@@ -1,0 +1,15 @@
+// Opciones del plato dentro de la ficha del comensal (solo aquí; el mesero no cambia).
+:host ::ng-deep .ps-options .modifier-group { margin: 0 0 16px; padding: 0; border: 0; min-width: 0; }
+:host ::ng-deep .ps-options .modifier-group legend { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; margin-bottom: 8px; padding: 0; }
+:host ::ng-deep .ps-options .modifier-group legend strong { font-size: .95rem; font-weight: 800; }
+:host ::ng-deep .ps-options .modifier-group legend small { padding: 3px 9px; border-radius: 999px; color: var(--muted); background: var(--surface-2); font-size: .7rem; font-weight: 750; }
+:host ::ng-deep .ps-options .modifier-group.incomplete legend small { color: #9a5b00; background: #ffefd2; }
+:host ::ng-deep .ps-options .modifier-group.dn-done legend small { color: var(--green, #2e7d32); background: color-mix(in srgb, var(--green, #2e7d32) 14%, transparent); }
+:host ::ng-deep .ps-options .modifier-group.dn-done legend small::before { content: '✓ '; }
+:host ::ng-deep .ps-options .modifier-options { gap: 6px; }
+:host ::ng-deep .ps-options .modifier-option { min-height: 46px; padding: 0 14px; border: 0; border-radius: 14px; color: var(--text); background: var(--surface-2); font-weight: 650; transition: background .18s, box-shadow .18s, transform .18s; }
+:host ::ng-deep .ps-options .modifier-option:active { transform: scale(.98); }
+:host ::ng-deep .ps-options .modifier-option.selected { background: var(--brand-soft); box-shadow: inset 0 0 0 2px var(--brand); }
+:host ::ng-deep .ps-options .modifier-option.selected b { color: var(--brand); }
+:host ::ng-deep .ps-options .modifier-group.dn-attn { animation: dn-attn .9s ease; }
+@keyframes dn-attn { 15%, 45% { transform: translateX(-5px); } 30%, 60% { transform: translateX(5px); } 0%, 100% { transform: none; } }

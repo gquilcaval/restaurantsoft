@@ -1,0 +1,102 @@
+@if (progress(); as value) {
+  @if (value.goal > 0) {
+    <section
+      class="goal"
+      [class.large]="size() === 'large'"
+      [class.reached]="value.reached"
+      [class.party]="celebrating()"
+      aria-label="Meta de ventas del día"
+    >
+      <div class="goal-copy">
+        <span class="goal-icon">{{ value.reached ? '🏆' : '🎯' }}</span>
+        <p>
+          <strong>Llevamos {{ value.revenue | currency: 'PEN' : 'S/ ' : '1.0-0' }}</strong>
+          de {{ value.goal | currency: 'PEN' : 'S/ ' : '1.0-0' }}
+          @if (!value.reached) {
+            <small>· faltan {{ missing() | currency: 'PEN' : 'S/ ' : '1.0-0' }}</small>
+          }
+        </p>
+        <b class="goal-percent">{{ value.percent || 0 }} %</b>
+        @if (manager()) {
+          <button class="goal-edit" (click)="openEditor()" title="Editar metas"><app-icon name="edit" [size]="15" /></button>
+        }
+      </div>
+      <div
+        class="goal-track"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        [attr.aria-valuenow]="percent()"
+      >
+        <i class="goal-fill" [style.width.%]="percent()"><b></b></i>
+        @if (value.projected && !value.reached) {
+          <i
+            class="goal-projection"
+            [style.left.%]="
+              (value.projected / value.goal) * 100 > 100
+                ? 100
+                : (value.projected / value.goal) * 100
+            "
+          ></i>
+        }
+        @for (mark of milestones; track mark) {
+          <em [style.left.%]="mark" [class.passed]="percent() >= mark"></em>
+        }
+      </div>
+      <small class="goal-mood">{{ mood() }}</small>
+      @if (celebrating()) {
+        <div class="goal-confetti" aria-hidden="true">
+          @for (piece of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]; track piece) {
+            <i [style.--n]="piece"></i>
+          }
+        </div>
+      }
+    </section>
+  } @else if (manager()) {
+    <button class="goal-empty" (click)="openEditor()">
+      🎯 Define la meta de ventas del día para motivar al equipo
+    </button>
+  }
+}
+
+@if (editing()) {
+  <div class="modal-backdrop" (click)="editing.set(false)">
+    <section
+      class="qr-dialog goal-editor"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="goal-title"
+    >
+      <button class="modal-close" (click)="editing.set(false)" aria-label="Cerrar">×</button>
+      <p class="eyebrow">Metas de ventas</p>
+      <h2 id="goal-title">¿Cuánto quieren vender cada día?</h2>
+      @for (day of days; track day; let index = $index) {
+        <label class="goal-day">
+          <span>{{ day }}</span>
+          <span class="money-input"
+            ><b>S/</b
+            ><input
+              type="number"
+              min="0"
+              step="50"
+              [(ngModel)]="amounts[index]"
+              [name]="'goal' + index"
+          /></span>
+          <button
+            type="button"
+            class="link-button"
+            (click)="copyToAll(index)"
+            title="Usar este monto para todos los días"
+          >
+            Copiar a todos
+          </button>
+        </label>
+      }
+      <p class="muted goal-hint">
+        Deja 0 en los días sin meta. Tip: usa el promedio de las últimas semanas más un 10 %.
+      </p>
+      <button class="primary full" (click)="save()">Guardar metas</button>
+    </section>
+  </div>
+}

@@ -1,0 +1,15 @@
+// Mesas que existen pero no se ubicaron en el plano: se listan aparte para no tapar el diseño.
+.fv-outside { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-top: 12px; padding: 10px 12px; border: 1px dashed var(--border); border-radius: 14px; }
+.fv-outside > span { font-size: .74rem; font-weight: 800; color: var(--muted); margin-right: 4px; }
+.fv-outside button {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 999px; font-weight: 750; font-size: .78rem;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text); transition: transform .2s, opacity .3s;
+}
+.fv-outside button:hover { transform: translateY(-2px); }
+.fv-outside button i { width: 9px; height: 9px; border-radius: 50%; background: var(--green); }
+.fv-outside button small { color: var(--muted); }
+.fv-outside button.dimmed { opacity: .35; }
+.fv-outside button:not([data-tone='free']) i { background: var(--zone-color); }
+.fv-outside button[data-tone='call'], .fv-outside button[data-tone='bill'] { border-color: var(--danger); animation: fv-out-pulse 1.4s ease-in-out infinite; }
+.fv-outside button[data-tone='ready'] { border-color: var(--green); background: var(--green-soft); }
+@keyframes fv-out-pulse { 50% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--danger) 25%, transparent); } }

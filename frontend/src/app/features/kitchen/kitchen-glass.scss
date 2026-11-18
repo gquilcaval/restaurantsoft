@@ -1,0 +1,18 @@
+// Columnas y comandas sobre vidrio: sin bordes, con una franja de color según la espera.
+.kds .kds-column.kitchen-column { border: 0; border-radius: 24px; background: color-mix(in srgb, var(--surface) 52%, transparent); -webkit-backdrop-filter: blur(26px) saturate(175%); backdrop-filter: blur(26px) saturate(175%); box-shadow: var(--elev-1); }
+:root.solid-ui .kds .kds-column.kitchen-column { background: var(--surface); }
+.kds .kds-column.kitchen-column > header { min-height: 62px; padding: 12px 16px; border-bottom: 0; background: transparent; }
+.kds .kds-column.kitchen-column h2 { font: 750 1rem var(--font-display); }
+.kds .kds-column.kitchen-column > header small { font-size: .72rem; }
+.kds .kds-column.kitchen-column > header > div > span { border-radius: 12px; }
+.kds .kds-column.kitchen-column > header > b { width: auto; min-width: 30px; height: 30px; padding: 0 8px; border: 0; border-radius: 999px; font: 800 .82rem var(--font-display); background: color-mix(in srgb, var(--text) 9%, transparent); }
+.kds .kitchen-column-scroll { padding: 4px 10px 12px; }
+.kds .order-card.kitchen-order-card { --tone: #8b95a7; border: 0; border-radius: 18px; background: color-mix(in srgb, var(--surface) 78%, transparent); box-shadow: inset 4px 0 0 var(--tone), var(--elev-1); }
+.kds .order-card.kitchen-order-card.attention { --tone: #f5b301; }
+.kds .order-card.kitchen-order-card.late { --tone: #ef5d55; box-shadow: inset 4px 0 0 var(--tone), 0 0 0 1.5px color-mix(in srgb, var(--tone) 45%, transparent); }
+:root[data-theme='dark'] .kds .order-card.kitchen-order-card { background: color-mix(in srgb, white 5%, transparent); }
+.kds .order-card.kitchen-order-card:hover { transform: translateY(-1px); }
+.kds .kitchen-item { border-top-color: color-mix(in srgb, var(--text) 7%, transparent); }
+.kds .kitchen-action { border-radius: 999px; }
+body app-shell .shell > main > .page-content:has(.kds) { overflow: hidden !important; }
+body app-shell .page-content .kds { flex: 1 1 auto !important; min-height: 0 !important; }

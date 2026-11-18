@@ -1,0 +1,153 @@
+<app-shell title="Configuración" eyebrow="Sucursal actual">
+  <div class="st">
+    <!-- Secciones del centro de ajustes -->
+    <nav class="lg st-nav" aria-label="Secciones de configuración">
+      @for (item of sections(); track item.key) {
+        <button [class.on]="section() === item.key" (click)="showSection(item.key)">
+          <span class="st-nav-ico"><app-icon [name]="item.icon" [size]="17" /></span>
+          <span class="st-nav-text"><strong>{{ item.label }}</strong><small>{{ item.hint }}</small></span>
+          @if (item.count !== null) { <b>{{ item.count }}</b> }
+        </button>
+      }
+      <p class="st-nav-tip">El diseño del salón se hace en <b>Plano del salón</b>. Tu tema y efectos personales, en tu menú → <b>Apariencia</b>.</p>
+    </nav>
+
+    <section class="st-main">
+      @switch (section()) {
+        @case ('BRAND') { <app-brand-dialog [inline]="true" /> }
+        @case ('TABLES') {
+          <header class="st-head">
+            <div><h2>Mesas y QR</h2><p>Cada mesa tiene un QR permanente para que el cliente vea la carta y pida.</p></div>
+            <label class="st-search"><app-icon name="search" [size]="15" /><input type="search" placeholder="Buscar mesa" [ngModel]="search()" (ngModelChange)="search.set($event)"></label>
+            <button class="st-pill primary" (click)="newTable()"><app-icon name="plus" [size]="15" />Mesa</button>
+          </header>
+          <div class="st-split" [class.open]="tableForm()">
+            <div class="lg st-list">
+              <div class="st-grid">
+                @for (table of visibleTables(); track table.id; let index = $index) {
+                  <button class="st-tile" [class.selected]="tableForm() && editingTableId === table.id" [class.off]="!table.active" [style.--zone]="zoneColorOf(table.zoneId)" [style.--d]="(index < 20 ? index * 20 : 0) + 'ms'" (click)="editTable(table)">
+                    <span class="st-tile-top"><strong>{{ table.label }}</strong><i class="st-state" [class.busy]="table.occupied">{{ table.occupied ? 'Ocupada' : 'Libre' }}</i></span>
+                    <small><app-icon name="users" [size]="12" />{{ table.capacity }} personas</small>
+                    <small class="st-zone"><i></i>{{ zoneName(table.zoneId) || 'Sin zona' }}@if (!table.active) { · inactiva }</small>
+                  </button>
+                } @empty { <p class="st-muted">No hay mesas con ese nombre.</p> }
+              </div>
+            </div>
+            @if (tableForm()) {
+              <aside class="lg st-editor">
+                <header class="st-editor-head"><div><small>{{ editingTableId ? 'Editar mesa' : 'Nueva mesa' }}</small><h3>{{ editingTableId ? tableLabel : 'Agrega una mesa' }}</h3></div><button class="st-close" (click)="tableForm.set(false); qrPreview.set(null)" aria-label="Cerrar"><app-icon name="x" [size]="16" /></button></header>
+                <form class="st-form" (ngSubmit)="saveTable()">
+                  <label>Nombre<input name="tableLabel" [(ngModel)]="tableLabel" required maxlength="30" placeholder="Mesa 09"></label>
+                  <div class="st-row">
+                    <label>Capacidad<span class="st-stepper"><button type="button" (click)="tableCapacity = tableCapacity > 1 ? tableCapacity - 1 : 1">−</button><b>{{ tableCapacity }}</b><button type="button" (click)="tableCapacity = tableCapacity < 50 ? tableCapacity + 1 : 50">+</button></span></label>
+                    <label>Zona<select name="tableZone" [(ngModel)]="tableZoneId"><option value="">Sin zona</option>@for (zone of activeZones(); track zone.id) { <option [value]="zone.id">{{ zone.name }}</option> }</select></label>
+                  </div>
+                  <button type="button" class="st-switch" role="switch" [attr.aria-checked]="tableActive" (click)="tableActive = !tableActive"><i></i>Mesa activa</button>
+                  <button class="st-pill primary wide">Guardar mesa</button>
+                </form>
+                @if (qrPreview(); as qr) {
+                  <div class="st-qr">
+                    <img [src]="qr.dataUrl" [alt]="'QR ' + qr.table.label">
+                    <div><strong>QR permanente</strong><small class="st-qr-link">{{ qr.link }}</small>
+                      <div class="st-qr-actions"><button class="st-pill small" (click)="downloadQr()"><app-icon name="download" [size]="14" />Descargar</button><button class="st-pill small" (click)="printQr()">Imprimir</button></div>
+                      <button class="st-link danger" [disabled]="qr.table.occupied" (click)="regenerateQr()" [title]="qr.table.occupied ? 'Libera la mesa para regenerar' : ''">Regenerar código</button></div>
+                  </div>
+                }
+              </aside>
+            }
+          </div>
+        }
+
+        @case ('ZONES') {
+          <header class="st-head">
+            <div><h2>Zonas</h2><p>Agrupa las mesas. Cada mesero ve primero sus zonas y recibe solo sus avisos. Una zona cerrada no recibe clientes nuevos por QR.</p></div>
+            <button class="st-pill primary" (click)="editZone()"><app-icon name="plus" [size]="15" />Zona</button>
+          </header>
+          <div class="st-split" [class.open]="zoneForm()">
+            <div class="lg st-list">
+              @for (zone of zones(); track zone.id) {
+                <div class="st-row-item" [class.selected]="zoneForm() && editingZoneId === zone.id" [class.off]="!zone.active" (click)="editZone(zone)">
+                  <span class="st-dot" [style.background]="zone.color"></span>
+                  <span class="st-row-main"><strong>{{ zone.name }}</strong><small>{{ zone.tables }} mesas · {{ zone.occupied }} ocupadas · {{ waiterNames(zone) }}</small></span>
+                  <button type="button" class="st-switch small" role="switch" [attr.aria-checked]="zone.open" [disabled]="!zone.active" (click)="$event.stopPropagation(); toggleZone(zone)" [title]="zone.open ? 'Cerrar hoy' : 'Abrir hoy'"><i></i>{{ zone.open ? 'Abierta' : 'Cerrada' }}</button>
+                </div>
+              } @empty { <div class="st-empty"><app-icon name="map" [size]="22" /><div><strong>Sin zonas</strong><small>Todas las mesas se muestran juntas. Crea zonas como Salón o Terraza.</small></div></div> }
+            </div>
+            @if (zoneForm()) {
+              <aside class="lg st-editor">
+                <header class="st-editor-head"><div><small>{{ editingZoneId ? 'Editar zona' : 'Nueva zona' }}</small><h3>{{ zoneFormName || 'Nueva zona' }}</h3></div><button class="st-close" (click)="zoneForm.set(false)" aria-label="Cerrar"><app-icon name="x" [size]="16" /></button></header>
+                <form class="st-form" (ngSubmit)="saveZone()">
+                  <label>Nombre<input name="zoneName" [(ngModel)]="zoneFormName" required maxlength="60" placeholder="Terraza"></label>
+                  <div class="st-field"><span>Color</span><div class="st-swatches">@for (color of zoneColors; track color) { <button type="button" [style.background]="color" [class.on]="zoneColor.toLowerCase() === color.toLowerCase()" (click)="zoneColor = color" [attr.aria-label]="'Color ' + color"></button> }<input type="color" name="zoneColor" [(ngModel)]="zoneColor" aria-label="Otro color"></div></div>
+                  <div class="st-row"><label>Orden<input type="number" min="0" name="zoneOrder" [(ngModel)]="zoneOrder"></label>
+                    <button type="button" class="st-switch" role="switch" [attr.aria-checked]="zoneOpen" (click)="zoneOpen = !zoneOpen"><i></i>Abierta hoy</button></div>
+                  @if (editingZoneId) { <button type="button" class="st-switch" role="switch" [attr.aria-checked]="zoneActive" (click)="zoneActive = !zoneActive"><i></i>Zona activa</button> }
+                  <button class="st-pill primary wide">Guardar zona</button>
+                </form>
+                @if (editingZoneId) {
+                  <div class="st-assign">
+                    <h4>Mesas de la zona <small>{{ zoneTablesSel.size }}</small></h4>
+                    <div class="st-chips">@for (table of tables(); track table.id) { <button type="button" [class.on]="zoneTablesSel.has(table.id)" (click)="toggleZoneTable(table.id)">{{ table.label }}@if (table.zoneId && table.zoneId !== editingZoneId) {<small>· {{ zoneName(table.zoneId) }}</small>}</button> }</div>
+                    <h4>Meseros <small>{{ zoneWaitersSel.size }}</small></h4>
+                    <div class="st-chips">@for (user of zoneStaff(); track user.id) { <button type="button" [class.on]="zoneWaitersSel.has(user.id)" (click)="toggleZoneWaiter(user.id)">{{ user.fullName }}</button> } @empty { <small class="st-muted">No hay meseros activos.</small> }</div>
+                    <button class="st-pill wide" (click)="saveZoneAssignments()">Guardar mesas y meseros</button>
+                  </div>
+                }
+              </aside>
+            }
+          </div>
+        }
+
+        @case ('PRINTERS') { <app-printing-settings /> }
+        @case ('DEVICES') {
+          <header class="st-head">
+            <div><h2>Tablets compartidas</h2><p>En una tablet autorizada el personal entra tocando su nombre y escribiendo su PIN, sin correo ni contraseña.</p></div>
+            @if (!thisDeviceAuthorized()) { <button class="st-pill primary" (click)="authorizeDevice()"><app-icon name="check" [size]="15" />Autorizar este equipo</button> }
+          </header>
+          <div class="lg st-list st-devices">
+            <div class="st-this-device" [class.on]="thisDeviceAuthorized()">
+              <span><app-icon [name]="thisDeviceAuthorized() ? 'check' : 'phone'" [size]="22" /></span>
+              <div><strong>{{ thisDeviceAuthorized() ? 'Este equipo está autorizado' : 'Este equipo no está autorizado' }}</strong><small>{{ thisDeviceAuthorized() ? 'Al cerrar sesión se mostrará el ingreso con PIN.' : 'Autorízalo solo si se queda en el local (tablet del salón, PC de caja).' }}</small></div>
+              @if (thisDeviceAuthorized()) { <button class="st-pill small" (click)="forgetDevice()">Olvidar en este equipo</button> }
+            </div>
+            <h4 class="st-subtitle">Equipos autorizados</h4>
+            @for (device of devices(); track device.id) {
+              <div class="st-row-item static"><span class="st-dot device"><app-icon name="phone" [size]="14" /></span><span class="st-row-main"><strong>{{ device.name }}</strong><small>Autorizada por {{ device.createdBy }} · {{ device.lastUsedAt ? 'último ingreso ' + dateLabel(device.lastUsedAt) : 'sin ingresos todavía' }}</small></span><button class="st-pill small danger" (click)="revokeDevice(device)">Desautorizar</button></div>
+            } @empty { <p class="st-muted">Todavía no hay tablets autorizadas.</p> }
+            <div class="st-steps"><p><i>1</i>Autoriza la tablet del salón desde aquí.</p><p><i>2</i>Asigna un PIN a cada persona en <a routerLink="/personal">Personal</a>.</p><p><i>3</i>Al cerrar sesión, cada uno entra con su nombre y PIN.</p></div>
+          </div>
+        }
+
+        @case ('BRANCHES') {
+          <header class="st-head">
+            <div><h2>Sucursales</h2><p>Tus locales. Cada uno tiene sus mesas, su equipo, su caja y sus reportes.</p></div>
+            <button class="st-pill primary" (click)="newBranch()"><app-icon name="plus" [size]="15" />Sucursal</button>
+          </header>
+          <div class="st-split" [class.open]="branchForm()">
+            <div class="lg st-list">
+              @for (branch of branches(); track branch.id) {
+                <div class="st-row-item" [class.selected]="branchForm() && editingBranchId === branch.id" [class.off]="!branch.active" (click)="editBranch(branch)">
+                  <span class="st-dot device"><app-icon name="store" [size]="14" /></span>
+                  <span class="st-row-main"><strong>{{ branch.name }}@if (branch.id === auth.branchId()) {<i class="st-current">Actual</i>}</strong><small>{{ branch.address || 'Sin dirección' }} · {{ branch.tableCount }} mesas · {{ branch.userCount }} usuarios · {{ branch.openSessionCount }} abiertas</small></span>
+                  <i class="st-state" [class.busy]="!branch.active">{{ branch.active ? 'Activa' : 'Inactiva' }}</i>
+                </div>
+              }
+            </div>
+            @if (branchForm()) {
+              <aside class="lg st-editor">
+                <header class="st-editor-head"><div><small>{{ editingBranchId ? 'Editar sucursal' : 'Nueva sucursal' }}</small><h3>{{ branchName || 'Nuevo local' }}</h3></div><button class="st-close" (click)="branchForm.set(false)" aria-label="Cerrar"><app-icon name="x" [size]="16" /></button></header>
+                <form class="st-form" (ngSubmit)="saveBranch()">
+                  <label>Nombre<input name="branchName" [(ngModel)]="branchName" required maxlength="120" placeholder="San Isidro"></label>
+                  <label>Dirección<input name="branchAddress" [(ngModel)]="branchAddress" maxlength="250" placeholder="Av. Conquistadores 456"></label>
+                  @if (!editingBranchId) { <label>Mesas iniciales<span class="st-stepper"><button type="button" (click)="branchTables = branchTables > 0 ? branchTables - 1 : 0">−</button><b>{{ branchTables }}</b><button type="button" (click)="branchTables = branchTables < 100 ? branchTables + 1 : 100">+</button></span></label> }
+                  @else { <button type="button" class="st-switch" role="switch" [attr.aria-checked]="branchActive" (click)="branchActive = !branchActive"><i></i>Sucursal activa</button> }
+                  <button class="st-pill primary wide">Guardar sucursal</button>
+                </form>
+              </aside>
+            }
+          </div>
+        }
+      }
+    </section>
+  </div>
+</app-shell>

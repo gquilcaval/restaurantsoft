@@ -1,0 +1,23 @@
+/* Continuación de staff-sidebar.scss: se divide para respetar el límite de tamaño por hoja. */
+.sidebar-signature>span{font-size:.8rem;font-weight:700;letter-spacing:-.04em;color:var(--muted)}
+.sidebar-signature>span>span{color:var(--text)}
+.sidebar-signature small{font-size:.52rem;color:var(--muted)}
+.sidebar-logout{position:relative;display:flex;align-items:center;gap:12px;width:100%;min-height:46px;padding:0 14px;border:1px solid var(--border);border-radius:12px;background:transparent;color:var(--muted);font-size:.76rem;font-weight:550;transition:color .18s,background .18s,border-color .18s}
+.sidebar-logout>span{position:absolute;left:46px;white-space:nowrap}
+.sidebar-logout svg{width:20px;height:20px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.sidebar-logout:hover{background:var(--danger-soft);color:var(--danger);border-color:color-mix(in srgb,var(--danger) 30%,var(--border))}
+/* La posición de los iconos y la altura de cada fila no cambian al plegar el rail. */
+.brand-copy,.nav-text,.nav-label,.sidebar-signature,.sidebar-logout>span,.nav-marker{opacity:1;visibility:visible;transition:opacity 140ms ease 100ms,visibility 0s 100ms}
+.sidebar-collapsed :is(.brand-copy,.nav-text,.nav-label,.sidebar-signature,.sidebar-logout>span,.nav-marker){opacity:0;visibility:hidden;transition:opacity 100ms ease,visibility 0s 100ms}
+.sidebar-collapsed nav a.active{box-shadow:none}
+.mobile-menu-close,.sidebar-scrim{display:none}
+@media(max-width:900px){
+  aside{display:none}
+  .mobile-menu-open>aside{display:flex;position:fixed;inset:12px auto 12px 12px;z-index:90;width:min(290px,calc(100vw - 24px));height:auto;border:1px solid var(--border);border-radius:22px;box-shadow:0 24px 80px #0005;animation:staff-menu-in .22s ease}
+  .sidebar-scrim{display:block;position:fixed;inset:0;z-index:89;background:#0008;backdrop-filter:blur(3px)}
+  .aside-branding{padding-right:30px;position:relative}
+  .mobile-menu-close{display:grid;place-items:center;position:absolute;right:0;top:7px;width:28px;height:28px;padding:0;border:0;border-radius:8px;background:var(--surface-2);color:var(--muted)}
+  .mobile-menu-close svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7}
+}
+@keyframes staff-menu-in{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){nav a,.sidebar-logout,.brand-copy,.nav-text,.nav-label,.sidebar-signature,.sidebar-logout>span,.nav-marker{transition:none!important}.mobile-menu-open>aside{animation:none}}

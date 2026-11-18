@@ -1,0 +1,25 @@
+// Barra superior de cocina: estaciones como pestañas y avisos agrupados en un botón.
+.kx-top { position: relative; z-index: 6; display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; flex: 0 0 auto; margin-bottom: 14px; }
+.kx-stations { display: flex; gap: 4px; padding: 4px; border-radius: 999px; overflow-x: auto; scrollbar-width: none; background: color-mix(in srgb, var(--surface) 55%, transparent); -webkit-backdrop-filter: blur(20px) saturate(170%); backdrop-filter: blur(20px) saturate(170%); box-shadow: var(--elev-1); }
+.kx-stations button { --tone: #3fbf2a; flex-shrink: 0; display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-weight: 750; font-size: .86rem; transition: background .3s, color .25s, box-shadow .3s; }
+.kx-stations button[data-status='BUSY'] { --tone: #f5b301; } .kx-stations button[data-status='LATE'] { --tone: #ef5d55; }
+.kx-stations button:hover { color: var(--text); }
+.kx-stations button i { width: 8px; height: 8px; border-radius: 50%; background: var(--tone); }
+.kx-stations button[data-status='LATE'] i { animation: kx-ping 1.6s infinite; }
+.kx-stations button small { min-width: 22px; padding: 1px 7px; border-radius: 999px; text-align: center; font: 800 .74rem var(--font-display); color: var(--text); background: color-mix(in srgb, var(--text) 9%, transparent); }
+.kx-stations button em { font-style: normal; font-size: .72rem; font-weight: 700; color: var(--tone); }
+.kx-stations button.on { color: var(--text); background: var(--surface); box-shadow: var(--elev-2); }
+:root[data-theme='dark'] .kx-stations button.on { background: color-mix(in srgb, white 12%, transparent); }
+@keyframes kx-ping { 0% { box-shadow: 0 0 0 0 currentColor; } 70%, 100% { box-shadow: 0 0 0 6px transparent; } }
+.kx-alerts { position: relative; margin-left: auto; }
+.kx-alert-btn { --tone: #f08a3c; display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 8px 0 14px; border: 0; border-radius: 999px; color: var(--tone); background: color-mix(in srgb, var(--tone) 14%, transparent); font-weight: 750; font-size: .82rem; }
+.kx-alert-btn[data-tone='late'] { --tone: #ef5d55; }
+.kx-alert-btn b { min-width: 26px; height: 26px; display: grid; place-items: center; border-radius: 999px; color: #fff; background: var(--tone); font-size: .76rem; }
+.kx-alert-pop { position: absolute; right: 0; top: calc(100% + 8px); width: min(420px, 90vw); max-height: 60vh; overflow-y: auto; display: grid; gap: 4px; padding: 8px; border-radius: 20px; box-shadow: var(--elev-4); animation: kx-drop .25s var(--ease-spring); }
+.kx-alert { --tone: #ef5d55; display: grid; grid-template-columns: 30px minmax(0, 1fr) 28px; align-items: start; gap: 10px; padding: 10px; border-radius: 14px; }
+.kx-alert[data-tone='stock'] { --tone: #f08a3c; }
+.kx-alert > app-icon { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 10px; color: var(--tone); background: color-mix(in srgb, var(--tone) 15%, transparent); }
+.kx-alert p { display: grid; gap: 2px; margin: 0; } .kx-alert strong { font-size: .84rem; } .kx-alert small { color: var(--muted); font-size: .74rem; line-height: 1.35; }
+.kx-alert button { width: 28px; height: 28px; display: grid; place-items: center; border: 0; border-radius: 50%; color: var(--muted); background: transparent; }
+.kx-alert button:hover { background: color-mix(in srgb, var(--text) 8%, transparent); }
+@keyframes kx-drop { from { opacity: 0; transform: translateY(-6px) scale(.98); } }

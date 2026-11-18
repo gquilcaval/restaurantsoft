@@ -1,0 +1,28 @@
+// Estilos de carta que elige el restaurante. «Clásico» es el diseño base.
+// Cevichería fresca: blancos y aguamarina, tarjetas redondeadas y aireadas.
+.diner-page[data-menu-theme='fresh'] {
+  --bg: #f1fafb; --surface: #ffffff; --surface-2: #e2f3f5; --surface-3: #cfe9ec; --text: #0b3640; --muted: #557a82; --border: #d3e9ec;
+  --shadow-color: #0b36401a;
+  background: radial-gradient(circle at 100% 0%, #c9eef2 0%, transparent 38%), var(--bg);
+}
+.diner-page[data-menu-theme='fresh'] .diner-product-card { border-radius: 22px; border-color: transparent; box-shadow: 0 8px 22px var(--shadow-color); }
+.diner-page[data-menu-theme='fresh'] .diner-product-card img { border-radius: 18px; }
+.diner-page[data-menu-theme='fresh'] .diner-header { background: color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter: blur(10px); }
+.diner-page[data-menu-theme='fresh'] .diner-categories button.active { box-shadow: 0 6px 16px color-mix(in srgb, var(--brand) 35%, transparent); }
+
+// Cafetería cálida: cremas y café, títulos con serifa, bordes suaves.
+.diner-page[data-menu-theme='warm'] {
+  --bg: #faf4ec; --surface: #fffcf7; --surface-2: #f2e7d8; --surface-3: #e7d8c4; --text: #3a2819; --muted: #8b735f; --border: #eadccb;
+  --shadow-color: #3a28191a;
+}
+.diner-page[data-menu-theme='warm'] :is(h1, h2, h3, .diner-top-copy strong, .diner-product-copy h2) { font-family: Georgia, 'Times New Roman', serif; letter-spacing: 0; }
+.diner-page[data-menu-theme='warm'] .diner-product-card { border-radius: 16px; border: 1px solid var(--border); box-shadow: none; }
+.diner-page[data-menu-theme='warm'] .diner-categories button { border-radius: 10px; }
+.diner-page[data-menu-theme='warm'] .diner-top-card { border-radius: 16px; }
+
+// Moderno oscuro: contraste alto, tarjetas con borde fino y etiquetas en mayúsculas.
+.diner-page[data-menu-theme='modern'] .diner-product-card { border-radius: 24px; border: 1px solid color-mix(in srgb, var(--text) 10%, transparent); box-shadow: none; }
+.diner-page[data-menu-theme='modern'] .diner-product-media small,
+.diner-page[data-menu-theme='modern'] .diner-categories button { text-transform: uppercase; letter-spacing: .06em; font-size: .72rem; }
+.diner-page[data-menu-theme='modern'] .diner-top-card { border-radius: 26px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand) 30%, transparent), 0 16px 34px #0008; }
+.diner-page[data-menu-theme='modern'] .diner-product-copy strong { color: var(--brand-accent); }

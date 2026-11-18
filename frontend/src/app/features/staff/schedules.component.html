@@ -1,0 +1,42 @@
+@if (data(); as current) {
+  <header class="sc-head">
+    <div>
+      <h2>Horarios</h2>
+      <p>Con el horario de cada persona se calculan las tardanzas y faltas.@if (withoutSchedule()) { {{ withoutSchedule() === 1 ? '1 persona aún no tiene horario.' : withoutSchedule() + ' personas aún no tienen horario.' }} }</p>
+    </div>
+    <div class="sc-tol">
+      <span>Tolerancia</span>
+      @if (current.canEditTolerance) {
+        <div class="sc-seg" role="radiogroup" aria-label="Tolerancia de tardanza">
+          @for (minutes of toleranceOptions; track minutes) {
+            <button role="radio" [attr.aria-checked]="current.toleranceMinutes === minutes" [class.on]="current.toleranceMinutes === minutes"
+              [disabled]="savingTolerance()" (click)="setTolerance(minutes)">{{ minutes }} min</button>
+          }
+        </div>
+      } @else {
+        <b>{{ current.toleranceMinutes }} min</b><small>La define el dueño</small>
+      }
+    </div>
+  </header>
+
+  <div class="lg sc-list">
+    @for (item of people(); track item.person.id) {
+      <button class="sc-row" [class.empty]="!item.summary.length" (click)="selectedId.set(item.person.id)">
+        <span class="sc-avatar">{{ initials(item.person.fullName) }}</span>
+        <span class="sc-main"><strong>{{ item.person.fullName }}</strong><small>{{ item.person.jobTitle || (item.person.hasPin ? '' : 'Sin PIN: no puede marcar') }}</small></span>
+        <span class="sc-week" aria-hidden="true">@for (on of item.working; track $index) {<i [class.on]="on">{{ letters[$index] }}</i>}</span>
+        <span class="sc-summary">
+          @for (line of item.summary.slice(0, 2); track line) { <span>{{ line }}</span> }
+          @if (item.summary.length > 2) { <span>y {{ item.summary.length - 2 }} horario{{ item.summary.length > 3 ? 's' : '' }} más</span> }
+          @if (!item.summary.length) { <span class="sc-none"><app-icon name="plus" [size]="14" />Definir horario</span> }
+        </span>
+      </button>
+    } @empty { <p class="sc-muted">Todavía no hay personas en el equipo.</p> }
+  </div>
+
+  @if (selected(); as person) {
+    <app-schedule-sheet [person]="person" (saved)="saved($event)" (closed)="selectedId.set(null)" />
+  }
+} @else {
+  <div class="lg sc-list"><p class="sc-muted">{{ failed() ? 'No se pudieron cargar los horarios. Revisa tu conexión.' : 'Cargando horarios…' }}</p></div>
+}

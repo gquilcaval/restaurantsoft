@@ -1,0 +1,26 @@
+// Selector de zona como hoja inferior: opciones grandes, ocupación de cada zona y cierre deslizando.
+.zp-backdrop { position: fixed; inset: 0; z-index: 90; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(5, 7, 6, .55); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); animation: zp-fade .2s ease-out; }
+.zp-sheet { position: relative; width: min(420px, 100%); max-height: 80dvh; display: flex; flex-direction: column; padding: 18px 14px 14px; border-radius: 30px; color: var(--text); background: var(--surface); box-shadow: 0 30px 80px rgba(0, 0, 0, .45), 0 6px 18px rgba(0, 0, 0, .18); animation: zp-pop .34s var(--ease-spring, cubic-bezier(.2, 1.2, .4, 1)); }
+.zp-close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 50%; color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); }
+.zp-close:active { transform: scale(.92); }
+.zp-head { padding: 2px 52px 14px 8px; }
+.zp-head h2 { margin: 0; font: 800 1.15rem var(--font-display); }
+.zp-head p { margin: 2px 0 0; color: var(--muted); font-size: .8rem; }
+.zp-list { display: grid; gap: 8px; overflow-y: auto; padding: 2px 0 4px; touch-action: pan-y; }
+.zp-option { display: grid; grid-template-columns: 44px minmax(0, 1fr) 28px; align-items: center; gap: 12px; width: 100%; min-height: 64px; padding: 10px 12px; border: 0; border-radius: 20px; color: var(--text); text-align: left; font: inherit; background: color-mix(in srgb, var(--text) 5%, transparent); -webkit-tap-highlight-color: transparent; transition: background .2s, transform .15s, box-shadow .2s; }
+.zp-option:active { transform: scale(.98); }
+.zp-option.on { background: color-mix(in srgb, var(--zc) 16%, transparent); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--zc) 75%, transparent); }
+.zp-option.closed { opacity: .7; }
+.zp-ico { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 15px; color: var(--zc); background: color-mix(in srgb, var(--zc) 16%, transparent); }
+.zp-text { display: grid; gap: 3px; min-width: 0; }
+.zp-text b { display: flex; align-items: center; gap: 8px; font-size: .96rem; }
+.zp-text b em { padding: 1px 8px; border-radius: 999px; color: var(--bad, #ef5d55); font-size: .64rem; font-style: normal; background: color-mix(in srgb, var(--bad, #ef5d55) 15%, transparent); }
+.zp-text small { color: var(--muted); font-size: .76rem; }
+.zp-bar { display: block; height: 5px; margin-top: 3px; overflow: hidden; border-radius: 999px; background: color-mix(in srgb, var(--text) 9%, transparent); }
+.zp-bar em { display: block; height: 100%; border-radius: inherit; background: var(--zc); transition: width .4s; }
+.zp-check { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--zc); opacity: 0; transform: scale(.4); transition: opacity .2s, transform .35s var(--ease-spring, ease); }
+.zp-option.on .zp-check { opacity: 1; transform: scale(1); }
+@keyframes zp-fade { from { opacity: 0; } }
+@keyframes zp-pop { from { opacity: 0; transform: scale(.9) translateY(10px); } }
+@media (prefers-reduced-motion: reduce) { .zp-backdrop, .zp-sheet { animation: none; } }
+.zp-empty { margin: 4px 8px 8px; color: var(--muted); font-size: .84rem; line-height: 1.45; }

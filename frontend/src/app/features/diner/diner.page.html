@@ -1,0 +1,695 @@
+<main class="diner-page" [attr.data-menu-theme]="menuTheme()" [class.dn-compact]="menuCompact()" [class.dn-has-cart]="cartCount() > 0">
+  <header class="diner-header">
+    @if (guest() && activeView() === 'order') {
+      <button class="appbar-back" (click)="setView('menu')" aria-label="Volver a la carta">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6" />
+          <path d="M9 12h10" />
+        </svg>
+      </button>
+      <div class="diner-user-context">
+        <strong>Pedido de la mesa</strong><small>{{ tableLabel() }}</small>
+      </div>
+    } @else if (guest()) {
+      @if (logoUrl()) {
+        <img class="restaurant-mark dn-mark" [src]="logoUrl()" [alt]="brandName()" />
+      } @else {
+        <div class="restaurant-mark dn-mark">{{ brandName().slice(0, 1) }}</div>
+      }
+      <div class="diner-user-context dn-me">
+        <strong>{{ tableLabel() || 'Tu mesa' }}</strong
+        ><small>{{ waiterName() ? 'Atiende ' + waiterName() : brandName() }}</small>
+      </div>
+    } @else {
+      @if (logoUrl()) {
+        <img class="restaurant-mark" [src]="logoUrl()" [alt]="brandName()" />
+      } @else {
+        <div class="restaurant-mark">{{ brandName().slice(0, 1) }}</div>
+      }
+      <div class="diner-user-context">
+        <strong>{{ brandName() }}</strong
+        ><small>{{ tableLabel() || 'Pedido de mesa' }}</small>
+      </div>
+    }
+    @if (guest() && activeView() === 'menu') {
+      <div class="dn-actions">
+        <button class="icon-button dn-search-toggle" [class.on]="searchOpen() || !!search" (click)="toggleSearch()" aria-label="Buscar en el menú"><svg class="dn-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m20 20-4.2-4.2" /></svg></button>
+        @if (tableGuests().length) {
+          <button type="button" class="dn-people" [class.offline]="realtime.connectionState() === 'ERROR'" (click)="peopleOpen.set(!peopleOpen())" [attr.aria-expanded]="peopleOpen()" [attr.aria-label]="tableGuests().length + ' conectados en la mesa'">
+            @for (person of tableGuests().slice(0, 3); track person.id; let index = $index) {
+              <span class="dn-avatar" [class.me]="person.id === guest()!.guestId" [style.z-index]="5 - index">{{ initials(person.displayName) }}</span>
+            }
+            @if (tableGuests().length > 3) { <span class="dn-avatar more">+{{ tableGuests().length - 3 }}</span> }
+            @if (realtime.connectionState() === 'ERROR') { <small class="dn-offline">Sin conexión</small> }
+          </button>
+        }
+        <button class="dn-exit" [disabled]="loading()" (click)="leaveTable()" aria-label="Salir de la mesa">↗ Salir</button>
+      </div>
+    } @else {
+        <span class="live-dot" [class.offline]="realtime.connectionState() === 'ERROR'"
+        ><i></i
+        ><b>{{
+          realtime.connected()
+            ? 'En vivo'
+            : realtime.connectionState() === 'ERROR'
+              ? 'Sin conexión'
+              : 'Conectando'
+        }}</b></span
+      >
+      @if (!guest()) { <button class="icon-button" appThemeToggle></button> }
+    }
+  </header>
+  @if (peopleOpen() && guest()) {
+    <button class="dn-people-scrim" (click)="peopleOpen.set(false)" aria-label="Cerrar"></button>
+    <section class="dn-people-card" aria-label="Personas en la mesa">
+      <small>En {{ tableLabel() || 'tu mesa' }}</small>
+      @for (person of tableGuests(); track person.id) {
+        <div class="dn-person"><span class="dn-avatar" [class.me]="person.id === guest()!.guestId">{{ initials(person.displayName) }}</span><b>{{ person.displayName }}</b>@if (person.id === guest()!.guestId) {<em>tú</em>}@if (person.host) {<i>Anfitrión</i>}</div>
+      }
+      <p>Todos ven y suman al mismo pedido.</p>
+    </section>
+  }
+  @if (!qrPublicId) {
+    <section class="empty-state">
+      <h1>Escanea el QR de tu mesa</h1>
+      <p>El enlace debe contener el identificador QR generado desde el panel del mesero.</p>
+    </section>
+  } @else if (sessionCompleted()) {
+    <section class="join-card completion-card">
+      <div class="logo">✓</div>
+      <p class="eyebrow">Atención finalizada</p>
+      <h1>¡Gracias por tu visita!</h1>
+      <p class="muted">
+        El pago fue completado y {{ tableLabel() }} ya quedó liberada. Esperamos verte nuevamente.
+      </p>
+      @if (lastVisit(); as visit) {
+        <app-diner-rating [sessionId]="visit.sessionId" [guestToken]="visit.guestToken" />
+      }
+      <button class="primary full" (click)="startNewVisit()">Iniciar una nueva visita</button>
+    </section>
+  } @else if (transferCandidate()) {
+    <section class="join-card transfer-card">
+      <div class="logo">⇄</div>
+      <p class="eyebrow">Cambio de mesa</p>
+      <h1>{{ transferCandidate()!.tableLabel || 'Tu mesa actual' }} → {{ tableLabel() }}</h1>
+      @if (!transferRequest()) {
+        <p class="muted">
+          El mesero debe aprobar el cambio. Hasta entonces continuarás perteneciendo a tu mesa
+          actual y ningún consumo será movido.
+        </p>
+        <button class="primary full" [disabled]="loading()" (click)="requestTableTransfer()">
+          {{ loading() ? 'Enviando…' : 'Solicitar cambio al mesero' }}
+        </button>
+      } @else if (transferRequest()!.status === 'PENDING') {
+        <p class="notice">Solicitud enviada. Esperando aprobación del mesero…</p>
+        <div class="waiting-pulse">●</div>
+        <button class="secondary full" [disabled]="loading()" (click)="cancelTableTransfer()">
+          Cancelar solicitud
+        </button>
+      } @else {
+        <p class="notice error">
+          {{ transferRequest()!.reason || 'El cambio no fue autorizado.' }}
+        </p>
+        <button class="primary full" (click)="transferRequest.set(null)">
+          Solicitar nuevamente
+        </button>
+      }
+      <button class="secondary full" (click)="returnToCurrentTable()">
+        Volver a {{ transferCandidate()!.tableLabel || 'mi mesa actual' }}
+      </button>
+    </section>
+  } @else if (reviewBlocked()) {
+    <section class="join-card">
+      <div class="logo">!</div>
+      <p class="eyebrow">{{ tableLabel() }}</p>
+      <h1>La mesa está en revisión</h1>
+      <p class="muted">
+        Esta mesa conserva un consumo anterior. Solicita al personal que lo revise; tu identidad
+        seguirá guardada en este dispositivo.
+      </p>
+      <button class="secondary full" (click)="retrySession()">Comprobar nuevamente</button>
+    </section>
+  } @else if (!guest()) {
+    <section class="join-card diner-join-card">
+      @if (logoUrl()) {
+        <img class="logo" [src]="logoUrl()" [alt]="brandName()" />
+      } @else {
+        <div class="logo">{{ brandName().slice(0, 1) }}</div>
+      }
+      <div class="join-table-pill">◉ {{ tableLabel() || 'Tu mesa' }}</div>
+      <p class="eyebrow">Bienvenido a {{ brandName() }}</p>
+      <h1>Tu experiencia empieza aquí</h1>
+      <p class="muted">Ingresa tu nombre para compartir el pedido con las personas de tu mesa.</p>
+      <form (ngSubmit)="join()">
+        <label
+          >¿Cómo te llamamos?<input
+            name="displayName"
+            [(ngModel)]="displayName"
+            (ngModelChange)="sameName.set('')"
+            maxlength="60"
+            autocomplete="given-name"
+            placeholder="Escribe tu nombre"
+            required
+        /></label>
+        @if (sameName()) {
+          <div class="dn-same-name" role="alert">
+            <b>Ya hay alguien llamado «{{ sameName() }}» en esta mesa</b>
+            <small>Si eres tú, recuperas tu pedido y lo que ya elegiste.</small>
+            <button type="button" class="primary full" [disabled]="loading()" (click)="join('RECLAIM')">Sí, soy yo</button>
+            <button type="button" class="dn-same-other" [disabled]="loading()" (click)="join('NEW')">No, soy otra persona</button>
+          </div>
+        } @else {
+          @if (error()) {
+            <p class="form-error">{{ error() }}</p>
+          }
+          <button class="primary full join-submit" [disabled]="loading()">
+            {{ loading() ? 'Preparando tu mesa…' : 'Ver el menú' }} <span>→</span>
+          </button>
+        }
+      </form>
+    </section>
+  } @else {
+    <div class="diner-app-shell">
+      @if (activeView() === 'menu') {
+        <section class="diner-view diner-menu-view view-enter">
+          @if (searchOpen() || search) {
+          <label class="diner-search dn-search-open"
+            ><span>⌕</span
+            ><input
+              [ngModel]="search"
+              (ngModelChange)="searchChanged($event)"
+              placeholder="Buscar platos y bebidas"
+              aria-label="Buscar en el menú"
+              id="dn-search-input"
+              enterkeyhint="search"
+            />
+            @if (search) {
+              <button (click)="searchChanged('')" aria-label="Limpiar búsqueda">×</button>
+            }
+          </label>
+          }
+          <nav class="diner-categories" aria-label="Categorías">
+            <button [class.active]="!activeCategory()" (click)="selectCategory('')">
+              Todos <b>{{ menu().length }}</b>
+            </button>
+            @for (category of categories(); track category) {
+              <button
+                [class.active]="category === activeCategory()"
+                (click)="selectCategory(category)"
+              >
+                {{ category }} <b>{{ categoryCount(category) }}</b>
+              </button>
+            }
+            @if (dietTags().length) {
+              <button class="dn-filter-chip" [class.active]="!!tagFilter()" [class.open]="filtersOpen()" (click)="filtersOpen.set(!filtersOpen())" [attr.aria-expanded]="filtersOpen()">
+                {{ tagFilter() ? tagIcon(tagFilter()) + ' ' + tagLabel(tagFilter()) : '⚙ Filtros' }}
+              </button>
+            }
+          </nav>
+          @if (filtersOpen() && dietTags().length) {
+            <nav class="diner-tag-filter dn-diet" aria-label="Mostrar solo">
+              <small>Solo</small>
+              @for (tag of dietTags(); track tag.value) {
+                <button [class.active]="tagFilter() === tag.value" (click)="selectTag(tag.value)">
+                  {{ tag.icon }} {{ tag.label }}
+                </button>
+              }
+            </nav>
+          }
+          @if (pageLoading()) {
+            <div class="diner-skeleton-list">
+              @for (slot of [1, 2, 3, 4]; track slot) {
+                <div class="diner-skeleton-card">
+                  <i></i><span><b></b><b></b><b></b></span>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="diner-dishes-scroll" (scroll)="onMenuScroll($event)">
+            <app-diner-tracker
+              [items]="snapshot()?.items || []"
+              [compact]="true"
+              (openOrder)="setView('order')"
+            />
+            @if (
+              !pageLoading() &&
+              !search &&
+              !activeCategory() &&
+              !tagFilter() &&
+              topToday().items.length
+            ) {
+              <section class="diner-top" aria-label="Lo más pedido">
+                <header>
+                  <strong
+                    >🔥
+                    {{ topToday().today ? 'Lo más pedido hoy' : 'Los favoritos de la casa' }}</strong
+                  >
+                  <small>Desliza para ver más</small>
+                </header>
+                <div class="diner-top-track">
+                  @for (dish of topToday().items; track dish.id; let index = $index) {
+                    <button class="diner-top-card" [style.--i]="index" (click)="openDish(dish)">
+                      @if (dish.imageUrl) {
+                        <img [src]="dish.imageUrl" [alt]="dish.name" loading="lazy" />
+                      } @else {
+                        <span class="diner-top-placeholder">🍽️</span>
+                      }
+                      <b class="diner-top-rank">#{{ index + 1 }}</b>
+                      <span class="diner-top-copy">
+                        <strong>{{ dish.name }}</strong>
+                        <small>
+                          {{ dish.price | currency: 'PEN' : 'S/ ' }}
+                          @if (dish.soldToday) {
+                            · {{ dish.soldToday }} hoy
+                          }
+                        </small>
+                      </span>
+                    </button>
+                  }
+                </div>
+              </section>
+            }
+              <section
+                class="diner-menu-list grid-layout"
+              >
+                @for (dish of visibleDishes(); track dish.id) {
+                  <article
+                    class="diner-product-card"
+                    [style.--i]="$index % 12"
+                    [class.sold-out]="!dish.available"
+                    role="button"
+                    [attr.tabindex]="dish.available ? 0 : -1"
+                    [attr.aria-disabled]="!dish.available"
+                    [attr.aria-label]="
+                      dish.available ? 'Abrir ' + dish.name : dish.name + ', agotado'
+                    "
+                    (click)="openDish(dish)"
+                    (keydown.enter)="openDish(dish)"
+                    (keydown.space)="openDish(dish); $event.preventDefault()"
+                  >
+                    <div class="diner-product-media">
+                      @if (dish.imageUrl) {
+                        <img [src]="dish.imageUrl" [alt]="dish.name" loading="lazy" />
+                      } @else {
+                        <div class="diner-product-placeholder">🍽️</div>
+                      }
+                      @if (dish.popular || dish.tags?.length) {
+                        <span class="diner-badges">
+                          @if (dish.popular) {
+                            <i class="hot" title="Popular">🔥</i>
+                          }
+                          @for (tag of dish.tags; track tag) {
+                            <i [title]="tagLabel(tag)">{{ tagIcon(tag) }}</i>
+                          }
+                        </span>
+                      }
+                      @if (!dish.available) {
+                        <span class="sold-out-tag">Agotado</span>
+                      }
+                    </div>
+                    <div class="diner-product-copy">
+                      <h2>{{ dish.name }}</h2>
+                      @if (dish.description) { <p class="dn-desc">{{ dish.description }}</p> }
+                      <div class="diner-product-meta">
+                        <strong>{{ dish.price | currency: 'PEN' : 'S/ ' }}</strong>
+                        @if (dish.available) {
+                          <button type="button" class="dn-add" [disabled]="loading()" (click)="$event.stopPropagation(); quickAdd(dish)" [attr.aria-label]="'Agregar ' + dish.name">+</button>
+                        }
+                      </div>
+                    </div>
+                  </article>
+                }
+                @if (!filteredDishes().length) {
+                  <div class="diner-empty menu-empty">
+                    <span>⌕</span>
+                    <h2>No encontramos resultados</h2>
+                    <p>Prueba con otro nombre o categoría.</p>
+                    <button class="secondary" (click)="searchChanged('')">Limpiar búsqueda</button>
+                  </div>
+                }
+              </section>
+              @if (visibleDishes().length < filteredDishes().length) {
+                <!-- Carga automática al llegar al final: tarjetas fantasma con brillo -->
+                <div class="dn-more" aria-live="polite" aria-label="Cargando más platos">
+                  <div class="dn-ghost"><i></i><b></b><b></b></div>
+                  <div class="dn-ghost"><i></i><b></b><b></b></div>
+                </div>
+              }
+            </div>
+          }
+        </section>
+      }
+    </div>
+    @if (flyingProduct()) {
+      <div
+        class="cart-flying-product"
+        [style.--fly-start-x]="flyingProduct()!.startX + 'px'"
+        [style.--fly-start-y]="flyingProduct()!.startY + 'px'"
+        [style.--fly-mid-x]="flyingProduct()!.midX + 'px'"
+        [style.--fly-mid-y]="flyingProduct()!.midY + 'px'"
+        [style.--fly-end-x]="flyingProduct()!.endX + 'px'"
+        [style.--fly-end-y]="flyingProduct()!.endY + 'px'"
+        aria-hidden="true"
+      >
+        @if (flyingProduct()!.imageUrl) {
+          <img [src]="flyingProduct()!.imageUrl" alt="" />
+        } @else {
+          <span>🍽️</span>
+        }
+      </div>
+    }
+    @if (activeView() === 'menu' && cartCount()) {
+      <button class="diner-cart-bar" (click)="setView('order')">
+        <span
+          ><b [class.received]="cartCountAnimating()">{{ cartCount() }}</b
+          ><span
+            ><strong>Pedido de la mesa</strong
+            ><small>{{
+              cartCount() ? (cartTotal() | currency: 'PEN' : 'S/ ') : 'Aún no hay productos'
+            }}</small></span
+          ></span
+        ><b>→</b>
+      </button>
+    }
+    @if (cartOpen()) {
+      <div class="cs-backdrop" [class.closing]="cartClosing()" (click)="closeCart()"></div>
+      <section
+        class="cs"
+        [class.expanded]="cartExpanded()"
+        [class.dragging]="cartDragging()"
+        [style.transform]="cartY() ? 'translateY(' + cartY() + 'px)' : null"
+        role="dialog"
+        aria-label="Pedido de la mesa"
+        (touchstart)="cartTouchStart($event)"
+        (touchmove)="cartTouchMove($event)"
+        (touchend)="cartTouchEnd()"
+        (touchcancel)="cartTouchEnd()"
+      >
+        <i class="cs-grip" aria-hidden="true"></i>
+        <header class="cs-head">
+          <div><h2>Tu pedido</h2><small>{{ tableLabel() }} · {{ cartCount() }} {{ cartCount() === 1 ? 'producto' : 'productos' }} en la mesa</small></div>
+          <button class="cs-x" (click)="closeCart()" aria-label="Cerrar">×</button>
+        </header>
+
+        <div class="cs-body" (click)="collapseOnOutside($event)">
+          @if (checkoutInProgress()) {
+            <p class="cs-note">🧾 La cuenta se está preparando: por ahora no se pueden agregar productos.</p>
+          }
+
+          @if (draftItems().length) {
+            <h3 class="cs-title"><span>Por enviar <i>{{ draftCount() }}</i></span>@if (myDrafts().length) {<small>Desliza ← para quitar</small>}</h3>
+            @for (item of myDrafts(); track item.id) {
+              <div class="cs-swipe" [class.removing]="removingItemId() === item.id">
+                <span class="cs-del" aria-hidden="true">Quitar</span>
+                <div
+                  class="cs-row"
+                  [style.transform]="swipe()?.id === item.id ? 'translateX(' + swipe()!.dx + 'px)' : null"
+                  [class.swiping]="swipe()?.id === item.id"
+                  (touchstart)="rowTouchStart($event, item)"
+                  (touchmove)="rowTouchMove($event)"
+                  (touchend)="rowTouchEnd(item)"
+                >
+                  <span class="cs-thumb">@if (imageFor(item); as url) {<img [src]="url" alt="" />} @else {🍽️}
+                    @if (severalOrdering()) { <i class="cs-ini" [class.me]="item.guestId === guest()!.guestId" [class.staff]="!item.guestId" (click)="flashName(item)" [attr.aria-label]="whoFor(item)">{{ iniFor(item) }}</i> }
+                    @if (nameFlash() === item.id) { <em class="cs-tip">{{ whoFor(item) }}</em> }
+                  </span>
+                  <button class="cs-info" [disabled]="item.guestId !== guest()!.guestId || checkoutInProgress()" (click)="editDraftItem(item)">
+                    <b>{{ item.name }}</b>
+                    @if (item.modifiers || item.notes) { <small>{{ item.modifiers }}{{ item.modifiers && item.notes ? ' · ' : '' }}{{ item.notes ? '📝 ' + item.notes : '' }}</small> }
+                    <strong>{{ item.unitPrice * item.quantity | currency: 'PEN' : 'S/ ' }}</strong>
+                  </button>
+                  @if (item.guestId === guest()!.guestId) {
+                    <div class="cs-step">
+                      <button [disabled]="checkoutInProgress() || removingItemId() === item.id" (click)="changeQuantity(item, -1)" [attr.aria-label]="item.quantity === 1 ? 'Quitar' : 'Uno menos'">−</button>
+                      <b>{{ item.quantity }}</b>
+                      <button [disabled]="checkoutInProgress() || removingItemId() === item.id" (click)="changeQuantity(item, 1)" aria-label="Uno más">+</button>
+                    </div>
+                  } @else {
+                    <span class="cs-qty">× {{ item.quantity }}</span>
+                  }
+                </div>
+              </div>
+            }
+            @for (group of otherDrafts(); track group.id) {
+              <section class="cs-group" [class.open]="openGroup() === 'g:' + group.id">
+                <button class="cs-group-head" (click)="toggleGroup('g:' + group.id)" [attr.aria-expanded]="openGroup() === 'g:' + group.id">
+                  <i class="cs-ini sm">{{ initials(group.name) }}</i>
+                  <span><b>{{ group.name }}</b><small>{{ group.count }} {{ group.count === 1 ? 'producto' : 'productos' }} · {{ group.total | currency: 'PEN' : 'S/ ' }}</small></span>
+                  <span class="cs-chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></svg></span>
+                </button>
+                <div class="cs-collapse"><div class="cs-sub" (scroll)="markSubEnd($event)">
+                  @for (item of group.items; track item.id) {
+                    <div class="cs-sub-row">
+                      <i class="cs-q">{{ item.quantity }}</i>
+                      <span><b>{{ item.name }}</b>@if (item.modifiers || item.notes) {<small>{{ item.modifiers }}{{ item.modifiers && item.notes ? ' · ' : '' }}{{ item.notes ? '📝 ' + item.notes : '' }}</small>}</span>
+                      <em>{{ item.unitPrice * item.quantity | currency: 'PEN' : 'S/ ' }}</em>
+                    </div>
+                  }
+                </div></div>
+              </section>
+            }
+            <button class="cs-add" (click)="closeCart()">＋ Agregar algo más</button>
+          }
+
+          @if (sentRounds().length) {
+            <h3 class="cs-title"><span>Ya en cocina</span></h3>
+            <div class="cs-rounds">
+              @for (round of sentRounds(); track round.number) {
+                <section class="cs-round" [class.open]="openGroup() === 'r:' + round.number">
+                  <button class="cs-round-head" (click)="toggleGroup('r:' + round.number)" [attr.aria-expanded]="openGroup() === 'r:' + round.number">
+                    <span><b>Ronda {{ round.number }}</b><small>{{ roundCount(round.items) }} {{ roundCount(round.items) === 1 ? 'plato' : 'platos' }} · {{ round.total | currency: 'PEN' : 'S/ ' }}</small></span>
+                    <i class="cs-pill" [attr.data-step]="round.step">{{ roundPill(round.step) }}</i>
+                    <span class="cs-chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></svg></span>
+                  </button>
+                  <div class="cs-collapse"><div class="cs-sub" (scroll)="markSubEnd($event)">
+                    @for (item of round.items; track item.id) {
+                      <div class="cs-sub-row">
+                        <i class="cs-q">{{ item.quantity }}</i>
+                        <span><b>{{ item.name }}</b>@if (severalOrdering() || statusStep(item.status) > round.step) {<small>@if (severalOrdering()) {{{ whoFor(item) }}}@if (severalOrdering() && statusStep(item.status) > round.step) { · }@if (statusStep(item.status) > round.step) {<i class="cs-st" [attr.data-s]="item.status">{{ statusLabel(item.status) }}</i>}</small>}</span>
+                        <em>{{ item.unitPrice * item.quantity | currency: 'PEN' : 'S/ ' }}</em>
+                      </div>
+                    }
+                  </div></div>
+                </section>
+              }
+            </div>
+          }
+
+          @if (!cartCount()) {
+            <div class="cs-empty"><span>🍽️</span><b>Aún no hay nada aquí</b><small>Toca «+» en un plato para agregarlo.</small></div>
+          }
+        </div>
+
+        <footer class="cs-foot">
+          <div class="cs-total"><small>Total de la mesa</small><b>{{ cartTotal() | currency: 'PEN' : 'S/ ' }}</b></div>
+          @if (draftCount()) {
+            @if (guest()!.host) {
+              <button class="cs-send" [disabled]="loading() || checkoutInProgress()" (click)="submitRound()">
+                @if (loading()) { Enviando… } @else { Enviar a cocina <i>{{ draftCount() }}</i> }
+              </button>
+            } @else {
+              <p class="cs-wait">⌛ {{ hostName() }} lo enviará</p>
+            }
+          } @else if (sentRounds().length && !billRequest()) {
+            <button class="cs-bill" (click)="closeCart(); openBillSheet()">🧾 Pedir la cuenta</button>
+          }
+        </footer>
+      </section>
+    }
+    @if (askAttended(); as request) {
+      <section class="dn-ask" role="dialog" aria-label="¿Ya te atendieron?">
+        <b>¿Ya te atendió {{ request.waiterName?.split(' ')?.[0] || 'el mesero' }}?</b>
+        <div>
+          <button class="yes" [disabled]="answering()" (click)="answerAttended(request, true)">Sí, gracias</button>
+          <button [disabled]="answering()" (click)="answerAttended(request, false)">Aún no</button>
+        </div>
+      </section>
+    }
+    @if (!selectedDish() && !editingItem() && !cartOpen()) {
+      <!-- Ayuda en la mesa: botón con texto (antes «•••») y panel con opciones grandes -->
+      <button
+        class="dn-help"
+        [class.raised]="activeView() === 'menu' && cartCount() > 0"
+        [class.pending]="!!waiterRequest() || !!billRequest()"
+        (click)="openHelp()"
+        aria-haspopup="dialog"
+      >
+        <span class="dn-help-ico" aria-hidden="true">{{ waiterRequest() ? '✋' : billRequest() ? '🧾' : '🛎️' }}</span>{{ helpLabel() }}
+      </button>
+      @if (quickActionsOpen()) {
+        <div class="dn-help-backdrop" [class.closing]="helpClosing()" (click)="closeHelp()"></div>
+        <section
+          class="dn-help-sheet"
+          role="dialog"
+          aria-label="Ayuda en la mesa"
+          [class.dragging]="helpDragging()"
+          [style.transform]="helpY() ? 'translateY(' + helpY() + 'px)' : null"
+          (touchstart)="helpTouchStart($event)"
+          (touchmove)="helpTouchMove($event)"
+          (touchend)="helpTouchEnd()"
+          (touchcancel)="helpTouchEnd()"
+        >
+          <i class="dn-help-grip" aria-hidden="true"></i>
+          @if (helpStep() === 'reason') {
+            <header>
+              <div><h2>¿Qué necesitas?</h2><small>Así el mesero viene con lo necesario</small></div>
+              <button class="dn-help-x" (click)="helpStep.set('menu')" aria-label="Volver">←</button>
+            </header>
+            <div class="dn-reasons">
+              @for (option of callReasons; track option.value) {
+                <button type="button" [class.on]="callReason() === option.value" [class.urgent]="option.value === 'PROBLEM'" (click)="callReason.set(callReason() === option.value ? null : option.value)">
+                  <span>{{ option.icon }}</span>{{ option.label }}
+                </button>
+              }
+            </div>
+            <button class="dn-call-send" [disabled]="requestingService() !== null" (click)="closeHelp(); requestService('WAITER_CALL', callReason())">✋ Llamar al mesero</button>
+            <small class="dn-call-hint">Elegir un motivo es opcional</small>
+          } @else {
+          <header>
+            <div><h2>¿En qué te ayudamos?</h2><small>{{ tableLabel() || 'Tu mesa' }}@if (waiterName()) { · te atiende {{ waiterName() }}}</small></div>
+            <button class="dn-help-x" (click)="closeHelp()" aria-label="Cerrar">×</button>
+          </header>
+          <div class="dn-help-grid">
+            <button
+              class="dn-help-opt"
+              [class.done]="!!waiterRequest()"
+              [disabled]="!!waiterRequest() || requestingService() !== null"
+              (click)="helpStep.set('reason'); callReason.set(null)"
+            >
+              <span>✋</span><b>{{ serviceButtonLabel('WAITER_CALL') }}</b
+              ><small>{{ waiterRequest() ? 'Ya le avisamos, viene a tu mesa' : 'Para una consulta o algo que necesites' }}</small>
+            </button>
+            <button
+              class="dn-help-opt"
+              [class.done]="!!billRequest()"
+              [disabled]="!!billRequest() || requestingService() !== null"
+              (click)="closeHelp(); openBillSheet()"
+            >
+              <span>🧾</span><b>{{ serviceButtonLabel('BILL') }}</b
+              ><small>{{ billRequest() ? 'El mesero te trae la cuenta' : 'Eliges cómo pagar y el mesero la trae' }}</small>
+            </button>
+            <button class="dn-help-opt" (click)="closeHelp(); openTableChange()">
+              <span>⇄</span><b>{{ transferRequest()?.status === 'PENDING' ? 'Cambio pendiente' : 'Cambiar de mesa' }}</b
+              ><small>Pásate a otra mesa libre</small>
+            </button>
+          </div>
+          <button class="dn-help-theme" appThemeToggle #themeRow="themeToggle">
+            <b>Modo oscuro</b><i class="dn-switch" [class.on]="themeRow.isDark()" aria-hidden="true"></i>
+          </button>
+          <button class="dn-help-leave" [disabled]="loading()" (click)="closeHelp(); leaveTable()">
+            ↗ Salir de la mesa
+          </button>
+          }
+        </section>
+      }
+    }
+  }
+  @if (billSheetOpen() && guest()) {
+    <app-diner-bill-sheet
+      [guests]="snapshot()?.guests || []"
+      [items]="snapshot()?.items || []"
+      [myGuestId]="guest()!.guestId"
+      [busy]="requestingService() === 'BILL'"
+      (confirm)="requestBill($event)"
+      (cancel)="billSheetOpen.set(false)"
+    />
+  }
+  @if (selectedDish() || editingItem()) {
+    <app-diner-product-sheet
+      [dish]="selectedDish()"
+      [editing]="editingItem()"
+      [busy]="loading()"
+      (closed)="closeCustomization()"
+      (submitted)="saveCustomization($event)"
+    />
+  }
+  @if (tableChangeOpen()) {
+    <div class="modal-backdrop" (click)="closeTableChange()">
+      <section class="qr-dialog table-change-dialog" (click)="$event.stopPropagation()">
+        <button class="modal-close" (click)="closeTableChange()">×</button>
+        <p class="eyebrow">Cambio de mesa</p>
+        @if (transferRequest()?.status === 'PENDING') {
+          <h2>Solicitud enviada</h2>
+          <div class="transfer-route">
+            <strong>{{ transferRequest()!.sourceTableLabel }}</strong
+            ><span>→</span><strong>{{ transferRequest()!.destinationTableLabel }}</strong>
+          </div>
+          <p class="muted">
+            Sigues en tu mesa actual mientras el mesero revisa la solicitud. Tus pedidos todavía no
+            se han movido.
+          </p>
+          <div class="waiting-pulse">●</div>
+          <button class="secondary full" [disabled]="loading()" (click)="cancelTableTransfer()">
+            {{ loading() ? 'Cancelando…' : 'Cancelar solicitud' }}
+          </button>
+        } @else if (transferRequest()?.status === 'REJECTED') {
+          <h2>Cambio no autorizado</h2>
+          <p class="notice error">
+            {{ transferRequest()!.reason || 'El mesero no pudo autorizar este cambio.' }}
+          </p>
+          <button class="primary full" (click)="retryTableSelection()">Elegir otra mesa</button>
+        } @else {
+          <h2>Elige una mesa libre</h2>
+          <p class="muted">El cambio se realizará únicamente cuando el mesero lo apruebe.</p>
+          @if (error()) {
+            <p class="notice error">{{ error() }}</p>
+          }
+          @if (loading()) {
+            <p class="table-loading">Buscando mesas disponibles…</p>
+          } @else if (!availableTables().length) {
+            <div class="table-empty">
+              <strong>No hay mesas libres</strong
+              ><span>Puedes cerrar esta ventana o llamar al mesero.</span>
+            </div>
+          } @else {
+            <div class="available-table-list">
+              @for (table of availableTables(); track table.qrPublicId) {
+                <button
+                  type="button"
+                  class="available-table"
+                  [class.selected]="selectedTransferTable()?.qrPublicId === table.qrPublicId"
+                  (click)="selectedTransferTable.set(table)"
+                >
+                  <span class="table-choice-icon">▱</span
+                  ><span
+                    ><strong>{{ table.label }}</strong
+                    ><small>Hasta {{ table.capacity }} personas</small></span
+                  ><b>{{ selectedTransferTable()?.qrPublicId === table.qrPublicId ? '✓' : '›' }}</b>
+                </button>
+              }
+            </div>
+            <button
+              class="primary full"
+              [disabled]="!selectedTransferTable() || loading()"
+              (click)="requestSelectedTable()"
+            >
+              Solicitar cambio{{
+                selectedTransferTable() ? ' a ' + selectedTransferTable()!.label : ''
+              }}
+            </button>
+          }
+        }
+      </section>
+    </div>
+  }
+  @if (exitBlockedOpen()) {
+    <div class="modal-backdrop" (click)="exitBlockedOpen.set(false)">
+      <section class="qr-dialog exit-blocked-dialog" (click)="$event.stopPropagation()">
+        <button class="modal-close" (click)="exitBlockedOpen.set(false)">×</button>
+        <div class="exit-warning-icon">!</div>
+        <p class="eyebrow">Atención en curso</p>
+        <h2>No puedes salir todavía</h2>
+        <p class="muted">
+          Eres el último comensal de {{ tableLabel() }} y existen pedidos enviados. Antes de salir,
+          solicita la cuenta o pide ayuda al mesero.
+        </p>
+        <button class="primary full" (click)="requestBeforeExit('BILL')">Pedir cuenta</button
+        ><button class="secondary full" (click)="requestBeforeExit('WAITER_CALL')">
+          Llamar al mesero</button
+        ><button class="danger-link full" (click)="exitBlockedOpen.set(false)">
+          Permanecer en la mesa
+        </button>
+      </section>
+    </div>
+  }
+</main>

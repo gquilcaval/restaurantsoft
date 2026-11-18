@@ -1,0 +1,23 @@
+// «Lo más pedido hoy» compacto: tarjetas bajas, se ven 2 y media a la vez.
+.diner-page .diner-top { margin: 0 0 12px; }
+.diner-page .diner-top header { margin-bottom: 6px; }
+.diner-page .diner-top header strong { font-size: .95rem; }
+.diner-page .diner-top header small { font-size: .7rem; }
+.diner-page .diner-top-track { grid-auto-columns: min(42%, 168px); gap: 8px; padding-bottom: 4px; }
+.diner-page .diner-top-card { aspect-ratio: auto; height: 150px; border-radius: 16px; box-shadow: 0 6px 16px var(--shadow-color); }
+.diner-page .diner-top-placeholder { font-size: 2.2rem; padding-bottom: 34px; }
+.diner-page .diner-top-card::after { background: linear-gradient(180deg, transparent 35%, #000b 100%); }
+.diner-page .diner-top-rank { top: 7px; left: 7px; padding: 2px 7px; font-size: .68rem; }
+.diner-page .diner-top-copy { left: 10px; right: 10px; bottom: 9px; gap: 1px; }
+.diner-page .diner-top-copy strong { display: -webkit-box; overflow: hidden; font-size: .86rem; line-height: 1.15; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.diner-page .diner-top-copy small { font-size: .66rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+// Carga automática de la carta: tarjetas fantasma con brillo y entrada escalonada de los nuevos platos.
+.diner-page .diner-menu-list .diner-product-card { animation: dn-card-in .42s cubic-bezier(.2, .9, .3, 1) both; animation-delay: calc(var(--i, 0) * 40ms); }
+@keyframes dn-card-in { from { opacity: 0; transform: translateY(14px) scale(.98); } }
+.dn-more { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+.dn-ghost { position: relative; display: grid; gap: 7px; overflow: hidden; padding-bottom: 12px; border-radius: 16px; background: var(--surface); }
+.dn-ghost i { display: block; aspect-ratio: 1 / .64; background: var(--surface-2); }
+.dn-ghost b { height: 10px; margin: 0 12px; border-radius: 6px; background: var(--surface-2); }
+.dn-ghost b:last-child { width: 45%; }
+.dn-ghost::after { content: ''; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--surface) 70%, transparent) 50%, transparent 70%); transform: translateX(-100%); animation: dn-shimmer 1.2s ease-in-out infinite; }
+@keyframes dn-shimmer { to { transform: translateX(100%); } }

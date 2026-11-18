@@ -1,0 +1,59 @@
+<main class="bk">
+  @if (error() && !info()) {
+    <section class="bk-card bk-center"><span class="bk-ico"><app-icon name="calendar" [size]="26" /></span><h1>Reservas no disponibles</h1><p>{{ error() }}</p></section>
+  } @else if (info(); as local) {
+    <header class="bk-head">
+      @if (local.logoUrl) { <img [src]="local.logoUrl" [alt]="local.organizationName"> } @else { <span class="bk-logo">{{ local.organizationName.slice(0, 1) }}</span> }
+      <div><h1>{{ local.organizationName }}</h1><p>{{ local.branchName }}@if (local.address) { · {{ local.address }} }</p></div>
+    </header>
+
+    @if (done(); as ok) {
+      <section class="bk-card bk-center bk-done">
+        <span class="bk-ico ok"><app-icon name="check" [size]="30" /></span>
+        <h2>¡Reserva enviada!</h2>
+        <p>{{ longDate(ok.date) }} a las <b>{{ ok.time.slice(0, 5) }}</b> para <b>{{ ok.partySize }}</b> {{ ok.partySize === 1 ? 'persona' : 'personas' }}@if (chosen()) { · {{ chosen()!.label }}}.</p>
+        <p class="bk-muted">El local la confirmará por WhatsApp o llamada al {{ phone }}. ¡Te esperamos!</p>
+      </section>
+    } @else {
+      <section class="bk-card">
+        <h2><i>1</i>¿Cuándo vienes?</h2>
+        <div class="bk-row">
+          <label class="bk-field">Personas
+            <span class="bk-stepper"><button type="button" (click)="setParty(party() - 1)" aria-label="Menos">−</button><b>{{ party() }}</b><button type="button" (click)="setParty(party() + 1)" aria-label="Más">+</button></span>
+          </label>
+          <label class="bk-field">Fecha<input type="date" [min]="today()" [max]="maxDate()" [ngModel]="date()" (ngModelChange)="setDate($event)"></label>
+        </div>
+        <div class="bk-times" role="radiogroup" aria-label="Hora">
+          @for (slot of times(); track slot) { <button role="radio" [attr.aria-checked]="time() === slot" [attr.data-slot]="slot" (click)="setTime(slot)">{{ slot }}</button> }
+          @empty { <p class="bk-muted">Ya no hay horarios para hoy. Elige otra fecha.</p> }
+        </div>
+      </section>
+
+      <section class="bk-card bk-plan-card">
+        <h2><i>2</i>Elige tu mesa <small>opcional</small></h2>
+        <p class="bk-muted">{{ loadingBusy() ? 'Revisando disponibilidad…' : freeCount() + (freeCount() === 1 ? ' mesa libre' : ' mesas libres') + ' para ' + party() + ' a las ' + time() }}. Toca una en el plano; si no eliges, el local te asigna la mejor.</p>
+        <div class="bk-plan">
+          <app-floor-view [tables]="states()" [zones]="zones()" [plan]="plan()" [picker]="true" [zoom]="true" (open)="pick($event)" />
+          @if (hint()) { <p class="bk-hint">{{ hint() }}</p> }
+        </div>
+        <div class="bk-legend"><span><i class="free"></i>Libre</span><span><i class="busy"></i>Reservada</span><span><i class="chosen"></i>Tu mesa</span></div>
+        @if (chosen(); as table) { <p class="bk-chosen"><app-icon name="check" [size]="15" />Elegiste <b>{{ table.label }}</b> · hasta {{ table.capacity }} personas</p> }
+      </section>
+
+      <section class="bk-card">
+        <h2><i>3</i>Tus datos</h2>
+        <div class="bk-row">
+          <label class="bk-field">Nombre<input [(ngModel)]="name" maxlength="120" placeholder="Tu nombre" autocomplete="name"></label>
+          <label class="bk-field">Celular (WhatsApp)<input [(ngModel)]="phone" maxlength="30" inputmode="tel" placeholder="987 654 321" autocomplete="tel"></label>
+        </div>
+        <label class="bk-field">¿Algo que debamos saber? <small>opcional</small><input [(ngModel)]="notes" maxlength="200" placeholder="Cumpleaños, silla para bebé, alergias…"></label>
+        @if (error()) { <p class="bk-error">{{ error() }}</p> }
+        <button class="bk-send" [disabled]="!canSend()" (click)="send()">{{ sending() ? 'Enviando…' : 'Reservar para ' + party() + ' · ' + time() }}</button>
+        <p class="bk-muted bk-center-text">Tu reserva queda pendiente hasta que el local la confirme.</p>
+      </section>
+    }
+    <footer class="bk-foot">Reservas con RestOS</footer>
+  } @else {
+    <section class="bk-card bk-center"><span class="bk-loader"></span><p>Cargando…</p></section>
+  }
+</main>

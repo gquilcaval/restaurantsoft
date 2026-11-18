@@ -1,0 +1,11 @@
+// Mapa de calor y repetición del día.
+.fv-table[data-tone='heat'] .fp-top {
+  fill: color-mix(in srgb, var(--heat) 58%, var(--surface)); stroke: var(--heat); stroke-width: 3;
+  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--heat) 55%, transparent));
+}
+.fv-table[data-tone='heat'] .fp-chair { fill: color-mix(in srgb, var(--heat) 35%, var(--surface-3)); }
+.fv-heat-value { font-size: 13px; font-weight: 900; }
+.fv-table[data-tone='heat'] .fp-label, .fv-table[data-tone='heat'] .fv-heat-value { paint-order: stroke; stroke: color-mix(in srgb, var(--surface) 70%, transparent); stroke-width: 3px; }
+:host-context(.tv-replay) .fv-table .fp-top { transition: fill .35s ease, stroke .35s ease; }
+:host-context(.tv-replay) .fv-table[data-tone='busy'] .fp-body { animation: fv-replay-in .45s cubic-bezier(.3, 1.5, .5, 1); }
+@keyframes fv-replay-in { 40% { transform: scale(1.12); } }

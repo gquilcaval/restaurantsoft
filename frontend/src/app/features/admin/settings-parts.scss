@@ -1,0 +1,25 @@
+// Botones, interruptores, QR, asignaciones y estados vacíos del centro de ajustes.
+.st-pill { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; padding: 0 16px; border: 0; border-radius: 999px; font-weight: 750; font-size: .84rem; color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); transition: transform .35s var(--ease-spring), background .2s; }
+.st-pill:hover:not(:disabled) { background: color-mix(in srgb, var(--text) 13%, transparent); } .st-pill:disabled { opacity: .5; }
+.st-pill.primary { color: var(--on-brand, #04110a); background: var(--brand); } .st-pill.small { height: 32px; padding: 0 12px; font-size: .76rem; }
+.st-pill.wide { width: 100%; height: 44px; } .st-pill.danger { color: var(--bad); background: var(--bad-soft); }
+.st-link { justify-self: start; padding: 0; border: 0; background: none; color: var(--muted); font-size: .74rem; font-weight: 700; } .st-link.danger:not(:disabled):hover { color: var(--bad); }
+.st-switch { display: inline-flex; align-items: center; gap: 9px; justify-self: start; height: 36px; padding: 0 14px 0 6px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--text) 6%, transparent); color: var(--text); font-weight: 700; font-size: .8rem; white-space: nowrap; }
+.st-switch.small { height: 30px; font-size: .72rem; }
+.st-switch i { position: relative; width: 34px; height: 20px; border-radius: 999px; background: color-mix(in srgb, var(--text) 18%, transparent); transition: background .25s; }
+.st-switch i::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .35s var(--ease-spring); }
+.st-switch[aria-checked='true'] i { background: var(--ok); } .st-switch[aria-checked='true'] i::after { transform: translateX(14px); }
+.st-seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; padding: 3px; border-radius: 999px; background: color-mix(in srgb, var(--text) 6%, transparent); }
+.st-seg button { height: 32px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-weight: 750; font-size: .76rem; }
+.st-seg button.on { color: var(--text); background: var(--surface); box-shadow: var(--elev-1); }
+:host-context([data-theme='dark']) .st-seg button.on { background: color-mix(in srgb, white 12%, transparent); }
+.st-qr { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 12px; align-items: center; padding: 12px; border-radius: 18px; background: color-mix(in srgb, var(--text) 4%, transparent); }
+.st-qr img { width: 120px; height: 120px; border-radius: 12px; background: #fff; }
+.st-qr > div { display: grid; gap: 6px; min-width: 0; } .st-qr strong { font-size: .86rem; }
+.st-qr-link { color: var(--muted); font-size: .66rem; word-break: break-all; } .st-qr-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.st-assign { display: grid; gap: 8px; padding-top: 4px; }
+.st-assign h4, .st-subtitle { display: flex; align-items: center; gap: 6px; margin: 4px 0 0; color: var(--muted); font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+.st-assign h4 small { padding: 0 6px; border-radius: 999px; background: color-mix(in srgb, var(--text) 9%, transparent); }
+.st-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.st-chips button { height: 30px; padding: 0 11px; border: 0; border-radius: 999px; font-size: .74rem; font-weight: 700; color: var(--text); background: color-mix(in srgb, var(--text) 7%, transparent); }
+.st-chips button small { color: var(--muted); margin-left: 3px; } .st-chips button.on { background: color-mix(in srgb, var(--brand) 20%, transparent); box-shadow: inset 0 0 0 1.5px var(--brand); }

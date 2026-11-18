@@ -1,0 +1,655 @@
+<app-shell [title]="zones().length ? zoneFilterLabel() : 'Salón principal'" [titleMenu]="zones().length > 0" (titleClick)="zonePickerOpen.set(true)" [eyebrow]="(realtime.connected() ? 'En línea' : realtime.connectionState() === 'ERROR' ? 'Sin conexión' : 'Conectando') + ' · ' + visibleTables().length + (visibleTables().length === 1 ? ' mesa' : ' mesas')">
+  <div shell-actions class="notification-center">
+    <span class="waiter-top-connection" [class.offline]="realtime.connectionState() === 'ERROR'"
+      ><i></i
+      ><b>{{
+        realtime.connected()
+          ? 'En línea'
+          : realtime.connectionState() === 'ERROR'
+            ? 'Sin conexión'
+            : 'Conectando'
+      }}</b></span
+    >
+    <button class="team-button" (click)="teamOpen.set(true)" title="Ranking del equipo">
+      <app-icon name="trophy" [size]="17" /><b>Equipo</b>
+    </button>
+    <app-waiter-notifications />
+  </div>
+  @if (!qrNetworkReady() && isManager()) {
+    <p class="notice error">
+      Los QR todavía apuntan a localhost. Configura PUBLIC_BASE_URL con la dirección fija del
+      servidor antes de imprimirlos.
+    </p>
+  }
+
+
+  <div
+    class="waiter-layout service-board"
+    [class.show-mobile-alerts]="mobileSection() === 'ALERTS'"
+  >
+    <section class="waiter-tables-panel">
+      <div class="mz-bar">
+        <nav class="mz-tabs" role="tablist" aria-label="Vista del salón">
+          <button role="tab" [attr.aria-selected]="viewMode() === 'cards'" (click)="setViewMode('cards')"><app-icon name="grid" [size]="16" />Tarjetas</button>
+          <button role="tab" [attr.aria-selected]="viewMode() === 'floor'" (click)="setViewMode('floor')"><app-icon name="map" [size]="16" />Plano</button>
+        </nav>
+        <div class="mz-filters" role="group" aria-label="Filtrar mesas">
+          @for (kpi of boardKpis(); track kpi.key) {
+            <button [attr.data-tone]="kpi.tone" [class.on]="tableFilter() === kpi.key" [attr.aria-pressed]="tableFilter() === kpi.key" (click)="tableFilter.set(kpi.key)"><i></i>{{ kpi.label }}<b>{{ kpi.count }}</b></button>
+          }
+        </div>
+        <label class="mz-search"><app-icon name="search" [size]="16" /><input type="search" aria-label="Buscar mesa" placeholder="Buscar mesa" [ngModel]="tableSearch()" (ngModelChange)="tableSearch.set($event)" /></label>
+        @if (zones().length) {
+          <div class="mz-zones" aria-label="Zonas del local">
+            <button [class.on]="zoneFilter() === 'ALL'" (click)="selectZone('ALL')">Todas las zonas</button>
+            @if (myZoneIds().length || myTableIds().length) {
+              <button [class.on]="zoneFilter() === 'MINE'" (click)="selectZone('MINE')"><app-icon name="star" [size]="13" />Mis mesas</button>
+            }
+            @for (zone of zones(); track zone.id) {
+              <button [class.on]="zoneFilter() === zone.id" [class.closed]="!zone.open" [style.--zone-color]="zone.color" (click)="selectZone(zone.id)" [attr.title]="zone.open ? '' : 'Zona cerrada: no recibe comensales por QR'">
+                <i></i>{{ zone.name }}<b>{{ zoneCount(zone.id).busy }}/{{ zoneCount(zone.id).total }}</b>@if (!zone.open) {<small>cerrada</small>}
+              </button>
+            }
+          </div>
+        }
+      </div>
+      <div class="service-table-list mz-list" [class.floor-mode]="viewMode() === 'floor'" [attr.aria-busy]="tablesLoading()">
+        @if (tablesError()) {
+          <div class="service-empty" role="alert">
+            <strong>No pudimos cargar las mesas</strong>
+            <p>Comprueba la conexión y vuelve a intentarlo.</p>
+            <button class="secondary" (click)="refresh()">Reintentar</button>
+          </div>
+        } @else if (tablesLoading()) {
+          <div class="service-empty" role="status"><span class="service-loader"></span><p>Cargando salón…</p></div>
+        } @else if (viewMode() === 'floor') {
+          <app-floor-view [fit]="true" [me]="myId()" [tables]="floorStates()" [zones]="zones()" [plan]="floorPlan()" (open)="select($event)" (move)="moveTable($event)" />
+        } @else {
+          @for (table of visibleTables(); track table.id; let index = $index) {
+            <article class="lg mz-table" [attr.data-state]="tableState(table)" [style.--zone-color]="zoneOf(table)?.color" [class.is-selected]="selected()?.id === table.id" [style.--d]="(index < 16 ? index * 30 : 0) + 'ms'">
+              <button class="mz-open" (click)="select(table)"
+                [attr.aria-label]="table.label + ', ' + tableStateLabel(table) + (table.status === 'OPEN' ? '. Abrir pedidos' : '. Mostrar QR')">
+                <span class="mz-top"><strong>{{ table.label }}</strong>
+                  @if (table.status === 'OPEN') {
+                    <span class="mz-served" [class.mine]="isMine(table)" [class.none]="!table.servedById" [class.away]="table.servedByAway" [style.--hue]="hue(table.servedById)"
+                      [title]="table.servedById ? 'Atiende ' + table.servedByName + (table.servedByAway ? ' (fuera de turno)' : '') : 'Nadie atiende esta mesa'"
+                      [attr.aria-label]="table.servedById ? 'Atiende ' + table.servedByName : 'Sin mesero'">{{ isMine(table) ? 'Tú' : table.servedById ? initials(table.servedByName) : '?' }}</span>
+                  }
+                  @if (labelParts(table.label); as parts) {<span class="mz-num"><small>{{ parts.word }}</small><b>{{ parts.number }}</b></span>}
+                </span>
+                <span class="mz-sub">
+                  <span class="mz-state"><i></i>{{ tableStateShort(table) }}</span>
+                  <small class="mz-zone">@if (zoneOf(table); as zone) {<i></i>{{ zone.name }}}</small>
+                  @if (table.status === 'OPEN' && openMinutes(table)) {<span class="mz-time"><app-icon name="clock" [size]="12" />{{ openMinutes(table) }}</span>}
+                </span>
+                @if (table.status === 'OPEN' || table.requiresReview) {
+                  <span class="mz-mid">
+                    @if (guestsFor(table).length) {
+                      <span class="service-avatars" [attr.aria-label]="guestsFor(table).length + ' comensales'">
+                        @for (person of guestsFor(table).slice(0, 4); track person.id) {
+                          <i [style.--hue]="avatarHue(person.displayName)" [title]="person.displayName">{{ guestInitials(person.displayName) }}</i>
+                        }
+                        @if (guestsFor(table).length > 4) { <i class="more">+{{ guestsFor(table).length - 4 }}</i> }
+                      </span>
+                    } @else {
+                      <span class="mz-muted"><app-icon name="users" [size]="13" />{{ activeGuestCountFor(table) }}/{{ table.capacity }}</span>
+                    }
+                    <b class="mz-total">{{ money(tableTotal(table)) }}</b>
+                  </span>
+                  <span class="mz-progress-row">
+                    @if (table.requiresReview) {
+                      <b class="mz-stage" data-stage="review">Revisar consumo</b>
+                    } @else if (submittedItems(table).length) {
+                      <b class="mz-stage" [attr.data-stage]="tableOrderStage(table)" [title]="'En cola ' + countStatus(table, 'SUBMITTED') + ' · preparando ' + countStatus(table, 'PREPARING') + ' · listos ' + countStatus(table, 'READY') + ' · servidos ' + countStatus(table, 'DELIVERED')">{{ tableOrderProgressLabel(table) }}{{ hasStatus(table, 'READY') ? ' · ' + countStatus(table, 'READY') : '' }}</b>
+                    } @else {
+                      <b class="mz-stage">Sin pedidos</b>
+                    }
+                    <i class="mz-bar-track" [attr.data-stage]="submittedItems(table).length ? tableOrderStage(table) : 0"><em [style.width.%]="submittedItems(table).length ? tableOrderStage(table) * 25 : 0"></em></i>
+                  </span>
+                } @else {
+                  <span class="mz-mid"><span class="mz-free"><app-icon name="chair" [size]="15" />Disponible</span><span class="mz-muted"><app-icon name="users" [size]="13" />{{ table.capacity }}</span></span>
+                  @if (reservationFor(table); as reservation) {
+                    <span class="mz-reservation" [title]="reservation.notes || ''"><app-icon name="calendar" [size]="12" />{{ reservation.reservedAt.slice(11, 16) }} · {{ reservation.customerName }} ({{ reservation.partySize }})</span>
+                  } @else {
+                    <span class="mz-progress-row"><small class="mz-muted">Toca para ver su QR</small></span>
+                  }
+                }
+              </button>
+              @if (quickAction(table); as quick) {
+                <button class="mz-quick" [disabled]="quickBusy(table)" (click)="runQuick(table)" [attr.aria-label]="quick.label + ' en ' + table.label"><app-icon [name]="quick.icon" [size]="16" />{{ quickBusy(table) ? '…' : quick.label }}</button>
+              }
+              <button class="mz-qr" [attr.aria-label]="'Mostrar QR de ' + table.label" title="Mostrar QR" (click)="displayQr(table)">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h6v6H3zm12 0h6v6h-6zM3 15h6v6H3zm12 0h2v2h-2zm6-3v5m-6 4h6v-2M3 12h4m5-9v4m0 5h5m-5 3v6" /></svg>
+              </button>
+            </article>
+          } @empty {
+            <div class="service-empty">
+              <strong>No hay mesas que mostrar</strong>
+              <p>Prueba con otro nombre o filtro.</p>
+              <button class="secondary small" (click)="tableSearch.set(''); tableFilter.set('ALL')">Ver todas</button>
+            </div>
+          }
+        }
+      </div>
+    </section>
+    <aside class="lg waiter-alerts-panel service-queue" aria-label="Pendientes del salón">
+      <div class="mz-goal-wrap" role="button" tabindex="0" (click)="teamOpen.set(true)" (keydown.enter)="teamOpen.set(true)" aria-label="Ver ranking del equipo">
+        <app-goal-bar class="mz-goal" />
+        <span class="mz-goal-cta"><app-icon name="trophy" [size]="14" />Ver ranking del equipo<b>›</b></span>
+      </div>
+      <header class="service-queue-head">
+        <div>
+          <h2>
+            Pendientes <b>{{ pendingCount() }}</b>
+          </h2>
+          <p>Lo que necesita tu atención</p>
+        </div>
+        <nav class="mq-tabs" role="tablist" aria-label="Pendientes o historial">
+          <button role="tab" [attr.aria-selected]="queueTab() === 'todo'" (click)="queueTab.set('todo')">Por hacer<b>{{ pendingCount() }}</b></button>
+          <button role="tab" [attr.aria-selected]="queueTab() === 'history'" (click)="openHistory()">Historial@if (notificationCenter().unreadNotifications()) {<i></i>}</button>
+        </nav>
+      </header>
+      @if (queueTab() === 'history') {
+        <div class="service-queue-list mq-history">
+          @for (item of notificationCenter().notifications(); track item.id) {
+            <article class="mq-log" [attr.data-tone]="item.tone">
+              <span class="mq-log-ico">{{ item.icon }}</span>
+              <div><strong>{{ item.title }}</strong><p>{{ item.body }}</p></div>
+              <time>{{ notificationCenter().notificationTime(item.createdAt) }}</time>
+            </article>
+          } @empty {
+            <div class="service-empty queue-empty"><span class="queue-check" aria-hidden="true"><app-icon name="clock" [size]="22" /></span><strong>Sin actividad todavía</strong><p>Aquí verás todo lo que pase en tu turno.</p></div>
+          }
+          @if (notificationCenter().notifications().length) {
+            <button class="mq-clear" (click)="notificationCenter().clearNotificationHistory()">Limpiar historial</button>
+          }
+        </div>
+      }
+      <div class="service-queue-list mq-list" [hidden]="queueTab() === 'history'">
+        @if (reservations().length) {
+          <label class="mq-search">
+            <app-icon name="search" [size]="15" />
+            <input type="search" enterkeyhint="search" autocomplete="off" placeholder="¿Llegó alguien? Busca su reserva" [ngModel]="resQuery()" (ngModelChange)="resQuery.set($event)" aria-label="Buscar reserva por nombre o celular">
+            @if (resQuery()) { <button type="button" (click)="resQuery.set('')" aria-label="Limpiar búsqueda"><app-icon name="x" [size]="13" /></button> }
+          </label>
+        }
+        @if (resQuery().trim()) {
+          @for (item of foundReservations(); track item.id) {
+            <article class="mq-item" data-tone="arrival">
+              <span class="mq-ico"><app-icon name="calendar" [size]="17" /></span>
+              <div class="mq-body">
+                <strong>{{ item.customerName }}</strong>
+                <small>{{ item.partySize }} pers. · {{ item.reservedAt.slice(11, 16) }} · {{ arrivalLabel(item) }}{{ item.tableLabel ? ' · ' + item.tableLabel : '' }}</small>
+                @if (item.notes) { <small class="mq-note">{{ item.notes }}</small> }
+              </div>
+              <button class="mq-btn primary" [disabled]="seatingBusy()" (click)="resQuery.set(''); seatArrival(item)">{{ item.tableId ? 'Sentar' : 'Elegir mesa' }}</button>
+            </article>
+          } @empty {
+            <div class="service-empty queue-empty"><span class="queue-check" aria-hidden="true"><app-icon name="search" [size]="22" /></span><strong>Sin reservas con «{{ resQuery().trim() }}»</strong><p>Prueba con otra parte del nombre<br />o los últimos dígitos del celular.</p></div>
+          }
+        } @else {
+        <!-- Lo más urgente primero: lo que pide la mesa, luego los platos listos -->
+        @if (zoneRequests().length) {
+          <h3 class="queue-group">Te necesitan <span>{{ zoneRequests().length }}</span></h3>
+        }
+        @for (alert of zoneRequests(); track alert.id) {
+          <article class="mq-item" [class.mq-urgent]="(alert.escalation || 0) > 0 || alert.reason === 'PROBLEM'" [attr.data-tone]="alert.type === 'BILL' ? 'bill' : alert.type === 'TABLE_EMPTY' ? 'review' : 'call'">
+            @if (alert.type === 'WAITER_CALL' && alert.status === 'IN_PROGRESS') {
+              <svg class="mq-ring" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="15" /><circle class="fg" cx="18" cy="18" r="15" [attr.stroke-dashoffset]="94.2 * callProgress(alert)" /></svg>
+            } @else {
+              <span class="mq-ico"><app-icon [name]="alert.type === 'BILL' ? 'receipt' : alert.type === 'TABLE_EMPTY' ? 'alert' : 'bell'" [size]="17" /></span>
+            }
+            <div class="mq-body">
+              <strong>{{ alert.tableLabel }}</strong>
+              <small [title]="alert.note || ''">{{ alert.type === 'BILL' ? 'Pide la cuenta' : alert.type === 'TABLE_EMPTY' ? 'Revisar consumo' : callLine(alert) }} · {{ alert.type === 'WAITER_CALL' && alert.status === 'IN_PROGRESS' ? 'se cierra en ' + callMinutesLeft(alert) + ' min' : sinceLabel(alert.requestedAt) }}</small>
+              @if (alert.type === 'BILL' && alert.note) { <small class="mq-note">{{ alert.note }}</small> }
+            </div>
+            @if (alert.type === 'WAITER_CALL' && alert.status === 'IN_PROGRESS' && !(alert.escalation || 0)) {
+              <button class="mq-btn mq-done" (click)="finishCall(alert)" title="Cerrar ya (si no, se cierra solo)">✓ Listo</button>
+            } @else {
+              <button class="mq-btn primary" (click)="handle(alert)">{{ alert.type === 'WAITER_CALL' && alert.status === 'IN_PROGRESS' ? 'Voy de nuevo' : requestActionLabel(alert) }}</button>
+            }
+          </article>
+        }
+        @if (readyTables().length) {
+          <h3 class="queue-group">Para servir <span>{{ readyTables().length }}</span></h3>
+        }
+        @for (ready of readyTables(); track ready.table.id) {
+          <article class="mq-item" data-tone="ready">
+            <span class="mq-ico"><app-icon name="chef" [size]="17" /></span>
+            <div class="mq-body">
+              <strong>{{ ready.table.label }}</strong>
+              <small [title]="ready.names">{{ ready.quantity }} {{ ready.quantity === 1 ? 'listo' : 'listos' }} · {{ ready.names }}</small>
+            </div>
+            <div class="mq-actions">
+              <button class="mq-btn" (click)="select(ready.table); mobileSection.set('TABLES')" title="Ver pedido">Ver</button>
+              <button class="mq-btn primary" [disabled]="readyServing(ready)" (click)="serveReady(ready)">{{ readyServing(ready) ? '…' : 'Servido' }}</button>
+            </div>
+          </article>
+        }
+        @if (waitingTables().length) {
+          <h3 class="queue-group">Esperando su plato <span>{{ waitingTables().length }}</span></h3>
+        }
+        @for (wait of waitingTables(); track wait.table.id) {
+          <article class="mq-item" data-tone="late">
+            <span class="mq-ico"><app-icon name="clock" [size]="17" /></span>
+            <div class="mq-body">
+              <strong>{{ wait.table.label }} · {{ wait.minutes }} min</strong>
+              <small [title]="wait.names">{{ wait.preparing ? 'Preparándose' : 'Aún en cola' }} · {{ wait.names }}</small>
+            </div>
+            <div class="mq-actions">
+              <button class="mq-btn" (click)="select(wait.table); mobileSection.set('TABLES')">Ver</button>
+              <button class="mq-btn primary" (click)="notifiedDelay(wait.table)">Avisé</button>
+            </div>
+          </article>
+        }
+        @if (arrivals().length) {
+          <h3 class="queue-group">Llegan pronto <span>{{ arrivals().length }}</span></h3>
+        }
+        @for (item of arrivals(); track item.id) {
+          <article class="mq-item" data-tone="arrival">
+            <span class="mq-ico"><app-icon name="calendar" [size]="17" /></span>
+            <div class="mq-body">
+              <strong>{{ item.customerName }}</strong>
+              <small>{{ item.partySize }} pers. · {{ item.reservedAt.slice(11, 16) }} · {{ arrivalLabel(item) }}{{ item.tableLabel ? ' · ' + item.tableLabel : '' }}</small>
+              @if (item.notes) { <small class="mq-note">{{ item.notes }}</small> }
+            </div>
+            <button class="mq-btn primary" [disabled]="seatingBusy()" (click)="seatArrival(item)">{{ item.tableId ? 'Sentar' : 'Elegir mesa' }}</button>
+          </article>
+        }
+        @if (transfers().length) {
+          <h3 class="queue-group">Cambios de mesa <span>{{ transfers().length }}</span></h3>
+        }
+        @for (transfer of transfers(); track transfer.id) {
+          <article class="mq-item" data-tone="transfer">
+            <span class="mq-ico"><app-icon name="repeat" [size]="17" /></span>
+            <div class="mq-body">
+              <strong>{{ transfer.displayName }}</strong>
+              <small>{{ transfer.sourceTableLabel }} → {{ transfer.destinationTableLabel }}</small>
+            </div>
+            <div class="mq-actions">
+              <button class="mq-btn icon" (click)="rejectTransfer(transfer)" aria-label="Rechazar cambio" title="Rechazar"><app-icon name="x" [size]="15" /></button>
+              <button class="mq-btn primary icon" (click)="approveTransfer(transfer)" aria-label="Aprobar cambio" title="Aprobar"><app-icon name="check" [size]="15" /></button>
+            </div>
+          </article>
+        }
+        @if (opsAlerts().length) {
+          <h3 class="queue-group">Cocina atrasada <span>{{ opsAlerts().length }}</span></h3>
+        }
+        @for (alert of opsAlerts(); track alert.key) {
+          <article class="mq-item compact" [attr.data-tone]="alert.tone === 'error' ? 'review' : 'late'" [title]="alert.body">
+            <span class="mq-ico"><app-icon [name]="alert.key.startsWith('STOCK') ? 'package' : 'clock'" [size]="15" /></span>
+            <div class="mq-body"><strong>{{ alert.title }}</strong></div>
+          </article>
+        }
+        @if (!pendingCount() && !opsAlerts().length) {
+          <div class="service-empty queue-empty">
+            <span class="queue-check" aria-hidden="true"><app-icon name="check" [size]="22" /></span><strong>Todo está al día</strong>
+            <p>Aquí aparecerán las llamadas,<br />los platos listos y las cuentas.</p>
+          </div>
+        }
+        }
+      </div>
+    </aside>
+  </div>
+
+  @if (selected()?.sessionId && !order()) {
+    <button
+      class="waiter-detail-backdrop"
+      aria-label="Cerrar detalle de mesa"
+      (click)="closeSelected()"
+    ></button>
+    <article class="panel waiter-detail-panel service-detail">
+      <div class="service-empty" role="status">
+        <span class="service-loader"></span>
+        <p>Cargando pedidos…</p>
+      </div>
+    </article>
+  }
+  @if (selected()?.sessionId && order()) {
+    <button
+      class="waiter-detail-backdrop"
+      aria-label="Cerrar detalle de mesa"
+      (click)="closeSelected()"
+    ></button>
+    <article
+      class="panel session-detail waiter-detail-panel service-detail"
+      [class.dragging]="detailDragging()"
+      [class.closing]="detailClosing()"
+      [style.transform]="detailDragY() ? 'translateY(' + detailDragY() + 'px)' : null"
+      aria-label="Detalle de la mesa"
+    >
+      <div
+        class="waiter-detail-handle"
+        (pointerdown)="startDetailDrag($event)"
+        (pointermove)="moveDetailDrag($event)"
+        (pointerup)="endDetailDrag($event)"
+        (pointercancel)="endDetailDrag($event)"
+      ></div>
+      @if (selected()!.requiresReview) {
+        <div class="stale-session-warning">
+          <div>
+            <strong>Atención anterior bloqueada</strong>
+            <p>Revisa el consumo antes de permitir que nuevos comensales ingresen.</p>
+          </div>
+          <button class="primary" (click)="reactivateSession()">Reactivar atención</button
+          ><button class="secondary" (click)="cancelSession()">Cancelar y liberar</button>
+        </div>
+      }
+      <section class="waiter-detail-summary waiter-detail-summary-total">
+        <header class="mz-detail-head" [attr.data-state]="tableState(selected()!)">
+          <div>
+            <h2>{{ selected()!.label }} <span class="mz-state"><i></i>{{ tableStateLabel(selected()!) }}</span></h2>
+            <small>@if (zoneOf(selected()!); as zone) {<i [style.background]="zone.color"></i>{{ zone.name }} · }{{ activeGuestCountFor(selected()!) }} de {{ selected()!.capacity }} comensales@if (openMinutes(selected()!)) { · ocupada hace {{ openMinutes(selected()!) }}}</small>
+            <div class="mz-served-row">
+              @if (selected()!.servedById) {
+                <span class="mz-served-who" [style.--hue]="hue(selected()!.servedById)"><i>{{ isMine(selected()!) ? 'Tú' : initials(selected()!.servedByName) }}</i>
+                  <span><small>Atiende</small><b>{{ isMine(selected()!) ? 'Tú' : selected()!.servedByName }}@if (selected()!.servedByAway) {<em>fuera de turno</em>}</b></span></span>
+                @if (canPass(selected()!)) {
+                  <button class="mz-served-btn" (click)="toggleWaiterPicker()" [attr.aria-expanded]="waiterPicker()">Pasar a otro</button>
+                } @else {
+                  <button class="mz-served-btn" [disabled]="assigning()" (click)="takeTable(selected()!)">Tomar mesa</button>
+                }
+              } @else {
+                <span class="mz-served-who none"><i>?</i><span><small>Atiende</small><b>Nadie aún</b></span></span>
+                <button class="mz-served-btn primary" [disabled]="assigning()" (click)="takeTable(selected()!)">Tomar mesa</button>
+                @if (auth.role() !== 'WAITER') { <button class="mz-served-btn" (click)="toggleWaiterPicker()" [attr.aria-expanded]="waiterPicker()">Asignar</button> }
+              }
+            </div>
+            @if (waiterPicker()) {
+              <div class="mz-picker" role="listbox" aria-label="Elegir mesero">
+                @for (option of waiterOptions(); track option.id) {
+                  @if (option.id !== selected()!.servedById) {
+                    <button role="option" [disabled]="assigning()" [class.off]="!option.onShift" [style.--hue]="hue(option.id)" (click)="assignWaiter(selected()!, option.id)">
+                      <i>{{ initials(option.fullName) }}</i>
+                      <span><b>{{ option.id === myId() ? 'Yo' : option.fullName }}</b><small>{{ option.onShift ? 'En turno' : 'Fuera de turno' }} · {{ option.openTables }} {{ option.openTables === 1 ? 'mesa' : 'mesas' }}</small></span>
+                    </button>
+                  }
+                } @empty { <p class="mz-muted">Cargando meseros…</p> }
+              </div>
+            }
+          </div>
+          <button class="mz-close" (click)="closeSelected()" aria-label="Cerrar detalle"><app-icon name="x" [size]="18" /></button>
+        </header>
+        <div class="total">
+          <p>
+            <small>Consumo de la mesa</small
+            ><strong>{{ order()!.submittedTotal | currency: 'PEN' : 'S/ ' }}</strong>
+          </p>
+          <div class="waiter-detail-primary-actions">
+            @if (!selected()!.requiresReview) {
+              <button
+                class="secondary small"
+                [disabled]="activeBill()?.status === 'IN_PROGRESS'"
+                [title]="
+                  activeBill()?.status === 'IN_PROGRESS' ? 'La cuenta está en preparación' : ''
+                "
+                (click)="openComposer()"
+              >
+                + Agregar pedido
+              </button>
+            }
+            @if (order()!.submittedTotal > 0) {
+              <button class="primary small" (click)="openCheckout()">Gestionar cuenta</button>
+            }
+          </div>
+        </div>
+      </section>
+      <div class="waiter-detail-content">
+        <section class="waiter-detail-orders">
+          <header>
+            <div>
+              <p class="eyebrow">Consumo</p>
+              <h3>Pedidos de la mesa</h3>
+            </div>
+            <span>{{ orderItemCount() }} productos</span>
+          </header>
+          @if (printedRounds().length) {
+            <div class="mz-rounds" aria-label="Comandas impresas">
+              @for (round of printedRounds(); track round.orderId) {
+                <div class="mz-round" [class.failed]="round.failed">
+                  <b>Ronda {{ round.round }}</b>
+                  <span class="mz-round-jobs">
+                    @for (job of round.jobs; track job.id) {
+                      <span class="mz-job" [attr.data-status]="job.status" [title]="job.error || ''">{{ job.stationName || 'Cocina' }} · {{ jobLabel(job) }}</span>
+                    }
+                  </span>
+                  <span class="mz-round-actions">
+                    @if (round.failedJob; as failed) { <button class="mz-mini warn" (click)="retryPrint(failed)">Reintentar</button> }
+                    @else if (round.jobs.length) { <button class="mz-mini" (click)="reprint(round.orderId)">Reimprimir</button> }
+                    @if (round.pending) { <button class="mz-mini primary" [disabled]="servingRound() === round.orderId" (click)="serveRound(round.orderId)">Servir ronda</button> }
+                  </span>
+                </div>
+              }
+            </div>
+          }
+          <div class="order-items-grid">
+            @for (item of order()!.items; track item.id) {
+              <article
+                class="order-line detailed waiter-order-item"
+                [class.voided]="item.status === 'CANCELLED'"
+              >
+                <b class="waiter-order-quantity">{{ item.quantity }}</b
+                ><span
+                  ><strong>{{ item.name }}</strong>
+                  @if (item.modifiers) {
+                    <small class="item-modifiers">{{ item.modifiers }}</small>
+                  }
+                  <small>{{ guestName(item) }} · Ronda {{ item.roundNumber }}</small>
+                  @if (item.notes) {
+                    <small class="item-notes">Nota: {{ item.notes }}</small>
+                  }
+                  @if (item.voidReason) {
+                    <small class="item-void-reason">Anulado: {{ item.voidReason }}</small>
+                  }
+                </span>
+                <div class="item-state">
+                  <span class="status" [class]="statusClass(item.status)">{{
+                    statusLabel(item.status)
+                  }}</span>
+                  @if (item.status === 'READY' || (item.printed && (item.status === 'SUBMITTED' || item.status === 'PREPARING'))) {
+                    <button
+                      class="primary small"
+                      [disabled]="isServing(item.id)"
+                      (click)="deliver(item)"
+                    >
+                      {{ isServing(item.id) ? 'Confirmando…' : 'Servido' }}
+                    </button>
+                  }
+                  @if (canVoid(item)) {
+                    <button
+                      class="item-void-action"
+                      (click)="voiding.set(item)"
+                      [attr.aria-label]="'Anular ' + item.name"
+                    >
+                      Anular
+                    </button>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+          @if (!order()!.items.length) {
+            <div class="waiter-detail-empty">
+              <span>▤</span><strong>Sin pedidos enviados</strong>
+              <p>Los productos aparecerán aquí cuando la mesa los envíe.</p>
+            </div>
+          }
+        </section>
+        <aside class="guest-management waiter-detail-guests">
+          <header>
+            <div>
+              <p class="eyebrow">Mesa</p>
+              <h3>Comensales</h3>
+            </div>
+            <span>{{ activeGuestCount() }} activos</span>
+          </header>
+          @for (person of order()!.guests; track person.id) {
+            <div class="waiter-guest-row">
+              <b>{{ guestInitials(person.displayName) }}</b>
+              <div>
+                <strong>{{ person.displayName }}</strong
+                ><small
+                  >{{ person.host ? 'Anfitrión' : 'Comensal' }} ·
+                  {{ person.active ? 'En la mesa' : 'Retirado' }}</small
+                >
+              </div>
+              @if (person.active) {
+                <button
+                  class="waiter-guest-action"
+                  (click)="retireGuest(person.id, person.displayName)"
+                  aria-label="Retirar comensal"
+                >
+                  ×
+                </button>
+              } @else {
+                <span class="status neutral">Salió</span>
+              }
+            </div>
+          }
+          @if (activeGuestCount() > 1) {
+            <div class="waiter-host-control">
+              <label
+                ><span>Cambiar anfitrión</span
+                ><select [(ngModel)]="hostGuestId">
+                  @for (person of order()!.guests; track person.id) {
+                    @if (person.active) {
+                      <option [value]="person.id">{{ person.displayName }}</option>
+                    }
+                  }
+                </select></label
+              ><button class="secondary" (click)="transferHost()">Asignar</button>
+            </div>
+          }
+        </aside>
+      </div>
+      <footer class="mz-sheet-actions">
+        @if (!selected()!.requiresReview) {
+          <button class="mz-sheet-btn" [disabled]="activeBill()?.status === 'IN_PROGRESS'" (click)="openComposer()"><app-icon name="plus" [size]="18" />Pedido</button>
+        }
+        @if (order()!.submittedTotal > 0) {
+          <button class="mz-sheet-btn primary" (click)="openCheckout()"><app-icon name="receipt" [size]="18" />Cuenta · {{ order()!.submittedTotal | currency: 'PEN' : 'S/ ' }}</button>
+        }
+      </footer>
+      @if (canCancel()) {
+        <footer class="waiter-detail-danger">
+          <span
+            ><strong>Finalizar esta atención</strong
+            ><small>Libera la mesa y descarta productos no enviados.</small></span
+          ><button class="secondary" (click)="cancelSession()">Cancelar atención</button>
+        </footer>
+      }
+    </article>
+  }
+  @if (seatingFor(); as item) {
+    <div class="zp-backdrop" (click)="seatingFor.set(null)">
+      <section class="zp-sheet" role="dialog" aria-modal="true" aria-label="Elegir mesa" (click)="$event.stopPropagation()">
+        <button class="zp-close" (click)="seatingFor.set(null)" aria-label="Cerrar"><app-icon name="x" [size]="18" /></button>
+        <header class="zp-head"><h2>¿Dónde se sienta {{ item.customerName }}?</h2><p>Mesas libres para {{ item.partySize }} personas</p></header>
+        <div class="zp-list">
+          @for (table of seatOptions(item); track table.id) {
+            <button class="zp-option" (click)="seatArrival(item, table.id)" [disabled]="seatingBusy()" [style.--zc]="zoneOf(table)?.color || 'var(--brand)'">
+              <span class="zp-ico"><app-icon name="chair" [size]="18" /></span>
+              <span class="zp-text"><b>{{ table.label }}</b><small>{{ zoneOf(table)?.name || 'Sin zona' }} · {{ table.capacity }} sillas</small></span>
+              <span class="zp-check"><app-icon name="check" [size]="16" /></span>
+            </button>
+          } @empty {
+            <p class="zp-empty">No hay mesas libres para {{ item.partySize }} personas. Libera una o une dos mesas.</p>
+          }
+        </div>
+      </section>
+    </div>
+  }
+  @if (zonePickerOpen()) {
+    <div class="zp-backdrop" (click)="zonePickerOpen.set(false)">
+      <section class="zp-sheet" role="dialog" aria-modal="true" aria-label="Elegir zona" (click)="$event.stopPropagation()">
+<button class="zp-close" (click)="zonePickerOpen.set(false)" aria-label="Cerrar"><app-icon name="x" [size]="18" /></button>
+        <header class="zp-head"><h2>¿Qué mesas quieres ver?</h2><p>Elige tu zona de trabajo</p></header>
+        <div class="zp-list">
+          @if (myZoneIds().length || myTableIds().length) {
+            <button class="zp-option" [class.on]="zoneFilter() === 'MINE'" (click)="pickZone('MINE')" style="--zc: var(--brand)">
+              <span class="zp-ico"><app-icon name="star" [size]="18" /></span>
+              <span class="zp-text"><b>Mis mesas</b><small>Las que tienes asignadas</small></span>
+              <span class="zp-check"><app-icon name="check" [size]="16" /></span>
+            </button>
+          }
+          <button class="zp-option" [class.on]="zoneFilter() === 'ALL'" (click)="pickZone('ALL')" style="--zc: #8b95a7">
+            <span class="zp-ico"><app-icon name="grid" [size]="18" /></span>
+            <span class="zp-text"><b>Todo el local</b><small>{{ tables().length }} mesas en todas las zonas</small></span>
+            <span class="zp-check"><app-icon name="check" [size]="16" /></span>
+          </button>
+          @for (zone of zones(); track zone.id) {
+            <button class="zp-option" [class.on]="zoneFilter() === zone.id" [class.closed]="!zone.open" (click)="pickZone(zone.id)" [style.--zc]="zone.color">
+              <span class="zp-ico"><app-icon name="map" [size]="18" /></span>
+              <span class="zp-text"><b>{{ zone.name }}@if (!zone.open) {<em>Cerrada</em>}</b>
+                <small>{{ zoneCount(zone.id).busy }} de {{ zoneCount(zone.id).total }} ocupadas</small>
+                <i class="zp-bar"><em [style.width.%]="zoneCount(zone.id).total ? zoneCount(zone.id).busy / zoneCount(zone.id).total * 100 : 0"></em></i>
+              </span>
+              <span class="zp-check"><app-icon name="check" [size]="16" /></span>
+            </button>
+          }
+        </div>
+      </section>
+    </div>
+  }
+  @if (qrPreview()) {
+    <div class="modal-backdrop" (click)="qrPreview.set(null)">
+      <section class="qr-dialog" (click)="$event.stopPropagation()">
+        <button class="modal-close" (click)="qrPreview.set(null)">×</button>
+        <p class="eyebrow">Código de mesa</p>
+        <h2>{{ qrPreview()!.label }}</h2>
+        <img [src]="qrPreview()!.dataUrl" [alt]="'QR de ' + qrPreview()!.label" />
+        <p class="muted">Los comensales escanean este código para unirse.</p>
+        <small class="qr-link">{{ qrPreview()!.link }}</small>
+        @if (qrPreview()!.table && !qrPreview()!.table!.sessionId) {
+          <button
+            class="primary full"
+            [disabled]="openingTable()"
+            (click)="takeOrderAtFreeTable(qrPreview()!.table!)"
+          >
+            {{ openingTable() ? 'Abriendo mesa…' : 'Tomar pedido sin QR' }}
+          </button>
+        }
+        <button class="secondary full" (click)="copyQrLink()">Copiar enlace</button>
+      </section>
+    </div>
+  }
+  @if (composer(); as current) {
+    <app-staff-order
+      [sessionId]="current.sessionId"
+      [tableLabel]="current.label"
+      (sent)="onRoundSent($event, current.label)"
+      (closed)="composer.set(null)"
+    />
+  }
+  <app-void-item-dialog
+    [item]="voiding()"
+    [busy]="voidBusy()"
+    (confirmed)="confirmVoid($event)"
+    (cancelled)="voiding.set(null)"
+  />
+  @if (checkoutOpen() && selected()?.sessionId) {
+    <app-checkout-dialog
+      [sessionId]="selected()!.sessionId!"
+      [label]="selected()!.label"
+      [order]="order()"
+      (closed)="checkoutOpen.set(false)"
+      (paid)="closeSelected(); refresh()"
+      (sessionClosed)="onSessionClosed()"
+    />
+  }
+  @if (teamOpen()) {
+    <div class="modal-backdrop team-backdrop" (click)="teamOpen.set(false)">
+      <section
+        class="qr-dialog team-dialog"
+        (click)="$event.stopPropagation()"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Ranking del equipo"
+      >
+        <button class="modal-close" (click)="teamOpen.set(false)" aria-label="Cerrar">×</button>
+        <app-team-board />
+      </section>
+    </div>
+  }
+</app-shell>

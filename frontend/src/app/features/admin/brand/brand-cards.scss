@@ -1,0 +1,18 @@
+// Tarjetas de tema del equipo y de estilo de carta.
+.bd-themes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.bd-menus { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.bd-card { display: grid; gap: 7px; justify-items: center; padding: 8px 8px 10px; border: 0; border-radius: 18px; color: var(--muted); font-size: .78rem; font-weight: 750; background: color-mix(in srgb, var(--text) 4%, transparent); transition: background .2s, color .2s, box-shadow .25s, transform .25s var(--ease-spring, ease); }
+.bd-card:hover { color: var(--text); transform: translateY(-2px); }
+.bd-card[aria-checked='true'] { color: var(--text); background: color-mix(in srgb, var(--brand) 10%, transparent); box-shadow: 0 0 0 2px var(--brand); }
+.bd-menu { justify-items: start; text-align: left; gap: 3px; }
+.bd-menu strong { margin-top: 5px; color: var(--text); font-size: .82rem; } .bd-menu small { font-size: .7rem; font-weight: 600; }
+.bd-mini { position: relative; width: 100%; height: 56px; overflow: hidden; border-radius: 12px; background: #f2f3ef; --ink: rgba(20, 22, 26, .16); --side: #fff; }
+.bd-mini[data-look='DARK'] { background: #15171a; --ink: rgba(255, 255, 255, .16); --side: #22252a; }
+.bd-mini[data-look='SYSTEM'] { background: linear-gradient(135deg, #f2f3ef 50%, #15171a 50%); --ink: rgba(128, 130, 135, .35); --side: linear-gradient(180deg, #fff 45%, #22252a 45%); }
+.bd-mini i { position: absolute; top: 6px; bottom: 6px; left: 6px; width: 13px; border-radius: 5px; background: var(--side); }
+.bd-mini b { position: absolute; left: 26px; height: 6px; border-radius: 4px; background: var(--ink); }
+.bd-mini b:nth-of-type(1) { top: 11px; width: 40%; } .bd-mini b:nth-of-type(2) { top: 23px; width: 55%; }
+.bd-mini em { position: absolute; left: 26px; bottom: 9px; width: 26px; height: 9px; border-radius: 5px; }
+.bd-menu-swatch { display: flex; gap: 4px; width: 100%; height: 36px; padding: 5px; border-radius: 10px; background: var(--bg); }
+.bd-menu-swatch b { flex: 1; border-radius: calc(var(--r) / 2.5); background: var(--card); box-shadow: 0 1px 3px rgba(0, 0, 0, .12); }
+.bd-menu-swatch b:first-child { flex: .6; }

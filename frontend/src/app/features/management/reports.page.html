@@ -1,0 +1,247 @@
+<app-shell title="Reportes" eyebrow="¿Cómo le va a tu negocio?">
+  <div shell-actions class="rp-exports">
+    <button class="rp-pill" [disabled]="!report() || loading() || exporting() || !!error()" (click)="export('csv')">CSV</button>
+    <button class="rp-pill primary" [disabled]="!report() || loading() || exporting() || !!error()" (click)="export('xlsx')"><app-icon name="download" [size]="16" />{{ exporting() ? 'Exportando…' : 'Excel' }}</button>
+  </div>
+
+  <div class="rp" [class.busy]="loading() && !!report()">
+    <!-- Período: se elige una vez para todas las pestañas -->
+    <div class="lg rp-period">
+      <div class="rp-presets" role="radiogroup" aria-label="Período">
+        @for (item of presets; track item.key) {
+          <button role="radio" [attr.aria-checked]="preset() === item.key" [disabled]="loading()" (click)="choosePreset(item.key)">{{ item.label }}</button>
+        }
+        <button role="radio" [attr.aria-checked]="preset() === 'CUSTOM'" (click)="choosePreset('CUSTOM')"><app-icon name="calendar" [size]="15" />Elegir fechas</button>
+      </div>
+      @if (preset() === 'CUSTOM') {
+        <form class="rp-dates" (ngSubmit)="load()">
+          <input type="date" name="from" required [(ngModel)]="from" aria-label="Desde"><span>→</span><input type="date" name="to" required [(ngModel)]="to" aria-label="Hasta">
+          <button class="rp-pill primary small" [disabled]="loading()">Ver</button>
+        </form>
+      } @else if (report()) {
+        <p class="rp-range"><b>{{ rangeLabel() }}</b><small>comparado con {{ previousLabel() }}{{ includesToday() ? ' (completo)' : '' }}</small></p>
+      }
+      <i class="rp-progress"></i>
+    </div>
+
+    <!-- Pestañas del módulo -->
+    <div class="rp-navrow">
+      <nav class="rp-tabs" role="tablist" aria-label="Secciones de reportes">
+        <button role="tab" [attr.aria-selected]="tab() === 'SUMMARY'" (click)="showTab('SUMMARY')"><app-icon name="chart" [size]="16" />Resumen</button>
+        <button role="tab" [attr.aria-selected]="tab() === 'PRODUCTS'" (click)="showTab('PRODUCTS')"><app-icon name="utensils" [size]="16" />Platos y equipo</button>
+        <button role="tab" [attr.aria-selected]="tab() === 'LEDGER'" (click)="showTab('LEDGER')"><app-icon name="receipt" [size]="16" />Cobros @if (report()) {<small>{{ report()!.paymentCount }}</small>}</button>
+        @if (isOwner()) { <button role="tab" [attr.aria-selected]="tab() === 'BRANCHES'" (click)="showTab('BRANCHES')"><app-icon name="store" [size]="16" />Sucursales</button> }
+      </nav>
+      <p class="rp-purpose">{{ tabPurpose() }}</p>
+    </div>
+
+    @if (error()) {
+      <div class="lg rp-alert" role="alert"><span><app-icon name="alert" [size]="22" /></span><div><strong>No se pudo consultar el reporte</strong><small>{{ error() }}</small></div><button class="rp-pill" (click)="load()">Reintentar</button></div>
+    }
+
+    @if (loading() && !report()) {
+      <div class="rp-grid"><div class="lg rp-card rp-hero rp-skeleton"><i class="ui-skeleton"></i><i class="ui-skeleton"></i><i class="ui-skeleton"></i></div><div class="lg rp-card rp-side rp-skeleton"><i class="ui-skeleton"></i><i class="ui-skeleton"></i></div></div>
+    } @else if (report(); as data) {
+      @switch (tab()) {
+        @case ('SUMMARY') {
+          <section class="rp-grid rp-view">
+            <!-- Total cobrado, tendencia y gráfico -->
+            <article class="lg rp-card rp-hero">
+              <div class="rp-hero-top">
+                <div>
+                  <p class="rp-label">Total cobrado</p>
+                  <strong class="rp-big" [appCountUp]="data.totals.collected" countUpFormat="currency"></strong>
+                  @if (salesTrend(); as t) {
+                    <span class="rp-trend" [class.down]="t < 0">{{ t >= 0 ? '↑' : '↓' }} {{ t >= 0 ? t : -t }}% <small>vs período anterior</small></span>
+                  } @else if (previous()) {
+                    <span class="rp-trend flat">Sin ventas en el período anterior</span>
+                  }
+                </div>
+                <div class="rp-kpis">
+                  <span><small>Ticket promedio</small><b>{{ money(ticket()) }}</b>@if (ticketTrend(); as t) {<em [class.down]="t < 0">{{ t >= 0 ? '↑' : '↓' }}{{ t >= 0 ? t : -t }}%</em>}</span>
+                  <span><small>Atenciones</small><b>{{ data.totals.sessions }}</b>@if (sessionsTrend(); as t) {<em [class.down]="t < 0">{{ t >= 0 ? '↑' : '↓' }}{{ t >= 0 ? t : -t }}%</em>}</span>
+                  <span><small>Pagos</small><b>{{ data.totals.payments }}</b></span>
+                  <span><small>Propinas <app-info-tip text="Aparte del total cobrado." /></small><b>{{ money(data.totals.tips) }}</b></span>
+                </div>
+              </div>
+
+              <div class="rp-chart-head">
+                <h3>{{ chartMode() === 'HOURS' ? 'Cobros por hora' : 'Cobros por día' }}</h3>
+                @if (!singleDay()) {
+                  <div class="rp-seg"><button [class.on]="chart() === 'DAYS'" (click)="chart.set('DAYS')">Por día</button><button [class.on]="chart() === 'HOURS'" (click)="chart.set('HOURS')">Por hora</button></div>
+                }
+              </div>
+              <div class="rp-chart" role="img" [attr.aria-label]="chartMode() === 'HOURS' ? 'Cobros por hora del día' : 'Cobros por día'">
+                @for (bar of bars(); track bar.key; let index = $index) {
+                  <button class="rp-bar" [class.best]="bar.best" [class.link]="!!bar.day" [style.--h]="bar.ratio + '%'" [style.--d]="index * 25 + 'ms'" (click)="drill(bar)" [attr.aria-label]="bar.tip + ': ' + money(bar.amount)">
+                    <span class="rp-tip"><b>{{ money(bar.amount) }}</b>{{ bar.tip }}@if (bar.day) {<em>Clic para ver este día</em>}</span>
+                    @if (bars().length <= 14) { <em class="rp-val">{{ compact(bar.amount) }}</em> }
+                    <i></i>
+                    <small [class.hide]="!bar.showLabel">{{ bar.label }}</small>
+                  </button>
+                } @empty {
+                  <div class="rp-empty"><span><app-icon name="chart" [size]="22" /></span><div><strong>Sin cobros en este período</strong><small>Prueba con otro rango de fechas.</small></div></div>
+                }
+              </div>
+              <div class="rp-insights">
+                @if (bestDay(); as best) { <span><app-icon name="trophy" [size]="15" />Mejor día <b>{{ longDay(best.day) }}</b> · {{ money(best.amount) }}</span> }
+                @if (peakHour(); as peak) { <span><app-icon name="clock" [size]="15" />Hora pico <b>{{ peak.hour }}:00 – {{ peak.hour + 1 }}:00</b></span> }
+                @if (data.products[0]; as star) { <span><app-icon name="star" [size]="15" />Plato estrella <b>{{ star.name }}</b></span> }
+              </div>
+            </article>
+
+            <!-- Medios de pago -->
+            <article class="lg rp-card rp-side">
+              <h3>Medios de pago</h3>
+              <div class="rp-donut-wrap">
+                <div class="rp-donut" [style.background]="donut()"><span><small>{{ data.methods.length }} {{ data.methods.length === 1 ? 'medio' : 'medios' }}</small><b>{{ compact(data.totals.collected) }}</b></span></div>
+              </div>
+              <div class="rp-legend">
+                @for (item of data.methods; track item.method) {
+                  <div><i [style.background]="methodTone(item.method)"></i><span>{{ methodLabel(item.method) }}<small>{{ item.count }} pagos</small></span><b>{{ money(item.amount) }}<small>{{ methodShare(item.amount) }}%</small></b></div>
+                } @empty { <p class="rp-muted">No hay cobros en este período.</p> }
+              </div>
+            </article>
+
+            <!-- Controles del dueño -->
+            <article class="lg rp-card rp-third">
+              <h3>Controles <app-info-tip text="Dinero que se dejó de cobrar o que no entró en ninguna caja." /></h3>
+              <div class="rp-rows">
+                <div><span class="rp-ico" data-tone="red"><app-icon name="x" [size]="17" /></span><span>Anulaciones<small>{{ data.voids.count }} {{ data.voids.count === 1 ? 'plato' : 'platos' }}</small></span><b>{{ money(data.voids.amount) }}</b></div>
+                <div><span class="rp-ico" data-tone="amber"><app-icon name="percent" [size]="17" /></span><span>Descuentos<small>{{ data.discounts.count }} {{ data.discounts.count === 1 ? 'cuenta' : 'cuentas' }}</small></span><b>{{ money(data.discounts.amount) }}</b></div>
+                <button (click)="openUnassigned()"><span class="rp-ico" data-tone="blue"><app-icon name="receipt" [size]="17" /></span><span>Cobrado sin caja<small>Ver cobros →</small></span><b [class.warn]="data.totals.unassigned > 0">{{ money(data.totals.unassigned) }}</b></button>
+              </div>
+            </article>
+
+            <!-- Comparación con el período anterior y margen -->
+            <article class="lg rp-card rp-third">
+              <h3>Frente al período anterior <app-info-tip [text]="'Comparado con ' + previousLabel() + '.'" /></h3>
+              <div class="rp-rows tight rp-compare">
+                @for (row of comparison(); track row.label) {
+                  <div><span>{{ row.label }}<small>antes {{ row.before }}</small></span><b>{{ row.now }}@if (row.delta !== null) {<em [class.down]="row.delta < 0">{{ row.delta >= 0 ? '↑' : '↓' }} {{ row.delta >= 0 ? row.delta : -row.delta }}%</em>} @else {<em class="flat">—</em>}</b></div>
+                }
+              </div>
+              @if (margin() !== null) {
+                <div class="rp-margin">
+                  <div class="rp-ring" [style.--p]="margin()"><b>{{ margin() }}%</b><small>margen</small></div>
+                  <div class="rp-rows tight">
+                    <div><span>Costo de insumos<small>según recetas</small></span><b>{{ money(data.inventoryCost) }}</b></div>
+                    <div><span>Ganancia bruta<small>cobrado − insumos</small></span><b class="ok">{{ money(data.totals.collected - data.inventoryCost) }}</b></div>
+                  </div>
+                </div>
+              } @else {
+                <a class="rp-hint" routerLink="/inventory"><app-icon name="sparkles" [size]="16" /><span>¿Cuánto ganas de verdad?<small>Carga las recetas en Inventario y verás tu margen aquí.</small></span><app-icon name="send" [size]="14" /></a>
+              }
+            </article>
+
+            <!-- Zonas -->
+            <article class="lg rp-card rp-third">
+              <h3>Ventas por zona <app-info-tip text="Según la zona actual de cada mesa. «Mostrador» son pedidos para llevar y delivery." /></h3>
+              <div class="rp-ranks">
+                @for (zone of data.zones; track zone.name; let index = $index) {
+                  <div class="rp-rank" [style.--d]="index * 60 + 'ms'"><span>{{ zone.name }}<small>{{ zone.sessions }} atenciones</small></span><b>{{ money(zone.amount) }}</b><i class="rp-track"><i [style.width.%]="zone.amount / maxZone() * 100" [style.background]="zone.color"></i></i></div>
+                } @empty { <p class="rp-muted">Sin ventas por zona en este período.</p> }
+              </div>
+            </article>
+          </section>
+        }
+
+        @case ('PRODUCTS') {
+          <section class="rp-grid rp-view">
+            <article class="lg rp-card rp-products">
+              <h3>Los 10 platos más pedidos <app-info-tip text="Consumo enviado a cocina en el período, excluyendo pedidos cancelados. No equivale a dinero cobrado." /></h3>
+              @if (data.products.length) {
+                <div class="rp-podium">
+                  @for (product of data.products.slice(0, 3); track $index; let index = $index) {
+                    <div [attr.data-pos]="index + 1" [style.--d]="index * 90 + 'ms'"><span>{{ medals[index] }}</span><strong>{{ product.name }}</strong><small>{{ product.quantity }} und · {{ money(product.amount) }}</small></div>
+                  }
+                </div>
+              }
+              <div class="rp-ranks">
+                @for (product of data.products.slice(3); track $index; let index = $index) {
+                  <div class="rp-rank" [style.--d]="index * 50 + 'ms'"><span><strong><em>{{ index + 4 }}</em>{{ product.name }}</strong><small>{{ money(product.amount) }} de consumo</small></span><b>{{ product.quantity }} und</b><i class="rp-track"><i [style.width.%]="product.quantity / maxProduct() * 100"></i></i></div>
+                } @empty {
+                  @if (!data.products.length) { <div class="rp-empty"><span><app-icon name="utensils" [size]="22" /></span><div><strong>Sin pedidos en este período</strong><small>Prueba con otro rango de fechas.</small></div></div> }
+                }
+              </div>
+            </article>
+            <div class="rp-team"><app-waiter-ranking [from]="data.from" [to]="data.to" /></div>
+          </section>
+        }
+
+        @case ('LEDGER') {
+          <section class="lg rp-card rp-ledger rp-view">
+            <div class="rp-toolbar">
+              <div class="rp-seg">
+                @for (item of methods; track item) {
+                  <button [class.on]="method === item" [disabled]="loading()" (click)="setMethod(item)">@if (item !== 'ALL') {<i class="rp-dot" [style.background]="methodTone(item)"></i>}{{ item === 'ALL' ? 'Todos' : methodLabel(item) }}</button>
+                }
+              </div>
+              <button class="rp-switch" role="switch" [attr.aria-checked]="unassigned" [disabled]="loading()" (click)="toggleUnassigned()"><i></i>Solo cobros sin caja</button>
+              <small class="rp-muted">{{ data.paymentCount }} {{ data.paymentCount === 1 ? 'cobro' : 'cobros' }} · el CSV y el Excel usan estos filtros</small>
+            </div>
+            <div class="rp-table-wrap">
+              <table>
+                <thead><tr><th>Mesa</th><th>Fecha</th><th>Método</th><th class="num">Importe</th><th class="num">Propina</th><th>Referencia</th><th>Responsable</th><th>Caja</th></tr></thead>
+                <tbody>
+                  @for (payment of data.payments; track payment.id; let index = $index) {
+                    <tr [style.--d]="index * 15 + 'ms'">
+                      <td><strong>{{ payment.tableLabel }}</strong></td>
+                      <td class="muted">{{ timestamp(payment.paidAt) }}</td>
+                      <td><span class="rp-method" [style.--tone]="methodTone(payment.method)"><i></i>{{ methodLabel(payment.method) }}</span></td>
+                      <td class="num"><b>{{ money(payment.amount) }}</b></td>
+                      <td class="num muted">{{ payment.tip > 0 ? money(payment.tip) : '—' }}</td>
+                      <td class="muted">{{ payment.reference || '—' }}</td>
+                      <td>{{ payment.registeredBy }}</td>
+                      <td><span class="rp-tag" [class.warn]="!payment.shiftId" [title]="payment.shiftId ? 'Asignado a un turno de caja' : 'Cobro registrado sin un turno de caja abierto'">{{ payment.shiftId ? 'En caja' : 'Sin caja' }}</span></td>
+                    </tr>
+                  } @empty {
+                    <tr><td colspan="8"><div class="rp-empty"><span><app-icon name="receipt" [size]="22" /></span><div><strong>No hay cobros con estos filtros</strong><small>Cambia el medio de pago o el período.</small></div></div></td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            <footer class="rp-pager">
+              <button class="rp-pill small" [disabled]="data.page === 0 || loading()" (click)="page(data.page - 1)">← Anterior</button>
+              <span>Página <b>{{ data.page + 1 }}</b> de {{ totalPages(data) }}</span>
+              <button class="rp-pill small" [disabled]="(data.page + 1) * data.pageSize >= data.paymentCount || loading()" (click)="page(data.page + 1)">Siguiente →</button>
+            </footer>
+          </section>
+        }
+
+        @case ('BRANCHES') {
+          <section class="lg rp-card rp-ledger rp-view">
+            <div class="rp-toolbar">
+              <h3>Comparar sucursales <app-info-tip text="Mismo período para todas las sucursales activas." /></h3>
+              <button class="rp-pill small" [disabled]="branchesLoading()" (click)="loadBranches()"><app-icon name="refresh" [size]="15" />{{ branchesLoading() ? 'Calculando…' : 'Actualizar' }}</button>
+              @if (branches()) { <button class="rp-pill primary small" (click)="exportBranches()"><app-icon name="download" [size]="15" />Excel</button> }
+            </div>
+            @if (branches(); as list) {
+              <div class="rp-table-wrap">
+                <table>
+                  <thead><tr><th>Sucursal</th><th class="num">Cobrado</th><th class="num">Atenciones</th><th class="num">Ticket prom.</th><th class="num">Llevar / delivery</th><th class="num">Anulaciones</th><th class="num">Descuentos</th><th class="num">Costo insumos</th><th class="num">Margen bruto</th><th>Plato estrella</th></tr></thead>
+                  <tbody>
+                    @for (branch of list.branches; track branch.branchId; let index = $index) {
+                      <tr [style.--d]="index * 40 + 'ms'">
+                        <td><strong>{{ index < 3 ? medals[index] + ' ' : '' }}{{ branch.name }}</strong><i class="rp-track"><i [style.width.%]="branch.collected / maxBranch() * 100"></i></i></td>
+                        <td class="num"><b>{{ money(branch.collected) }}</b></td><td class="num">{{ branch.sessions }}</td><td class="num">{{ money(branch.averageTicket) }}</td><td class="num">{{ branch.counterOrders }}</td>
+                        <td class="num muted">{{ money(branch.voids) }}</td><td class="num muted">{{ money(branch.discounts) }}</td><td class="num muted">{{ branch.inventoryCost > 0 ? money(branch.inventoryCost) : '—' }}</td><td class="num">{{ branch.inventoryCost > 0 ? money(branch.grossMargin) : '—' }}</td><td>{{ branch.topProduct || '—' }}</td>
+                      </tr>
+                    }
+                    <tr class="total"><td><strong>Total</strong></td><td class="num"><b>{{ money(list.total) }}</b></td><td colspan="8"></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              @if (list.branches.length < 2) {
+                <div class="rp-empty"><span><app-icon name="store" [size]="22" /></span><div><strong>Por ahora tienes una sola sucursal</strong><small>Cuando abras otro local verás aquí cuál vende más, su ticket promedio y su plato estrella, lado a lado.</small></div></div>
+              }
+            } @else {
+              <div class="rp-skeleton"><i class="ui-skeleton"></i><i class="ui-skeleton"></i><i class="ui-skeleton"></i></div>
+            }
+          </section>
+        }
+      }
+      <p class="rp-foot">Control interno: no sustituye comprobantes fiscales ni conciliación con bancos o pasarelas. Zona horaria {{ data.timezone }}.</p>
+    }
+  </div>
+</app-shell>

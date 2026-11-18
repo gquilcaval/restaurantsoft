@@ -1,0 +1,5 @@
+// Comparativo entre sucursales.
+.branch-comparison > header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.branch-bar { display: block; height: 5px; margin-top: 5px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.branch-bar i { display: block; height: 100%; background: var(--brand); }
+.branch-total td { border-top: 2px solid var(--border); }

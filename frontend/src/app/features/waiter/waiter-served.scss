@@ -1,0 +1,23 @@
+// Mesero a cargo: etiqueta en cada mesa, fila en el detalle y selector para pasar la mesa.
+.mz-served { --hue: 210; flex-shrink: 0; min-width: 22px; height: 22px; display: inline-grid; place-items: center; margin-left: 8px; padding: 0 6px; border-radius: 999px; color: #fff; background: hsl(var(--hue) 55% 48%); font-size: .62rem; font-weight: 800; white-space: nowrap; }
+.mz-served.mine { padding: 0 8px; color: var(--on-brand, #04110a); background: var(--brand); }
+.mz-served.none { color: var(--warn); background: color-mix(in srgb, var(--warn) 18%, transparent); }
+.mz-served.away { opacity: .55; }
+.mz-served-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.mz-served-who { --hue: 210; display: inline-flex; align-items: center; gap: 8px; margin-right: auto; }
+.mz-served-who > i { width: 34px; height: 34px; display: grid; place-items: center; flex-shrink: 0; border-radius: 50%; color: #fff; background: hsl(var(--hue) 55% 48%); font: 800 .72rem var(--font-display); font-style: normal; }
+.mz-served-who.none > i { color: var(--warn); background: color-mix(in srgb, var(--warn) 18%, transparent); }
+.mz-served-who > span { display: grid; line-height: 1.2; }
+.mz-served-who small { color: var(--muted); font-size: .68rem; font-weight: 700; }
+.mz-served-who b { font-size: .9rem; }
+.mz-served-who em { margin-left: 6px; color: var(--warn); font-size: .7rem; font-style: normal; font-weight: 750; }
+.mz-served-btn { height: 36px; padding: 0 14px; border: 0; border-radius: 999px; color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); font-size: .8rem; font-weight: 750; }
+.mz-served-btn.primary { color: var(--on-brand, #04110a); background: var(--brand); }
+.mz-served-btn:disabled { opacity: .5; }
+.mz-picker { display: grid; gap: 4px; margin-top: 8px; padding: 6px; border-radius: 18px; background: color-mix(in srgb, var(--text) 5%, transparent); animation: mz-picker-in .22s var(--ease-out); }
+.mz-picker button { --hue: 210; display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border: 0; border-radius: 14px; color: var(--text); background: transparent; text-align: left; font: inherit; }
+.mz-picker button:hover:not(:disabled) { background: color-mix(in srgb, var(--text) 7%, transparent); }
+.mz-picker button.off { opacity: .55; }
+.mz-picker i { width: 32px; height: 32px; display: grid; place-items: center; flex-shrink: 0; border-radius: 50%; color: #fff; background: hsl(var(--hue) 55% 48%); font: 800 .7rem var(--font-display); font-style: normal; }
+.mz-picker span { display: grid; } .mz-picker b { font-size: .88rem; } .mz-picker small { color: var(--muted); font-size: .72rem; }
+@keyframes mz-picker-in { from { opacity: 0; transform: translateY(-4px); } }

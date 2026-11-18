@@ -1,0 +1,297 @@
+// Sistema de diseño de RestOS: escalas fijas y piezas comunes reutilizadas por todas las pantallas.
+:root {
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px;
+  --radius-sm: 8px; --radius: 12px; --radius-lg: 16px; --radius-xl: 24px;
+  --shadow-sm: 0 2px 8px var(--shadow-color); --shadow: 0 8px 22px var(--shadow-color); --shadow-lg: 0 24px 60px var(--shadow-color);
+  --text-xs: .72rem; --text-sm: .82rem; --text-md: .95rem; --text-lg: 1.15rem; --text-xl: 1.6rem; --text-2xl: 2.2rem;
+  --ease-out: cubic-bezier(.2, .9, .3, 1); --ease-spring: cubic-bezier(.2, 1.3, .4, 1);
+  --dur-fast: 180ms; --dur: 320ms; --dur-slow: 480ms;
+  // Colores con significado: listo, atención, urgente, información y cuenta.
+  --ok: var(--green); --ok-soft: var(--green-soft); --warn: var(--orange); --warn-soft: var(--orange-soft);
+  --bad: var(--danger); --bad-soft: var(--danger-soft); --bill: #7c5cc4; --bill-soft: #efe9fa;
+}
+:root[data-theme='dark'] { --bill: #b79cf2; --bill-soft: #2a2238; }
+@media (prefers-color-scheme: dark) { :root[data-theme='system'] { --bill: #b79cf2; --bill-soft: #2a2238; } }
+body { font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
+
+// Control segmentado (vistas, períodos, pestañas).
+.seg { display: inline-flex; flex-wrap: wrap; gap: 3px; padding: 3px; border-radius: var(--radius); background: var(--surface-2); border: 1px solid var(--border); }
+.seg > button {
+  display: inline-flex; align-items: center; gap: 6px; border: 0; border-radius: calc(var(--radius) - 3px); padding: 7px 12px;
+  background: transparent; color: var(--muted); font-weight: 750; font-size: var(--text-sm);
+  transition: background var(--dur-fast), color var(--dur-fast), box-shadow var(--dur-fast);
+}
+.seg > button:hover { color: var(--text); }
+.seg > button.active, .seg > button[aria-pressed='true'], .seg > button[aria-selected='true'] { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+.seg > button > b, .count-badge {
+  min-width: 20px; height: 20px; padding: 0 6px; display: inline-grid; place-items: center; border-radius: 999px;
+  background: var(--brand); color: #fff; font-size: .68rem; font-weight: 850;
+}
+.seg.lg > button { padding: 10px 14px; font-size: var(--text-md); }
+
+// Pastillas de filtro.
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); font-weight: 700; font-size: var(--text-sm); transition: border-color var(--dur-fast), background var(--dur-fast);
+}
+.chip:hover { border-color: color-mix(in srgb, var(--brand) 50%, var(--border)); }
+.chip.active, .chip[aria-pressed='true'] { border-color: var(--brand); background: var(--brand-soft); }
+
+// Botón de ícono sin fondo.
+.icon-btn {
+  width: 36px; height: 36px; display: inline-grid; place-items: center; border: 0; border-radius: var(--radius-sm);
+  background: transparent; color: var(--muted); transition: background var(--dur-fast), color var(--dur-fast);
+}
+.icon-btn:hover { background: var(--surface-2); color: var(--text); }
+.icon-btn.danger:hover { color: var(--bad); background: var(--bad-soft); }
+
+// Estado vacío y esqueleto de carga.
+.ui-empty { display: grid; justify-items: center; gap: var(--space-2); padding: var(--space-6) var(--space-4); border-radius: var(--radius-lg); border: 1px dashed var(--border); text-align: center; color: var(--muted); }
+.ui-empty > app-icon, .ui-empty > .ui-empty-icon { width: 52px; height: 52px; display: grid; place-items: center; border-radius: var(--radius-lg); background: var(--brand-soft); color: var(--brand-accent); }
+.ui-empty strong { color: var(--text); font-size: var(--text-md); }
+.ui-empty p { margin: 0; max-width: 340px; font-size: var(--text-sm); }
+.ui-skeleton { border-radius: var(--radius-sm); background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%); background-size: 200% 100%; animation: ui-shimmer 1.3s linear infinite; }
+@keyframes ui-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+// Ritmo de animación: nada decorativo se repite sin fin si el usuario prefiere menos movimiento.
+@media (prefers-reduced-motion: reduce) { .ui-skeleton { animation: none; } }
+:is(.primary, .secondary, .chip):has(> app-icon) { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+
+// ——— RestOS Glass ———
+:root {
+  --glass: color-mix(in srgb, var(--surface) 62%, transparent);
+  --glass-strong: color-mix(in srgb, var(--surface) 82%, transparent);
+  --glass-hover: color-mix(in srgb, var(--surface) 55%, transparent);
+  --glass-border: color-mix(in srgb, var(--border) 55%, transparent);
+  --glass-edge: rgba(255, 255, 255, .6);
+  --glass-blur: blur(22px) saturate(170%);
+  --glass-shadow: 0 12px 40px var(--shadow-color), inset 0 1px 0 var(--glass-edge);
+}
+:root[data-theme='dark'] { --glass-edge: rgba(255, 255, 255, .07); --glass: color-mix(in srgb, var(--surface) 58%, transparent); }
+@media (prefers-color-scheme: dark) { :root[data-theme='system'] { --glass-edge: rgba(255, 255, 255, .07); --glass: color-mix(in srgb, var(--surface) 58%, transparent); } }
+// Modo sólido: equipos modestos o quien prefiere menos transparencia.
+:root.solid-ui { --glass: var(--surface); --glass-strong: var(--surface); --glass-hover: var(--surface-2); --glass-border: var(--border); --glass-blur: none; --glass-shadow: none; }
+@media (prefers-reduced-transparency: reduce) { :root { --glass: var(--surface); --glass-strong: var(--surface); --glass-blur: none; } }
+// Fondo vivo: halos de color que se mueven despacio; el vidrio necesita color detrás.
+body:has(app-shell) { background: var(--bg); }
+body:has(app-shell)::before {
+  content: ''; position: fixed; inset: -12%; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(38vw 38vw at 8% 6%, color-mix(in srgb, var(--brand) 34%, transparent), transparent 62%),
+    radial-gradient(34vw 34vw at 96% 18%, color-mix(in srgb, #4f8cff 30%, transparent), transparent 62%),
+    radial-gradient(36vw 36vw at 55% 108%, color-mix(in srgb, #a46bff 26%, transparent), transparent 62%),
+    radial-gradient(20vw 20vw at 82% 82%, color-mix(in srgb, #ffb347 20%, transparent), transparent 62%);
+  animation: wall-drift 28s ease-in-out infinite alternate;
+}
+@keyframes wall-drift { to { transform: translate(3vw, -2vw) scale(1.08) rotate(2deg); } }
+@media (prefers-reduced-motion: reduce) { body:has(app-shell)::before { animation: none; } }
+:root.solid-ui body:has(app-shell)::before { display: none; }
+.app-toast, .app-dialog, .qr-dialog { background: var(--glass-strong); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); box-shadow: var(--shadow-lg), inset 0 1px 0 var(--glass-edge); }
+.modal-backdrop { -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+:root.solid-ui .modal-backdrop { backdrop-filter: none; }
+body app-shell .shell > main > .page-content { padding-top: 106px !important; scroll-padding-top: 106px; }
+@media (max-width: 900px) { body app-shell .shell > main > .page-content { padding-top: 98px !important; scroll-padding-top: 98px; } }
+
+// ——— Tipografía con carácter: títulos y cifras grandes ———
+:root { --font-display: 'Plus Jakarta Sans', Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+h1, h2, h3, .lp-hero h1,
+:is(.metric-card, .tv-kpi, .tv-clock, .lp-price, .wt-position, .tv-replay-clock) strong, .goal-percent, .bill-total strong, .wl-pos {
+  font-family: var(--font-display); letter-spacing: -.015em;
+}
+
+
+// ——— Color de la zona como identidad del mesero ———
+body.zone-tinted:has(app-shell) {
+  background:
+    radial-gradient(70vw 55vh at 50% -15%, color-mix(in srgb, var(--zone-tint) 24%, transparent), transparent 65%),
+    radial-gradient(45vw 45vw at 105% 110%, color-mix(in srgb, var(--zone-tint) 12%, transparent), transparent 60%), var(--bg);
+  background-attachment: fixed;
+}
+body.zone-tinted app-shell main > header { box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--zone-tint) 70%, transparent); }
+:root.solid-ui body.zone-tinted:has(app-shell) { background: linear-gradient(180deg, color-mix(in srgb, var(--zone-tint) 8%, var(--bg)), var(--bg) 40%); }
+
+// Cocina: si arriba hay meta, estaciones y alertas, la pantalla se desplaza y las columnas conservan altura útil.
+
+
+// ——— Vidrio líquido (.lg): translúcido, borde especular y brillo que sigue al puntero ———
+.lg {
+  position: relative; isolation: isolate; border-radius: 28px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--surface) 48%, transparent), color-mix(in srgb, var(--surface) 24%, transparent));
+  -webkit-backdrop-filter: blur(28px) saturate(190%); backdrop-filter: blur(28px) saturate(190%);
+  box-shadow: inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 rgba(255, 255, 255, .04), 0 22px 56px var(--shadow-color);
+}
+.lg::before {
+  content: ''; position: absolute; inset: 0; z-index: 3; padding: 1.2px; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(140deg, rgba(255, 255, 255, .7), rgba(255, 255, 255, .08) 35%, rgba(255, 255, 255, .02) 62%, rgba(255, 255, 255, .32));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.lg::after {
+  content: ''; position: absolute; inset: 0; z-index: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .35s;
+  background: radial-gradient(300px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, .13), transparent 60%);
+}
+.lg:hover::after { opacity: 1; }
+.lg > * { position: relative; z-index: 1; }
+:root.solid-ui .lg { background: var(--surface); backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: 0 1px 0 var(--border), 0 10px 24px var(--shadow-color); }
+:root.solid-ui .lg::before, :root.solid-ui .lg::after { display: none; }
+// Las tarjetas de cada módulo: vidrio más opaco para que tablas y montos se lean bien.
+body:has(app-shell) :is(.panel, .management-panel, .metric-card) {
+  background: var(--glass-strong); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+  border-color: var(--glass-border); box-shadow: inset 0 1px 0 var(--glass-edge), 0 12px 32px var(--shadow-color);
+}
+:root.no-glow .lg::after { display: none; }
+
+// ——— Elevación tipo Material (cardElevation): sombras en capas, sin bordes de luz ———
+:root {
+  --elev-1: 0 1px 2px rgba(0, 0, 0, .14), 0 1px 3px 1px rgba(0, 0, 0, .08);
+  --elev-2: 0 1px 2px rgba(0, 0, 0, .16), 0 2px 6px 2px rgba(0, 0, 0, .09);
+  --elev-3: 0 4px 8px 3px rgba(0, 0, 0, .10), 0 1px 3px rgba(0, 0, 0, .16);
+  --elev-4: 0 6px 10px 4px rgba(0, 0, 0, .12), 0 2px 3px rgba(0, 0, 0, .16);
+  --elev-5: 0 10px 18px 6px rgba(0, 0, 0, .14), 0 4px 6px rgba(0, 0, 0, .18);
+}
+:root[data-theme='dark'] {
+  --elev-1: 0 1px 2px rgba(0, 0, 0, .5), 0 1px 3px 1px rgba(0, 0, 0, .3);
+  --elev-2: 0 1px 2px rgba(0, 0, 0, .55), 0 2px 6px 2px rgba(0, 0, 0, .35);
+  --elev-3: 0 4px 8px 3px rgba(0, 0, 0, .38), 0 1px 3px rgba(0, 0, 0, .55);
+  --elev-4: 0 6px 10px 4px rgba(0, 0, 0, .42), 0 2px 3px rgba(0, 0, 0, .55);
+  --elev-5: 0 10px 18px 6px rgba(0, 0, 0, .48), 0 4px 6px rgba(0, 0, 0, .6);
+}
+@media (prefers-color-scheme: dark) { :root[data-theme='system'] {
+  --elev-1: 0 1px 2px rgba(0, 0, 0, .5), 0 1px 3px 1px rgba(0, 0, 0, .3);
+  --elev-2: 0 1px 2px rgba(0, 0, 0, .55), 0 2px 6px 2px rgba(0, 0, 0, .35);
+  --elev-3: 0 4px 8px 3px rgba(0, 0, 0, .38), 0 1px 3px rgba(0, 0, 0, .55);
+  --elev-4: 0 6px 10px 4px rgba(0, 0, 0, .42), 0 2px 3px rgba(0, 0, 0, .55);
+  --elev-5: 0 10px 18px 6px rgba(0, 0, 0, .48), 0 4px 6px rgba(0, 0, 0, .6);
+} }
+// Sin bordes ni brillos blancos en ningún vidrio.
+:root, :root[data-theme] { --glass-edge: transparent !important; --glass-border: transparent !important; }
+.lg::before { display: none !important; }
+.lg { box-shadow: var(--elev-2); transition: box-shadow .3s var(--ease-out), transform .45s var(--ease-spring); }
+body:has(app-shell) :is(.panel, .management-panel, .metric-card) { border-color: transparent; box-shadow: var(--elev-1); }
+.app-toast, .app-dialog, .qr-dialog { box-shadow: var(--elev-5); }
+
+// Elevación difuminada: sombras amplias y suaves, sin línea de contacto nítida.
+:root {
+  --elev-1: 0 4px 18px rgba(15, 23, 20, .05);
+  --elev-2: 0 8px 32px rgba(15, 23, 20, .07);
+  --elev-3: 0 12px 40px rgba(15, 23, 20, .09);
+  --elev-4: 0 18px 54px rgba(15, 23, 20, .12);
+  --elev-5: 0 26px 70px rgba(15, 23, 20, .16);
+}
+:root[data-theme='dark'] {
+  --elev-1: 0 6px 24px rgba(0, 0, 0, .22);
+  --elev-2: 0 10px 38px rgba(0, 0, 0, .28);
+  --elev-3: 0 14px 46px rgba(0, 0, 0, .32);
+  --elev-4: 0 22px 60px rgba(0, 0, 0, .38);
+  --elev-5: 0 30px 80px rgba(0, 0, 0, .45);
+}
+@media (prefers-color-scheme: dark) { :root[data-theme='system'] {
+  --elev-1: 0 6px 24px rgba(0, 0, 0, .22);
+  --elev-2: 0 10px 38px rgba(0, 0, 0, .28);
+  --elev-3: 0 14px 46px rgba(0, 0, 0, .32);
+  --elev-4: 0 22px 60px rgba(0, 0, 0, .38);
+  --elev-5: 0 30px 80px rgba(0, 0, 0, .45);
+} }
+
+// Tarjetas internas de los módulos: sin un segundo fondo encima del vidrio (evita rectángulos de otro tono).
+body:has(app-shell) :is(.supplier-card, .reservation-card, .setup-step, .team-award, .management-note:not(.error), .forecast-row, .wl-card, .fe-template, .split-row) {
+  background: transparent !important; box-shadow: none !important; border-color: transparent !important;
+}
+body:has(app-shell) :is(.supplier-card, .reservation-card, .setup-step, .wl-card) { border-bottom: 0; }
+
+// Sombras contenidas: su difuminado no supera el margen del área de contenido (evita bordes rectos recortados).
+:root {
+  --elev-1: 0 3px 12px rgba(15, 23, 20, .05);
+  --elev-2: 0 5px 18px rgba(15, 23, 20, .07);
+  --elev-3: 0 7px 20px rgba(15, 23, 20, .09);
+  --elev-4: 0 9px 22px rgba(15, 23, 20, .11);
+  --elev-5: 0 24px 60px rgba(15, 23, 20, .16);
+}
+:root[data-theme='dark'] {
+  --elev-1: 0 2px 10px rgba(0, 0, 0, .14);
+  --elev-2: 0 4px 14px rgba(0, 0, 0, .18);
+  --elev-3: 0 6px 18px rgba(0, 0, 0, .22);
+  --elev-4: 0 8px 20px rgba(0, 0, 0, .26);
+  --elev-5: 0 24px 60px rgba(0, 0, 0, .45);
+}
+@media (prefers-color-scheme: dark) { :root[data-theme='system'] {
+  --elev-1: 0 2px 10px rgba(0, 0, 0, .14);
+  --elev-2: 0 4px 14px rgba(0, 0, 0, .18);
+  --elev-3: 0 6px 18px rgba(0, 0, 0, .22);
+  --elev-4: 0 8px 20px rgba(0, 0, 0, .26);
+  --elev-5: 0 24px 60px rgba(0, 0, 0, .45);
+} }
+// La barra superior flota sin proyectar sombra sobre el contenido.
+body:has(app-shell) main > header.lg { box-shadow: none; }
+
+// Modo oscuro con elevación tonal (Material): sin sombras proyectadas, que oscurecían y se recortaban en el área de contenido.
+// Una tarjeta más elevada se ve levemente más clara; al pasar el mouse se aclara un poco más.
+:root[data-theme='dark'] { --elev-1: none; --elev-2: none; --elev-3: none; --elev-4: none; }
+@media (prefers-color-scheme: dark) { :root[data-theme='system'] { --elev-1: none; --elev-2: none; --elev-3: none; --elev-4: none; } }
+:root[data-theme='dark'] body:has(app-shell) :is(.lg, .panel, .management-panel, .metric-card):hover { box-shadow: inset 0 0 0 999px rgba(255, 255, 255, .025); }
+@media (prefers-color-scheme: dark) { :root[data-theme='system'] body:has(app-shell) :is(.lg, .panel, .management-panel, .metric-card):hover { box-shadow: inset 0 0 0 999px rgba(255, 255, 255, .025); } }
+
+// Elevación de las barras flotantes (riel lateral y barra superior): mayor que la de las tarjetas.
+:root { --elev-bar: 0 10px 30px rgba(15, 23, 20, .10), 0 2px 8px rgba(15, 23, 20, .05); --bar-tint: 0%; }
+:root[data-theme='dark'] { --elev-bar: 0 14px 36px rgba(0, 0, 0, .38), 0 3px 10px rgba(0, 0, 0, .22); --bar-tint: 7%; }
+@media (prefers-color-scheme: dark) { :root[data-theme='system'] { --elev-bar: 0 14px 36px rgba(0, 0, 0, .38), 0 3px 10px rgba(0, 0, 0, .22); --bar-tint: 7%; } }
+// Barras en modo oscuro: aclarado tonal más sutil.
+:root[data-theme='dark'] { --bar-tint: 2.5%; }
+@media (prefers-color-scheme: dark) { :root[data-theme='system'] { --bar-tint: 2.5%; } }
+
+// Modo TV: el plano y la meta van directo sobre el vidrio, sin rectángulos de otro tono.
+.tv .fp-svg { background-color: transparent !important; border-color: transparent !important; }
+.tv .goal {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--surface) 48%, transparent), color-mix(in srgb, var(--surface) 24%, transparent)) !important;
+  border: 0 !important; box-shadow: var(--elev-2) !important; border-radius: 28px !important; padding: 18px 24px !important;
+}
+.tv .tv-insight { background: transparent !important; padding: 0 !important; color: var(--warn); }
+/* Mostrador: el tablero ocupa el alto disponible y cada columna tiene su propio scroll. */
+body app-shell .shell > main > .page-content:has(.cn-layout) { display: flex; flex-direction: column; overflow: hidden; }
+@media (max-width: 860px) { body app-shell .shell > main > .page-content:has(.cn-layout) { display: block; overflow-y: auto; } }
+body app-shell .shell > main > .page-content:has(.rv-layout) { display: flex; flex-direction: column; overflow: hidden; }
+@media (max-width: 860px) { body app-shell .shell > main > .page-content:has(.rv-layout) { display: block; overflow-y: auto; } body:has(.w-dock) .rv-fab { bottom: calc(max(12px, env(safe-area-inset-bottom)) + 82px) !important; } }
+body app-shell .shell > main > .page-content:has(.wl) { display: flex; flex-direction: column; overflow: hidden; }
+body app-shell .shell > main > .page-content:has(.mn-layout) { display: flex; flex-direction: column; overflow: hidden; }
+body app-shell .shell > main > .page-content:has(.iv) { display: flex; flex-direction: column; overflow: hidden; }
+body app-shell .shell > main > .page-content:has(.fe-layout) { display: flex; flex-direction: column; overflow: hidden; }
+body app-shell .shell > main > .page-content:has(.st) { display: flex; flex-direction: column; overflow: hidden; }
+body app-shell .shell > main > .page-content:has(.su) { display: flex; flex-direction: column; overflow: hidden; }
+body app-shell .shell > main > .page-content:has(.au) { display: flex; flex-direction: column; overflow: hidden; }
+
+/* Barra superior en celular: menú, título con estado y acciones redondas del mismo tamaño. */
+app-shell .ico-menu { display: none; }
+@media (max-width: 900px) {
+  app-shell .sidebar-toggle .ico-panel { display: none; }
+  app-shell .sidebar-toggle .ico-menu { display: block; }
+}
+@media (max-width: 620px) {
+  body app-shell main > header { height: 60px !important; margin: 8px 8px 0 !important; padding: 0 8px 0 8px !important; gap: 8px !important; border-radius: 22px !important; }
+  body app-shell main > header .header-leading { gap: 10px !important; }
+  body app-shell main > header h1 { margin: 0 !important; font-size: 1.04rem !important; font-weight: 750 !important; line-height: 1.15 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+  body app-shell main > header .eyebrow { display: block !important; max-width: 240px !important; margin: 1px 0 0 !important; color: var(--muted) !important; font-size: .66rem !important; font-weight: 700 !important; letter-spacing: 0 !important; text-transform: none !important; order: 2 !important; }
+  body app-shell main > header .header-leading > div { display: flex !important; flex-direction: column !important; }
+  body app-shell main > header .header-actions { gap: 6px !important; }
+  body app-shell main > header :is(.sidebar-toggle, .icon-button, .notification-bell) {
+    width: 40px !important; height: 40px !important; border: 0 !important; border-radius: 50% !important; color: var(--text) !important; background: color-mix(in srgb, var(--text) 7%, transparent) !important; box-shadow: none !important;
+  }
+  body app-shell main > header .notification-bell span { top: -2px !important; right: -2px !important; min-width: 18px !important; height: 18px !important; padding: 0 5px !important; font-size: .6rem !important; box-shadow: 0 0 0 2px var(--surface) !important; }
+  body app-shell main > header .user-menu .user-chip { padding: 0 !important; border: 0 !important; background: transparent !important; }
+  body app-shell main > header .user-menu .user-chip > span { width: 40px !important; height: 40px !important; border: 0 !important; border-radius: 50% !important; color: var(--on-brand, #fff) !important; font-size: .78rem !important; font-weight: 800 !important; background: var(--brand) !important; box-shadow: 0 4px 12px color-mix(in srgb, var(--brand) 30%, transparent) !important; }
+  body:has(.waiter-layout) app-shell main > header .eyebrow { display: flex !important; align-items: center !important; gap: 6px !important; }
+  body:has(.waiter-layout) app-shell main > header .eyebrow::before { content: '' !important; width: 7px !important; height: 7px !important; flex-shrink: 0 !important; border-radius: 50% !important; background: #3fbf2a !important; box-shadow: 0 0 0 3px rgba(63, 191, 42, .2) !important; }
+  body:has(.waiter-top-connection.offline) app-shell main > header .eyebrow::before { background: #ef5d55 !important; box-shadow: 0 0 0 3px rgba(239, 93, 85, .2) !important; }
+  body app-shell main > header .notification-bell svg { width: 20px !important; height: 20px !important; fill: none !important; stroke: currentColor !important; stroke-width: 1.8 !important; }
+  body app-shell .waiter-top-connection { display: none !important; }
+  body app-shell main > header .notification-bell { display: none !important; }
+  body app-shell main > .page-content { padding-top: 78px !important; }
+}
+@media (max-width: 860px) { body:has(.w-dock) .cn-fab { bottom: calc(max(12px, env(safe-area-inset-bottom)) + 82px) !important; } }
+
+/* Alertas en celular: sin franja lateral; el tono lo da el ícono. */
+@media (max-width: 620px) {
+  body .app-toast { border-left: 0 !important; background: color-mix(in srgb, var(--surface) 94%, transparent) !important; box-shadow: 0 14px 34px rgba(0, 0, 0, .35) !important; }
+  body .app-toast.success .notification-symbol { color: #fff; background: #3fbf2a; }
+  body .app-toast.error .notification-symbol { color: #fff; background: #ef5d55; }
+  body .app-toast.warning .notification-symbol { color: #1a1300; background: #f5b301; }
+  body .app-toast.info .notification-symbol { color: #fff; background: #4f8cff; }
+}

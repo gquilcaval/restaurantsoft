@@ -1,0 +1,18 @@
+// Cifras compactas del Modo TV.
+.tv-kpi-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.tv-kpi {
+  display: flex; align-items: center; gap: 13px; min-width: 0; padding: 16px 18px; border-radius: 22px;
+  transition: transform .4s var(--ease-spring); animation: tv-rise .5s var(--ease-spring) backwards;
+}
+.tv-kpi:hover { transform: translateY(-2px); }
+.tv-kpi:nth-child(2) { animation-delay: 50ms; } .tv-kpi:nth-child(3) { animation-delay: 100ms; } .tv-kpi:nth-child(4) { animation-delay: 150ms; }
+.tv-kpi:nth-child(5) { animation-delay: 200ms; } .tv-kpi:nth-child(6) { animation-delay: 250ms; }
+.tv-kpi > div { display: grid; min-width: 0; }
+.tv-kpi b { font: 800 clamp(1.3rem, 2vw, 1.75rem) var(--font-display); letter-spacing: -.02em; white-space: nowrap; }
+.tv-kpi b em { font-style: normal; color: var(--muted); font-size: .6em; }
+.tv-kpi.warn b { color: var(--bad); }
+.tv-dot { width: 44px; height: 44px; flex-shrink: 0; display: grid; place-items: center; border-radius: 15px; font-size: 1.2rem; }
+.tv-dot.blue { background: rgba(79, 140, 255, .24); } .tv-dot.violet { background: rgba(164, 107, 255, .24); } .tv-dot.green { background: rgba(68, 214, 44, .22); }
+.tv-dot.amber { background: rgba(255, 179, 71, .24); } .tv-dot.red { background: rgba(255, 95, 109, .22); } .tv-dot.gold { background: rgba(255, 200, 80, .24); }
+.tv-chip { margin-left: auto; font-style: normal; font-weight: 800; font-size: .76rem; color: var(--muted); white-space: nowrap; }
+.tv-chip.up { color: var(--ok); } .tv-chip.down { color: var(--bad); }

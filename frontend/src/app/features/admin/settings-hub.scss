@@ -1,0 +1,33 @@
+// Centro de ajustes: menú de secciones, encabezado, listas y fichas.
+.st { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 16px; flex: 1; min-height: 0; }
+.st-nav { display: flex; flex-direction: column; gap: 4px; min-height: 0; padding: 10px; border-radius: 24px; overflow-y: auto; }
+.st-nav button { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 9px 10px; border: 0; border-radius: 16px; text-align: left; color: var(--text); background: transparent; transition: background .2s; }
+.st-nav button:hover { background: color-mix(in srgb, var(--text) 5%, transparent); }
+.st-nav button.on { background: color-mix(in srgb, var(--brand) 15%, transparent); }
+.st-nav-ico { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 12px; color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); }
+.st-nav button.on .st-nav-ico { color: var(--on-brand, #04110a); background: var(--brand); }
+.st-nav-text { display: grid; gap: 1px; min-width: 0; } .st-nav-text strong { font: 750 .9rem var(--font-display); }
+.st-nav-text small { color: var(--muted); font-size: .7rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.st-nav button > b { min-width: 24px; padding: 1px 7px; border-radius: 999px; text-align: center; font: 800 .74rem var(--font-display); background: color-mix(in srgb, var(--text) 8%, transparent); }
+.st-nav-tip { margin: auto 6px 4px; padding-top: 12px; color: var(--muted); font-size: .72rem; line-height: 1.45; } .st-nav-tip b { color: var(--text); }
+.st-main { display: flex; flex-direction: column; gap: 14px; min-height: 0; animation: st-in .3s var(--ease-out); }
+.st-head { display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; flex-shrink: 0; }
+.st-head > div { flex: 1 1 320px; min-width: 0; } .st-head h2 { margin: 0; font: 800 1.35rem var(--font-display); letter-spacing: -.02em; }
+.st-head p { margin: 3px 0 0; color: var(--muted); font-size: .84rem; line-height: 1.4; }
+.st-search { display: flex; align-items: center; gap: 8px; width: 200px; height: 40px; padding: 0 14px; border-radius: 999px; color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); }
+.st-search:focus-within { box-shadow: 0 0 0 2px var(--brand); }
+.st-search input { flex: 1; width: 100%; min-width: 0; height: 100%; border: 0; background: transparent; color: var(--text); font: inherit; font-weight: 600; outline: none; }
+.st-split { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.st-split.open { grid-template-columns: minmax(0, 1fr) 360px; }
+.st-list { min-height: 0; overflow-y: auto; padding: 12px; border-radius: 24px; scrollbar-width: thin; }
+.st-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
+.st-grid.people { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.st-tile { --zone: #8b95a7; position: relative; display: grid; gap: 4px; padding: 12px 12px 12px 15px; border: 0; border-radius: 16px; text-align: left; color: var(--text); background: color-mix(in srgb, var(--text) 4%, transparent); animation: st-in .35s var(--ease-out) var(--d) backwards; transition: background .2s, transform .3s var(--ease-spring); }
+.st-tile::before { content: ''; position: absolute; left: 6px; top: 12px; bottom: 12px; width: 3px; border-radius: 3px; background: var(--zone); }
+.st-tile:hover { transform: translateY(-2px); background: color-mix(in srgb, var(--text) 7%, transparent); }
+.st-tile.selected, .st-person.selected, .st-row-item.selected { background: color-mix(in srgb, var(--brand) 14%, transparent); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--brand) 60%, transparent); }
+.st-tile.off, .st-person.off, .st-row-item.off { opacity: .55; }
+.st-tile-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; } .st-tile-top strong { font: 750 .95rem var(--font-display); }
+.st-tile small { display: flex; align-items: center; gap: 5px; color: var(--muted); font-size: .72rem; font-weight: 600; }
+@keyframes st-in { from { opacity: 0; transform: translateY(6px); } }
+@media (max-width: 1100px) { .st { grid-template-columns: minmax(0, 1fr); } .st-nav { flex-direction: row; overflow-x: auto; } .st-nav-tip { display: none; } .st-split.open { grid-template-columns: minmax(0, 1fr); } }

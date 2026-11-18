@@ -1,0 +1,37 @@
+.bill-backdrop { position: fixed; inset: 0; z-index: 40; display: grid; align-items: end; justify-items: center; background: #0007; -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); animation: bs-fade .2s ease-out; }
+.bill-sheet {
+  width: min(560px, 100%); max-height: calc(100vh - 30px); overflow: auto; display: grid; gap: 12px; padding: 10px 20px 22px;
+  border-radius: 26px 26px 0 0; background: var(--glass-strong); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); box-shadow: inset 0 1px 0 var(--glass-edge); color: var(--text); animation: bs-up .4s cubic-bezier(.2, 1.1, .3, 1);
+}
+.bill-grip { justify-self: center; width: 42px; height: 5px; border-radius: 9px; background: var(--surface-3); }
+.bill-sheet h2 { margin: -4px 0 4px; font-size: 1.3rem; }
+.bill-sheet .eyebrow { margin: 4px 0 0; }
+.bill-options { display: grid; gap: 8px; }
+.bill-options button {
+  display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 10px; text-align: left; padding: 12px;
+  border-radius: 16px; border: 2px solid var(--border); background: var(--surface-2); color: var(--text); transition: border-color .2s, transform .2s, background .2s;
+}
+.bill-options button > span { font-size: 1.5rem; }
+.bill-options button div { display: grid; gap: 1px; }
+.bill-options small { color: var(--muted); font-size: .74rem; }
+.bill-options b { font-size: .86rem; }
+.bill-options button.active { border-color: var(--brand); background: var(--brand-soft); transform: scale(1.01); }
+.bill-detail { display: grid; gap: 6px; padding: 12px; border-radius: 14px; background: var(--surface-2); animation: bs-fade .3s ease-out; }
+.bill-detail div { display: flex; justify-content: space-between; font-size: .88rem; }
+.bill-detail div.me { font-weight: 850; color: var(--brand-accent); }
+.bill-detail p { margin: 2px 0 0; font-size: .74rem; color: var(--muted); }
+.bill-parts { display: flex; align-items: center; justify-content: center; gap: 18px; animation: bs-fade .3s ease-out; }
+.bill-parts button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font-size: 1.4rem; font-weight: 800; }
+.bill-parts strong { font-size: 1.6rem; min-width: 120px; text-align: center; }
+.bill-parts small { font-size: .8rem; color: var(--muted); }
+.bill-label { margin: 4px 0 0; font-weight: 800; font-size: .88rem; }
+.bill-tips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.bill-tips button { display: grid; gap: 1px; padding: 10px 4px; border-radius: 13px; border: 2px solid var(--border); background: var(--surface-2); color: var(--text); transition: transform .15s, border-color .2s; }
+.bill-tips button.active { border-color: var(--brand); background: var(--brand-soft); transform: translateY(-2px); }
+.bill-tips small { font-size: .68rem; color: var(--muted); }
+.bill-total { display: flex; justify-content: space-between; align-items: baseline; padding-top: 10px; border-top: 1px dashed var(--border); }
+.bill-total strong { font-size: 1.4rem; }
+.bill-submit { min-height: 50px; font-size: 1rem; }
+.bill-cancel { border: 0; background: transparent; color: var(--muted); font-weight: 700; padding: 6px; }
+@keyframes bs-up { from { transform: translateY(100%); } }
+@keyframes bs-fade { from { opacity: 0; } }

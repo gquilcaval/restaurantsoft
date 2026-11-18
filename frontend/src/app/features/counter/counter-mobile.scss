@@ -1,0 +1,22 @@
+// Mostrador en celular: una etapa a la vez, botón flotante para crear y el pedido como hoja deslizable.
+@media (max-width: 860px) {
+  .cn-new, .cn-channel-tabs, .cn-flow { display: none !important; }
+  .cn-navrow { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .cn-stage-tabs { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+  .cn-stage-tabs button { justify-content: center; padding: 0 6px; font-size: .78rem; white-space: nowrap; }
+  .cn-due { display: none !important; }
+  .cn-col-off { display: none !important; }
+  .cn-col-head { display: none; }
+  .cn-col { padding: 0; background: transparent !important; box-shadow: none !important; }
+  .cn, .cn-layout, .cn-board, .cn-col, .cn-col-list { min-height: auto; flex: none; overflow: visible; }
+  .cn-fab { position: fixed; right: 18px; bottom: calc(max(12px, env(safe-area-inset-bottom)) + 18px); z-index: 45; display: grid; place-items: center; width: 58px; height: 58px; border: 0; border-radius: 20px; color: var(--on-brand, #fff); background: var(--brand); box-shadow: 0 12px 28px color-mix(in srgb, var(--brand) 40%, transparent), 0 4px 10px rgba(0, 0, 0, .25); }
+  .cn-fab:active { transform: scale(.94); }
+  .cn-sheet-backdrop { position: fixed; inset: 0; z-index: 85; display: block; border: 0; background: rgba(5, 7, 6, .5); }
+  .cn-detail { display: none !important; }
+  .cn-detail.open { position: fixed; left: 0; right: 0; bottom: 0; z-index: 86; display: flex !important; max-height: 88dvh; padding: 18px 16px 0; border-radius: 26px 26px 0 0; background: var(--surface) !important; -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: 0 -20px 50px rgba(0, 0, 0, .35); animation: cn-up .3s cubic-bezier(.2, 1, .4, 1); }
+  .cn-detail.open .cn-detail-actions { position: sticky; bottom: 0; margin: 0 -16px; padding: 12px 16px max(14px, env(safe-area-inset-bottom)); background: var(--surface); box-shadow: 0 -10px 22px rgba(0, 0, 0, .14); }
+}
+@media (max-width: 620px) {
+  body .cn-tabs { max-width: 100%; }
+}
+@keyframes cn-up { from { transform: translateY(100%); } }

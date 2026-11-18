@@ -1,0 +1,5 @@
+// Resumen: mesero a cargo en cada mesa del salón y mesas por mesero.
+.rs-table { position: relative; }
+.rs-waiter { --hue: 210; position: absolute; right: -5px; bottom: -5px; min-width: 18px; height: 18px; display: grid; place-items: center; padding: 0 3px; border-radius: 999px; color: #fff; background: hsl(var(--hue) 55% 48%); box-shadow: 0 0 0 2px var(--surface); font-size: .5rem; font-style: normal; font-weight: 800; }
+.rs-waiter.none { background: var(--warn); }
+.rs-load { display: block; margin-top: 10px; }

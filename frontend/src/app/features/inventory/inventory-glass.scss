@@ -1,0 +1,23 @@
+// Pestaña «Hoy»: dos paneles de vidrio que llenan el alto, cada uno con su scroll.
+:host { display: flex; flex: 1; min-height: 0; }
+.insights { flex: 1; min-height: 0; margin: 0 !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+.insight-panel { min-height: 0; display: flex; flex-direction: column; padding: 18px; border-radius: 24px; }
+.insight-panel > header { flex-shrink: 0; }
+.insight-panel .eyebrow { margin: 0 0 2px; color: var(--muted); font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+.insight-panel h2 { display: flex; align-items: center; gap: 6px; font: 800 1.15rem var(--font-display) !important; }
+.insight-scroll { flex: 1; min-height: 0; overflow-y: auto; margin: 0 -8px; padding: 0 8px; scrollbar-width: thin; }
+.forecast-row { border-top: 0 !important; padding: 9px 6px !important; border-radius: 14px; }
+.forecast-row:hover { background: color-mix(in srgb, var(--text) 4%, transparent); }
+.forecast-icon { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 11px; color: var(--warn); background: var(--warn-soft); }
+.forecast-row[data-level='OUT'] .forecast-icon { color: var(--bad); background: var(--bad-soft); }
+.forecast-bar { background: color-mix(in srgb, var(--text) 9%, transparent) !important; }
+.insight-ok { display: flex; align-items: center; gap: 8px; color: var(--ok) !important; background: var(--ok-soft) !important; }
+.supplier-card { border: 0 !important; border-radius: 18px !important; background: color-mix(in srgb, var(--text) 4%, transparent) !important; }
+.supplier-card > header strong { font: 750 .92rem var(--font-display); }
+.shopping-row { border-top: 0 !important; padding: 7px 4px !important; border-radius: 12px; }
+.shopping-qty input, .supplier-form input { height: 34px; border: 0 !important; border-radius: 10px !important; background: color-mix(in srgb, var(--text) 8%, transparent) !important; font-weight: 700; }
+.supplier-card footer { border-top: 0 !important; }
+.ins-pill { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 13px; border: 0; border-radius: 999px; font-size: .78rem; font-weight: 750; color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); }
+.ins-pill:hover { background: color-mix(in srgb, var(--text) 13%, transparent); }
+.ins-pill.wa { color: #fff; background: #25d366; } .ins-pill.wa:hover { background: #1fb959; }
+@media (max-width: 1000px) { .insights { grid-template-columns: minmax(0, 1fr) !important; } }

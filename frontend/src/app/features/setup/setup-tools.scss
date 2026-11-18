@@ -1,0 +1,20 @@
+// Botones, textos guía y vista previa de la tarjeta QR.
+.su-pill { display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 40px; padding: 0 16px; border: 0; border-radius: 999px; font-weight: 750; font-size: .84rem; color: var(--text); text-decoration: none; background: color-mix(in srgb, var(--text) 8%, transparent); transition: transform .35s var(--ease-spring), background .2s; }
+.su-pill:hover:not(:disabled) { background: color-mix(in srgb, var(--text) 13%, transparent); transform: translateY(-1px); }
+.su-pill:disabled { opacity: .5; } .su-pill.primary { color: var(--on-brand, #04110a); background: var(--brand); justify-self: start; }
+.su-intro { display: flex; align-items: flex-start; gap: 14px; } .su-intro p, .su-text { margin: 0; flex: 1; color: var(--muted); font-size: .86rem; line-height: 1.5; }
+.su-guide { display: grid; gap: 14px; max-width: 560px; padding-top: 6px; }
+.su-guide > p:first-child { margin: 0; font-size: 1rem; line-height: 1.6; }
+.su-status { display: flex; align-items: center; gap: 8px; margin: 0; padding: 10px 14px; border-radius: 14px; font-size: .84rem; font-weight: 700; color: var(--muted); background: color-mix(in srgb, var(--text) 5%, transparent); }
+.su-qr-layout { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 20px; align-items: start; }
+.su-qr-config { display: grid; gap: 14px; }
+.su-qr-preview { display: grid; gap: 8px; justify-items: center; }
+.su-qr-preview > small { color: var(--muted); font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+.su-card { width: 230px; display: grid; justify-items: center; gap: 6px; padding: 20px 16px; border-radius: 22px; text-align: center; color: #111; background: #fff; box-shadow: 0 18px 40px rgba(0, 0, 0, .25); transform: rotate(-2deg); transition: transform .4s var(--ease-spring); }
+.su-card:hover { transform: rotate(0) scale(1.03); }
+.su-card-logo { max-height: 34px; max-width: 120px; object-fit: contain; }
+.su-card-brand { font: 800 .9rem var(--font-display); }
+.su-card strong { font: 800 1.5rem var(--font-display); }
+.su-card-qr { width: 150px; height: 150px; border-radius: 8px; } .su-card-qr.empty { background: repeating-linear-gradient(45deg, #eee 0 8px, #f7f7f7 8px 16px); }
+.su-card-hint { color: #555; font-size: .72rem; line-height: 1.35; }
+@media (max-width: 1200px) { .su-qr-layout { grid-template-columns: minmax(0, 1fr); } }

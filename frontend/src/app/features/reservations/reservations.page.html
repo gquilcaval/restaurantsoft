@@ -1,0 +1,290 @@
+<app-shell title="Reservas" [eyebrow]="headerSummary()">
+  @if (tab() === 'reservations') {
+    <button shell-actions class="rv-pill primary rv-new" (click)="edit('NEW')"><app-icon name="plus" [size]="16" />Nueva reserva</button>
+  }
+  <div class="rv">
+    <div class="rv-navrow">
+      <nav class="rv-tabs" role="tablist" aria-label="Recepción">
+        <button role="tab" [attr.aria-selected]="tab() === 'reservations'" (click)="setTab('reservations')"><app-icon name="calendar" [size]="16" />Reservas</button>
+        <button role="tab" [attr.aria-selected]="tab() === 'waitlist'" (click)="setTab('waitlist')"><app-icon name="hourglass" [size]="16" />Lista de espera @if (waitingCount()) {<small>{{ waitingCount() }}</small>}</button>
+      </nav>
+      <p class="rv-purpose">{{ tab() === 'reservations' ? 'Quién viene, a qué hora y en qué mesa. Marca «Llegó» para abrir su mesa.' : 'Clientes que llegan sin reserva: avísales por WhatsApp cuando haya mesa.' }}</p>
+    </div>
+
+    @if (tab() === 'waitlist') {
+      <app-waitlist-panel (countChange)="waitingCount.set($event)" />
+    } @else {
+      <!-- Día de la agenda -->
+      <div class="lg rv-day">
+        <button class="rv-arrow" (click)="shiftDay(-1)" aria-label="Día anterior">‹</button>
+        <div class="rv-day-title"><strong>{{ dayTitle() }}</strong>@if (isToday()) {<small>Hoy</small>}</div>
+        <button class="rv-arrow" (click)="shiftDay(1)" aria-label="Día siguiente">›</button>
+        <label class="rv-date" title="Elegir fecha"><app-icon name="calendar" [size]="15" /><input type="date" [ngModel]="date()" (ngModelChange)="setDate($event)" aria-label="Elegir fecha"></label>
+        @if (!isToday()) { <button class="rv-chip" (click)="setDate(today())">Volver a hoy</button> }
+        <div class="rv-stats">
+          <span><b>{{ active().length }}</b> {{ active().length === 1 ? 'reserva' : 'reservas' }}</span>
+          <span><b>{{ guests() }}</b> personas</span>
+          @if (pendingCount()) { <span class="warn"><b>{{ pendingCount() }}</b> por confirmar</span> }
+          @if (seatedCount()) { <span class="ok"><b>{{ seatedCount() }}</b> llegaron</span> }
+        </div>
+      </div>
+
+      <nav class="rv-days" aria-label="Días">
+        @for (day of nextDays(); track day.value) {
+          <button type="button" [class.on]="date() === day.value" (click)="setDate(day.value)"><small>{{ day.top }}</small><b>{{ day.num }}</b></button>
+        }
+      </nav>
+      <div class="rv-layout">
+        <!-- Agenda del día agrupada por hora -->
+        <section class="lg rv-agenda">
+          <label class="rv-search">
+            <app-icon name="search" [size]="16" />
+            <input type="search" enterkeyhint="search" autocomplete="off" [placeholder]="isToday() ? 'Buscar por nombre o celular' : 'Buscar en este día'" [ngModel]="query()" (ngModelChange)="query.set($event)" aria-label="Buscar reserva">
+            @if (query()) { <button type="button" (click)="query.set('')" aria-label="Limpiar búsqueda"><app-icon name="x" [size]="14" /></button> }
+          </label>
+          <ng-template #row let-reservation>
+            <article class="rv-row" [class.done]="!['PENDING', 'CONFIRMED'].includes(reservation.status)" [attr.data-status]="reservation.status" [class.late]="late(reservation)" [class.selected]="selectedId() === reservation.id" (click)="select(reservation)">
+              <time>{{ timeLabel(reservation) }}@if (countdown(reservation)) {<small>{{ countdown(reservation) }}</small>}</time>
+              <div class="rv-row-main">
+                <strong>{{ reservation.customerName }}@if (reservation.customerVisits > 0) {<i class="rv-star" title="Cliente frecuente">★ {{ reservation.customerVisits }}</i>}</strong>
+                <small>
+                  <span><app-icon name="users" [size]="12" />{{ reservation.partySize }}</span>
+                  <span><app-icon name="chair" [size]="12" />{{ reservation.tableLabel || 'Mesa al llegar' }}</span>
+                  @if (query() && reservation.phone) { <span>{{ reservation.phone }}</span> }
+                  @if (reservation.zoneName) { <span>{{ reservation.zoneName }}</span> }
+                  @if (reservation.notes) { <span class="note">{{ reservation.notes }}</span> }
+                </small>
+              </div>
+              <span class="rv-status">{{ late(reservation) ? 'Retrasada' : statusLabel(reservation.status) }}</span>
+              @if (isToday() && ['PENDING', 'CONFIRMED'].includes(reservation.status)) { <button class="rv-pill primary small" [class.rv-solo]="found().length === 1" (click)="$event.stopPropagation(); startSeat(reservation)">Llegó</button> }
+            </article>
+          </ng-template>
+          <div class="rv-list">
+            @if (query().trim()) {
+              @for (reservation of found(); track reservation.id) {
+                <ng-container *ngTemplateOutlet="row; context: { $implicit: reservation }" />
+              } @empty {
+                <div class="rv-empty"><span><app-icon name="search" [size]="22" /></span><div><strong>No hay reservas con «{{ query().trim() }}»</strong><small>Prueba con otra parte del nombre o los últimos dígitos del celular.</small></div></div>
+              }
+            } @else {
+            @if (arrivingNow().length) {
+              <div class="rv-hour rv-now"><span>Llegan ahora</span><i></i><small>{{ arrivingNow().length }} {{ arrivingNow().length === 1 ? 'reserva' : 'reservas' }}</small></div>
+              @for (reservation of arrivingNow(); track reservation.id) { <ng-container *ngTemplateOutlet="row; context: { $implicit: reservation }" /> }
+            }
+            @for (group of groups(); track group.hour) {
+              <div class="rv-hour"><span>{{ group.hour }}</span><i></i><small>{{ group.items.length }} {{ group.items.length === 1 ? 'reserva' : 'reservas' }} · {{ group.guests }} pers.</small></div>
+              @for (reservation of group.items; track reservation.id) { <ng-container *ngTemplateOutlet="row; context: { $implicit: reservation }" /> }
+            } @empty {
+              @if (!arrivingNow().length) {
+              <div class="rv-empty"><span><app-icon name="calendar" [size]="24" /></span><div><strong>Sin reservas para este día</strong><small>Cuando un cliente llame o escriba, regístralo con «Nueva reserva».</small></div></div>
+              }
+            }
+            @if (closed().length) {
+              <button class="rv-closed-toggle" (click)="showClosed.set(!showClosed())">{{ showClosed() ? '▾' : '▸' }} Atendidas, canceladas y no llegaron <small>{{ closed().length }}</small></button>
+              @if (showClosed()) {
+                @for (reservation of closed(); track reservation.id) {
+                  <article class="rv-row done" [attr.data-status]="reservation.status" [class.selected]="selectedId() === reservation.id" (click)="select(reservation)">
+                    <time>{{ timeLabel(reservation) }}</time>
+                    <div class="rv-row-main"><strong>{{ reservation.customerName }}</strong><small><span><app-icon name="users" [size]="12" />{{ reservation.partySize }}</span>@if (reservation.tableLabel) {<span>{{ reservation.tableLabel }}</span>}</small></div>
+                    <span class="rv-status">{{ statusLabel(reservation.status) }}</span>
+                  </article>
+                }
+              }
+            }
+            }
+          </div>
+        </section>
+
+        <!-- Panel: detalle, formulario o elegir mesa -->
+        @if (panelOpen()) { <button class="rv-sheet-backdrop" (click)="closePanel()" aria-label="Cerrar"></button> }
+        <aside class="lg rv-panel" [class.open]="panelOpen()" [class.expanded]="sheetExpanded()" [class.sheet-dragging]="sheetDragging()"
+          [style.transform]="sheetY() > 0 ? 'translateY(' + sheetY() + 'px)' : null" [style.height]="sheetHeight() ? sheetHeight() + 'px' : null">
+          <div class="rv-sheet-drag" (pointerdown)="sheetStart($event)" (pointermove)="sheetMove($event)" (pointerup)="sheetEnd($event)" (pointercancel)="sheetEnd($event)"><span class="rv-sheet-grip" aria-hidden="true"></span></div>
+          @if (editing(); as current) {
+            <header class="rv-panel-head"><div><h2>{{ current === 'NEW' ? 'Nueva reserva' : 'Editar reserva' }}</h2></div><button class="rv-close" (click)="editing.set(null)" aria-label="Cerrar"><app-icon name="x" [size]="17" /></button></header>
+            <form class="rf" (ngSubmit)="save()">
+              <div class="rf-two">
+                <input class="rf-input" name="customerName" [(ngModel)]="customerName" maxlength="120" required placeholder="Nombre" autocomplete="off" aria-label="Nombre">
+                <input class="rf-input" name="phone" type="tel" inputmode="tel" [(ngModel)]="phone" maxlength="30" required placeholder="Celular" aria-label="Celular">
+              </div>
+
+              <div class="rf-row">
+                <div class="rf-chips rf-scroll">
+                  @for (option of nextDays(); track option.value) {
+                    <button type="button" class="rf-day" [class.on]="day === option.value" (click)="day = option.value; revealChips()"><small>{{ option.top }}</small><b>{{ option.num }}</b></button>
+                  }
+                </div>
+                <button type="button" class="rf-day rf-pick" [class.on]="!isNextDay(day)" (click)="openPicker('day')" aria-label="Otra fecha"><app-icon name="calendar" [size]="16" /><small>{{ isNextDay(day) ? 'Otra' : otherDayLabel() }}</small></button>
+              </div>
+              <div class="rf-row">
+                <div class="rf-chips rf-scroll">
+                  @for (slot of timeSlots(); track slot) {
+                    <button type="button" class="rf-chip" [class.on]="time === slot" (click)="time = slot">{{ slot }}</button>
+                  }
+                </div>
+                <button type="button" class="rf-chip rf-pick" [class.on]="!timeSlots().includes(time)" (click)="openPicker('time')"><app-icon name="clock" [size]="15" />{{ timeSlots().includes(time) ? 'Otra' : time }}</button>
+              </div>
+              <div class="rf-row">
+                <div class="rf-chips rf-scroll">
+                  <app-icon class="rf-ico" name="users" [size]="17" />
+                  @for (size of partyOptions; track size) {
+                    <button type="button" class="rf-chip rf-num" [class.on]="partySize === size" (click)="partySize = size">{{ size }}</button>
+                  }
+                </div>
+                <input class="rf-chip rf-other" [class.on]="partySize > 10" type="number" inputmode="numeric" min="1" max="200" placeholder="Más" aria-label="Otra cantidad de personas" [value]="partySize > 10 ? partySize : ''" (input)="setParty($event)">
+              </div>
+
+              <button type="button" class="rf-more" [class.open]="moreOpen" (click)="moreOpen = !moreOpen">
+                <span>Mesa y notas <small>{{ detailsSummary() || 'opcional' }}</small></span><app-icon name="chevron-down" [size]="16" />
+              </button>
+              @if (moreOpen) {
+                <div class="rf-extra">
+                  <section class="rf-group">
+                    <h4>¿Dónde se sienta?</h4>
+                    @if (zones().length > 1) {
+                      <div class="rf-seg">
+                        <button type="button" [class.on]="!zoneId" (click)="zoneId = ''; tableId = ''">Todas</button>
+                        @for (zone of zones(); track zone.id) { <button type="button" [class.on]="zoneId === zone.id" [style.--zc]="zone.color" (click)="zoneId = zone.id; tableId = ''"><i class="rf-dot"></i>{{ zone.name }}</button> }
+                      </div>
+                    }
+                    <div class="rf-chips rf-scroll">
+                      <button type="button" class="rf-chip" [class.on]="!tableId" (click)="tableId = ''">La que esté libre</button>
+                      @for (table of formTables(); track table.id) {
+                        <button type="button" class="rf-chip" [class.on]="tableId === table.id" [class.warn]="!tableFits(table)" (click)="tableId = table.id">{{ table.label }} <small>{{ table.capacity }} 🪑</small></button>
+                      }
+                    </div>
+                  </section>
+                  <section class="rf-group">
+                    <h4>Nota para el equipo <small>toca para agregar</small></h4>
+                    <div class="rf-chips">@for (note of noteChips; track note) {<button type="button" class="rf-chip" [class.on]="hasNote(note)" (click)="toggleNote(note)">{{ note }}</button>}</div>
+                    <input class="rf-input" name="notes" [(ngModel)]="notes" maxlength="300" placeholder="O escribe otra cosa…">
+                  </section>
+                </div>
+              }
+
+              <footer class="rf-foot">
+                <button class="rf-save" [disabled]="!customerName.trim() || !phone.trim() || !day || !time || busy()">
+                  @if (busy()) { Guardando… } @else if (!customerName.trim() || !phone.trim()) { Falta nombre y celular } @else { Reservar · {{ formSummary() }} }
+                </button>
+              </footer>
+            </form>
+          } @else if (seating(); as current) {
+            <header class="st-head">
+              <span class="st-avatar">{{ initials(current.customerName) }}</span>
+              <div><h2>Llegó {{ current.customerName }}</h2><small>{{ current.partySize }} {{ current.partySize === 1 ? 'persona' : 'personas' }} · reservó {{ timeLabel(current) }}{{ zoneName(current.zoneId) ? ' · pidió ' + zoneName(current.zoneId) : '' }}</small></div>
+              <button class="rv-close" (click)="seating.set(null)" aria-label="Cerrar"><app-icon name="x" [size]="17" /></button>
+            </header>
+            @if (seatOptions(current).length) {
+              <h3 class="st-title">¿En qué mesa se sienta?</h3>
+              @if (seatZones(current).length > 1) {
+                <div class="rf-seg">
+                  <button type="button" [class.on]="!seatZone" (click)="seatZone = ''; seatTableId = idealSeat(current)">Todas</button>
+                  @for (zone of seatZones(current); track zone.id) { <button type="button" [class.on]="seatZone === zone.id" [style.--zc]="zone.color" (click)="seatZone = zone.id; seatTableId = idealSeat(current)"><i class="rf-dot"></i>{{ zone.name }}</button> }
+                </div>
+              }
+              <div class="st-tables">
+                @for (table of seatList(current); track table.id) {
+                  <button type="button" class="st-table" [class.on]="seatTableId === table.id" [class.small]="table.capacity < current.partySize" (click)="seatTableId = table.id">
+                    <b>{{ table.label }}</b>
+                    <small>{{ table.capacity }} 🪑{{ table.capacity < current.partySize ? ' · pequeña' : '' }}</small>
+                  </button>
+                }
+              </div>
+              <footer class="rf-foot">
+                <button class="rf-save" [disabled]="!seatTableId || busy()" (click)="seat(current, seatTableId)">
+                  @if (busy()) { Abriendo mesa… } @else if (seatTableId) { Sentar en {{ tableLabel(seatTableId) }} } @else { Elige una mesa }
+                </button>
+              </footer>
+            } @else {
+              <div class="st-empty"><span>🪑</span><b>No hay mesas libres ahora</b><small>Cuando se libere una, vuelve a tocar «Llegó».</small></div>
+            }
+          } @else if (selected(); as current) {
+            <header class="rv-panel-head">
+              <div class="rv-who"><span class="rv-avatar">{{ initials(current.customerName) }}</span><div><h2>{{ current.customerName }}</h2><small>{{ current.customerVisits > 0 ? '★ ' + current.customerVisits + (current.customerVisits === 1 ? ' visita' : ' visitas') + ' anteriores' : 'Primera vez' }}</small></div></div>
+              <button class="rv-close" (click)="closePanel()" aria-label="Cerrar"><app-icon name="x" [size]="17" /></button>
+            </header>
+            <span class="rv-status big" [attr.data-status]="current.status" [class.late]="late(current)">{{ late(current) ? 'Retrasada · ' + countdown(current) : statusLabel(current.status) + (countdown(current) && ['PENDING','CONFIRMED'].includes(current.status) ? ' · llega ' + countdown(current) : '') }}</span>
+            <div class="rv-facts">
+              <span><small>Hora</small><b>{{ timeLabel(current) }}</b></span>
+              <span><small>Personas</small><b>{{ current.partySize }}</b></span>
+              <span><small>Duración</small><b>{{ current.durationMinutes }} min</b></span>
+              <span><small>Mesa</small><b>{{ current.tableLabel || 'Al llegar' }}</b></span>
+            </div>
+            @if (current.tableCapacity && current.tableCapacity < current.partySize) { <p class="rv-warn"><app-icon name="alert" [size]="15" />La mesa es para {{ current.tableCapacity }}: cambia a una más grande.</p> }
+            <div class="rv-contact">
+              <a [href]="'tel:' + current.phone"><app-icon name="phone" [size]="14" />{{ current.phone }}</a>
+              @if (current.zoneName) { <span><app-icon name="map" [size]="14" />Prefiere {{ current.zoneName }}</span> }
+              @if (current.notes) { <span class="note"><app-icon name="info" [size]="14" />{{ current.notes }}</span> }
+            </div>
+            @if (['PENDING', 'CONFIRMED'].includes(current.status)) {
+              <div class="rv-actions">
+                @if (isToday()) { <button class="rv-pill primary wide big" (click)="startSeat(current)"><app-icon name="check" [size]="16" />Llegó · abrir mesa</button> }
+                @if (current.status === 'PENDING') { <button class="rv-pill wide" (click)="changeStatus(current, 'CONFIRMED')"><app-icon name="check" [size]="15" />Marcar confirmada</button> }
+                <a class="rv-pill wa wide" [href]="whatsapp(current)" target="_blank" rel="noopener"><app-icon name="message" [size]="15" />Confirmar por WhatsApp</a>
+                <button class="rv-pill" (click)="edit(current)"><app-icon name="edit" [size]="15" />Editar</button>
+                @if (isToday()) { <button class="rv-pill" (click)="changeStatus(current, 'NO_SHOW')"><app-icon name="hourglass" [size]="15" />No llegó</button> }
+                <button class="rv-pill danger" (click)="changeStatus(current, 'CANCELLED')"><app-icon name="x" [size]="15" />Cancelar</button>
+              </div>
+            }
+          } @else {
+            <div class="rv-panel-empty">
+              <span><app-icon name="calendar" [size]="24" /></span>
+              @if (nextArrival(); as next) {
+                <small>Próxima llegada</small>
+                <button class="rv-next" (click)="select(next)"><time>{{ timeLabel(next) }}</time><span><strong>{{ next.customerName }}</strong><small>{{ next.partySize }} personas · {{ next.tableLabel || 'mesa al llegar' }}{{ countdown(next) ? ' · ' + countdown(next) : '' }}</small></span></button>
+              } @else {
+                <strong>Elige una reserva</strong>
+              }
+              <small class="rv-tip">Toca una reserva para ver sus datos, confirmarla por WhatsApp o sentar al cliente.</small>
+              @if (booking(); as online) {
+                <div class="rv-online" [class.on]="online.enabled">
+                  <button type="button" class="rv-switch" role="switch" [attr.aria-checked]="online.enabled" (click)="toggleBooking()"><i></i>Reservas online</button>
+                  <small>{{ online.enabled ? 'Tus clientes reservan y eligen su mesa en el plano desde este enlace.' : 'Actívalas para que tus clientes reserven solos desde Instagram, Google o WhatsApp.' }}</small>
+                  @if (online.enabled) {
+                    <div class="rv-online-link"><span>{{ bookingLink() }}</span><button class="rv-pill small" (click)="copyBookingLink()"><app-icon name="copy" [size]="14" />Copiar</button><a class="rv-pill small" [href]="bookingLink()" target="_blank" rel="noopener"><app-icon name="link" [size]="14" />Abrir</a></div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </aside>
+      </div>
+    }
+  </div>
+  @if (picker) {
+    <div class="pk-backdrop" (click)="picker = ''"></div>
+    <div class="pk-dialog" role="dialog" [attr.aria-label]="picker === 'day' ? 'Elegir fecha' : 'Elegir hora'">
+      @if (picker === 'day') {
+        <small class="pk-kicker">Fecha de la reserva</small>
+        <div class="pk-cal-head">
+          <button type="button" (click)="shiftMonth(-1)" [disabled]="!canPrevMonth()" aria-label="Mes anterior">‹</button>
+          <b>{{ monthLabel() }}</b>
+          <button type="button" (click)="shiftMonth(1)" aria-label="Mes siguiente">›</button>
+        </div>
+        <div class="pk-cal">
+          @for (name of weekDays; track $index) { <small>{{ name }}</small> }
+          @for (cell of monthCells(); track $index) {
+            @if (cell) { <button type="button" [class.on]="draftDay === cell.value" [class.today]="cell.today" [disabled]="cell.past" (click)="draftDay = cell.value">{{ cell.num }}</button> } @else { <i></i> }
+          }
+        </div>
+      } @else {
+        <small class="pk-kicker">Hora de llegada</small>
+        <b class="pk-time">{{ draftHour }}<span>:</span>{{ draftMinute }}</b>
+        <div class="pk-wheels" [class.pk-set]="wheelsReady()">
+          <div class="pk-wheel" data-wheel="h" (scroll)="onWheel($event, 'h')">
+            @for (hour of wheelHours; track hour) { <button type="button" [class.on]="draftHour === hour" (click)="scrollWheel('h', $index)">{{ hour }}</button> }
+          </div>
+          <div class="pk-colon">:</div>
+          <div class="pk-wheel" data-wheel="m" (scroll)="onWheel($event, 'm')">
+            @for (minute of wheelMinutes; track minute) { <button type="button" [class.on]="draftMinute === minute" (click)="scrollWheel('m', $index)">{{ minute }}</button> }
+          </div>
+        </div>
+      }
+      <div class="pk-actions">
+        <button type="button" (click)="picker = ''">Cancelar</button>
+        <button type="button" class="ok" (click)="acceptPicker()">Aceptar</button>
+      </div>
+    </div>
+  }
+  @if (tab() === 'reservations') { <button class="rv-fab" (click)="edit('NEW')" aria-label="Nueva reserva"><app-icon name="plus" [size]="24" /></button> }
+</app-shell>

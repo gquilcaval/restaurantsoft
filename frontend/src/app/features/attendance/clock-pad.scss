@@ -1,0 +1,41 @@
+// Panel de marcación: elegir acción, escribir el PIN y ver el comprobante.
+.ck-btn { height: 52px; display: inline-flex; align-items: center; justify-content: center; padding: 0 26px; border: 0; border-radius: 999px; color: var(--on-brand, #04110a); background: var(--brand); font-size: 1rem; font-weight: 800; text-decoration: none; }
+.ck-btn.wide { width: 100%; height: 58px; }
+.ck-btn:disabled { opacity: .45; }
+.ck-scrim { position: fixed; inset: 0; z-index: 40; background: rgba(0, 0, 0, .38); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: ck-fade .2s ease-out; }
+.ck-sheet { position: fixed; z-index: 41; left: 50%; top: 50%; width: min(420px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow-y: auto; padding: 22px; border-radius: 32px; background: var(--surface); box-shadow: 0 24px 70px rgba(0, 0, 0, .28); translate: -50% -50%; animation: ck-pop .28s var(--ease-out); }
+.ck-sheet-head { display: flex; align-items: center; gap: 12px; }
+.ck-sheet-head .ck-avatar { width: 46px; height: 46px; margin: 0; font-size: .95rem; }
+.ck-sheet-head div { display: grid; min-width: 0; }
+.ck-sheet-head strong { font: 800 1.15rem var(--font-display); }
+.ck-sheet-head small { color: var(--muted); font-size: .84rem; font-weight: 650; }
+.ck-round { width: 44px; height: 44px; display: grid; place-items: center; flex-shrink: 0; border: 0; border-radius: 50%; color: var(--text); background: color-mix(in srgb, var(--text) 7%, transparent); }
+
+.ck-choices { display: grid; gap: 10px; margin-top: 20px; }
+.ck-choices button { --tone: var(--text); height: 72px; display: flex; align-items: center; justify-content: center; gap: 10px; border: 0; border-radius: 22px; color: var(--tone); background: color-mix(in srgb, var(--tone) 12%, transparent); font-size: 1.08rem; font-weight: 800; }
+.ck-choices button:active { transform: scale(.98); }
+.ck-choices [data-kind='BREAK_START'] { --tone: var(--warn); }
+.ck-choices [data-kind='BREAK_END'] { --tone: var(--ok); }
+
+.ck-dots { display: flex; justify-content: center; gap: 14px; margin: 24px 0 8px; }
+.ck-dots i { width: 15px; height: 15px; border-radius: 50%; background: color-mix(in srgb, var(--text) 16%, transparent); transition: background .15s, transform .15s; }
+.ck-dots i.optional { opacity: .45; }
+.ck-dots i.filled { opacity: 1; background: var(--brand); transform: scale(1.12); }
+.ck-dots.error { animation: ck-shake .32s; }
+.ck-dots.error i { background: color-mix(in srgb, var(--bad) 55%, transparent); }
+.ck-hint { margin: 0 0 14px; color: var(--muted); font-size: .86rem; font-weight: 650; text-align: center; }
+.ck-hint.error { color: var(--bad); }
+.ck-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+.ck-pad button { height: 62px; border: 0; border-radius: 20px; color: var(--text); background: color-mix(in srgb, var(--text) 7%, transparent); font-size: 1.5rem; font-weight: 750; }
+.ck-pad button:active:not(:disabled) { background: color-mix(in srgb, var(--brand) 26%, transparent); }
+.ck-pad .soft { color: var(--muted); background: transparent; font-size: 1.15rem; }
+
+.ck-done { display: grid; justify-items: center; gap: 6px; padding: 14px 0 4px; text-align: center; }
+.ck-check { width: 92px; height: 92px; display: grid; place-items: center; margin-bottom: 8px; border-radius: 50%; color: var(--ok); background: var(--ok-soft); animation: ck-pop-in .45s var(--ease-spring); }
+.ck-done h2 { margin: 0; font: 800 1.5rem var(--font-display); letter-spacing: -.02em; }
+.ck-done-time { margin: 0; font: 800 2.2rem var(--font-display); font-variant-numeric: tabular-nums; }
+.ck-done-note { margin: 0 0 14px; color: var(--muted); font-size: .98rem; }
+@keyframes ck-fade { from { opacity: 0; } }
+@keyframes ck-pop { from { opacity: 0; transform: translateY(18px) scale(.97); } }
+@keyframes ck-pop-in { from { opacity: 0; transform: scale(.5); } }
+@keyframes ck-shake { 25% { transform: translateX(-7px); } 75% { transform: translateX(7px); } }

@@ -1,0 +1,34 @@
+// Total cobrado, indicadores con tendencia y gráfico interactivo.
+.rp-hero { display: flex; flex-direction: column; }
+.rp-hero-top { display: flex; justify-content: space-between; gap: 18px 28px; flex-wrap: wrap; }
+.rp-label { margin: 0 0 2px; color: var(--muted); font-weight: 650; font-size: .9rem; }
+.rp-big { display: block; font: 800 clamp(2.3rem, 4vw, 3.4rem) var(--font-display); letter-spacing: -.035em; line-height: 1.05; }
+.rp-trend { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 4px 11px; border-radius: 999px; font-weight: 800; font-size: .82rem; color: var(--ok); background: var(--ok-soft); }
+.rp-trend small { font-weight: 600; opacity: .8; }
+.rp-trend.down { color: var(--bad); background: var(--bad-soft); }
+.rp-trend.flat { color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); }
+.rp-kpis { display: grid; grid-template-columns: repeat(2, minmax(120px, auto)); gap: 14px 28px; align-content: center; }
+.rp-kpis span { display: grid; gap: 1px; }
+.rp-kpis small { display: flex; align-items: center; gap: 4px; color: var(--muted); font-size: .74rem; font-weight: 650; }
+.rp-kpis b { font: 750 1.15rem var(--font-display); }
+.rp-kpis em { font-style: normal; font-size: .72rem; font-weight: 800; color: var(--ok); }
+.rp-kpis em.down { color: var(--bad); }
+.rp-chart-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 22px 0 10px; }
+.rp-chart-head h3 { font-size: .92rem; color: var(--muted); }
+.rp-chart { flex: 1; display: flex; align-items: stretch; gap: 4px; min-height: 170px; }
+.rp-bar { position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px; padding: 0; border: 0; background: transparent; color: var(--muted); cursor: default; }
+.rp-bar.link { cursor: pointer; }
+.rp-bar i { width: 100%; max-width: 34px; height: max(var(--h), 3px); border-radius: 9px 9px 4px 4px; background: linear-gradient(to top, color-mix(in srgb, var(--brand) 28%, transparent), color-mix(in srgb, var(--brand) 62%, transparent)); transform-origin: bottom; animation: rp-grow-y .8s var(--ease-spring) var(--d) backwards; transition: background .2s, transform .3s var(--ease-spring); }
+.rp-bar.best i { background: linear-gradient(to top, color-mix(in srgb, var(--brand) 70%, transparent), var(--brand)); }
+.rp-bar:hover i, .rp-bar:focus-visible i { background: var(--brand); transform: scaleX(1.06); }
+.rp-val { font-style: normal; font: 750 .68rem var(--font-display); color: var(--text); white-space: nowrap; }
+.rp-bar:not(.best) .rp-val { color: var(--muted); }
+.rp-bar small { font-size: .66rem; font-weight: 700; white-space: nowrap; }
+.rp-bar small.hide { visibility: hidden; }
+.rp-tip { position: absolute; bottom: calc(var(--h) + 46px); left: 50%; z-index: 3; display: grid; gap: 1px; padding: 8px 11px; border-radius: 12px; white-space: nowrap; font-size: .72rem; font-weight: 600; color: var(--text); background: var(--surface); box-shadow: var(--elev-3); opacity: 0; pointer-events: none; transform: translate(-50%, 6px); transition: opacity .15s, transform .25s var(--ease-spring); }
+.rp-tip b { font: 800 .92rem var(--font-display); }
+.rp-tip em { font-style: normal; color: var(--brand); font-size: .68rem; }
+.rp-bar:hover .rp-tip, .rp-bar:focus-visible .rp-tip { opacity: 1; transform: translate(-50%, 0); }
+.rp-insights span { display: inline-flex; align-items: center; gap: 6px; }
+.rp-insights { display: flex; gap: 8px 18px; flex-wrap: wrap; margin-top: 16px; color: var(--muted); font-size: .8rem; }
+.rp-insights b { color: var(--text); }

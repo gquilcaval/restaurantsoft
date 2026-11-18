@@ -1,0 +1,192 @@
+<app-shell title="Clientes" eyebrow="Conoce a quienes vuelven">
+  <button shell-actions class="ct-pill primary" (click)="edit('NEW')"><app-icon name="user-plus" [size]="16" />Nuevo cliente</button>
+
+  <div class="ct">
+    <!-- Cifras de la cartera: cada una abre su grupo -->
+    <section class="ct-kpis">
+      <button class="lg ct-kpi" [class.on]="segment() === 'ALL' && tab() === 'CUSTOMERS'" (click)="setSegment('ALL')">
+        <span class="ct-kpi-ico" data-tone="blue"><app-icon name="users" [size]="20" /></span>
+        <div><small>Clientes registrados</small><strong>{{ summary()?.total ?? '—' }}</strong><em>{{ summary()?.active ?? 0 }} vinieron en los últimos 30 días</em></div>
+      </button>
+      <button class="lg ct-kpi" [class.on]="segment() === 'FREQUENT' && tab() === 'CUSTOMERS'" (click)="setSegment('FREQUENT')">
+        <span class="ct-kpi-ico" data-tone="green"><app-icon name="star" [size]="20" /></span>
+        <div><small>Frecuentes</small><strong>{{ summary()?.frequent ?? '—' }}</strong><em>3 visitas o más</em></div>
+      </button>
+      <button class="lg ct-kpi" [class.on]="segment() === 'AT_RISK' && tab() === 'CUSTOMERS'" (click)="setSegment('AT_RISK')">
+        <span class="ct-kpi-ico" data-tone="red"><app-icon name="hourglass" [size]="20" /></span>
+        <div><small>Para recuperar</small><strong>{{ summary()?.atRisk ?? '—' }}</strong><em>No vuelven hace más de 30 días</em></div>
+      </button>
+      <button class="lg ct-kpi" [class.on]="segment() === 'BIRTHDAY' && tab() === 'CUSTOMERS'" (click)="setSegment('BIRTHDAY')">
+        <span class="ct-kpi-ico" data-tone="pink"><app-icon name="gift" [size]="20" /></span>
+        <div><small>Cumpleaños del mes</small><strong>{{ summary()?.birthdays ?? '—' }}</strong><em>Salúdalos e invítalos</em></div>
+      </button>
+    </section>
+
+    <div class="ct-navrow">
+      <nav class="ct-tabs" role="tablist" aria-label="Secciones de clientes">
+        <button role="tab" [attr.aria-selected]="tab() === 'CUSTOMERS'" (click)="tab.set('CUSTOMERS')"><app-icon name="users" [size]="16" />Clientes</button>
+        <button role="tab" [attr.aria-selected]="tab() === 'PROGRAM'" (click)="tab.set('PROGRAM')"><app-icon name="gift" [size]="16" />Programa de puntos</button>
+      </nav>
+      <p class="ct-purpose">{{ tab() === 'CUSTOMERS' ? segmentHint() : 'Premia a quienes vuelven: ganan puntos al pagar y los canjean como descuento.' }}</p>
+    </div>
+
+    @if (tab() === 'CUSTOMERS') {
+      <section class="ct-grid ct-view">
+        <!-- Lista con buscador y grupos -->
+        <article class="lg ct-card ct-list">
+          <label class="ct-search"><app-icon name="search" [size]="17" /><input type="search" placeholder="Buscar por nombre o celular" aria-label="Buscar cliente" [(ngModel)]="query" (ngModelChange)="searchChanged()"></label>
+          <div class="ct-chips" role="radiogroup" aria-label="Grupo de clientes">
+            @for (item of segments(); track item.key) {
+              <button role="radio" [attr.aria-checked]="segment() === item.key" [attr.data-key]="item.key" (click)="setSegment(item.key)">{{ item.label }}@if (item.count !== undefined) {<small>{{ item.count }}</small>}</button>
+            }
+          </div>
+          @if (segment() !== 'BIRTHDAY') {
+            <div class="ct-sort"><span>Ordenar</span>
+              @for (item of sorts; track item.key) { <button [class.on]="sort === item.key" (click)="setSort(item.key)">{{ item.label }}</button> }
+            </div>
+          }
+          <div class="ct-rows">
+            @if (loading()) {
+              @for (i of [1, 2, 3, 4, 5]; track i) { <div class="ct-row ct-ghost"><i class="ui-skeleton"></i><i class="ui-skeleton"></i></div> }
+            } @else {
+              @for (customer of customers(); track customer.id; let index = $index) {
+                <button class="ct-row" [class.selected]="selectedId() === customer.id && mode() === 'VIEW'" [style.--d]="(index < 12 ? index * 30 : 0) + 'ms'" (click)="open(customer)">
+                  <span class="ct-avatar" [style.--tone]="avatarTone(customer.fullName)">{{ initials(customer.fullName) }}</span>
+                  <span class="ct-row-main">
+                    <strong>{{ customer.fullName }}@for (tag of tags(customer).slice(0, 1); track tag.label) {<i class="ct-tag" [attr.data-tone]="tag.tone">{{ tag.label }}</i>}</strong>
+                    <small>{{ segment() === 'BIRTHDAY' && customer.birthday ? (birthdayPassed(customer) ? 'Cumplió el ' : 'Cumple el ') + birthdayLabel(customer.birthday) : ago(customer.lastVisitAt) + ' · ' + customer.visits + (customer.visits === 1 ? ' visita' : ' visitas') }}</small>
+                  </span>
+                  <span class="ct-row-side"><b>{{ money(customer.totalSpent) }}</b><small>{{ customer.points }} pts</small></span>
+                </button>
+              } @empty {
+                <div class="ct-empty"><span><app-icon [name]="query ? 'search' : 'users'" [size]="22" /></span><div>
+                  @if (query) { <strong>Nadie coincide con «{{ query }}»</strong><small>Prueba con otro nombre o con el celular.</small> }
+                  @else if (segment() !== 'ALL') { <strong>No hay clientes en este grupo</strong><small>¡Buena señal si es «Para recuperar»!</small> }
+                  @else { <strong>Aún no hay clientes</strong><small>Se registran al asociarlos en el cobro, al pedir para llevar con su celular o al reservar.</small> }
+                </div></div>
+              }
+            }
+          </div>
+        </article>
+
+        <!-- Ficha o formulario, en el mismo lugar -->
+        <article class="lg ct-card ct-detail">
+          @if (mode() !== 'VIEW') {
+            <div class="ct-head"><button class="ct-back" (click)="cancelEdit()" aria-label="Volver">←</button><h3>{{ mode() === 'NEW' ? 'Nuevo cliente' : 'Editar datos' }}</h3></div>
+            <form class="ct-form" (ngSubmit)="save()"><fieldset [disabled]="busy()">
+              <label class="wide">Nombre y apellido<input name="fullName" [(ngModel)]="fullName" maxlength="120" required placeholder="Mariana Torres"></label>
+              <label>Celular<input name="phone" type="tel" inputmode="tel" [(ngModel)]="phone" maxlength="30" required placeholder="987654321"></label>
+              <label>Cumpleaños <small>opcional</small><input name="birthday" type="date" [(ngModel)]="birthday"></label>
+              <label class="wide">Correo <small>opcional</small><input name="email" type="email" [(ngModel)]="email" maxlength="180" placeholder="mariana@correo.com"></label>
+              <label class="wide">Notas <small>alergias, preferencias, ocasiones especiales</small><textarea name="notes" rows="3" [(ngModel)]="notes" maxlength="500" placeholder="Alérgica a los mariscos · prefiere la terraza"></textarea></label>
+              <p class="ct-muted wide">Con el cumpleaños podrás enviarle un saludo cada año, y con el celular, escribirle por WhatsApp.</p>
+              <button class="ct-pill primary wide" [disabled]="!fullName.trim() || !phone.trim() || busy()">{{ busy() ? 'Guardando…' : 'Guardar cliente' }}</button>
+            </fieldset></form>
+          } @else if (detail(); as current) {
+            <div class="ct-profile">
+              <span class="ct-avatar big" [style.--tone]="avatarTone(current.customer.fullName)">{{ initials(current.customer.fullName) }}</span>
+              <div class="ct-profile-main">
+                <h2>{{ current.customer.fullName }}</h2>
+                <p>
+                  <span><app-icon name="phone" [size]="14" />{{ current.customer.phone }}</span>
+                  @if (current.customer.birthday) { <span><app-icon name="gift" [size]="14" />{{ birthdayLabel(current.customer.birthday) }}</span> }
+                  @if (current.customer.email) { <span>{{ current.customer.email }}</span> }
+                </p>
+                <div class="ct-tags">@for (tag of tags(current.customer); track tag.label) { <i class="ct-tag" [attr.data-tone]="tag.tone">{{ tag.label }}</i> }</div>
+              </div>
+              <div class="ct-profile-actions">
+                <a class="ct-pill wa" [href]="whatsapp(current.customer)" target="_blank" rel="noopener"><app-icon name="message" [size]="16" />WhatsApp</a>
+                <button class="ct-icon-btn" (click)="edit(current.customer)" aria-label="Editar datos" title="Editar datos"><app-icon name="edit" [size]="17" /></button>
+              </div>
+            </div>
+            @if (current.customer.notes) { <p class="ct-notes"><app-icon name="info" [size]="15" />{{ current.customer.notes }}</p> }
+
+            <!-- Sugerencia según su situación -->
+            @if (isAtRisk(current.customer)) {
+              <a class="ct-suggest" data-tone="red" [href]="whatsapp(current.customer, 'miss')" target="_blank" rel="noopener"><app-icon name="hourglass" [size]="18" /><span><b>No viene hace {{ daysSince(current.customer.lastVisitAt) }} días</b><small>Envíale una invitación por WhatsApp con un mensaje listo.</small></span><em>Invitar →</em></a>
+            } @else if (isBirthdayMonth(current.customer)) {
+              <a class="ct-suggest" data-tone="pink" [href]="whatsapp(current.customer, 'birthday')" target="_blank" rel="noopener"><app-icon name="gift" [size]="18" /><span><b>{{ birthdayPassed(current.customer) ? 'Cumplió el ' : 'Cumple el ' }}{{ birthdayLabel(current.customer.birthday!) }}</b><small>{{ birthdayPassed(current.customer) ? 'Aún estás a tiempo: un saludo y un detalle lo traen a celebrar.' : 'Un saludo y un detalle lo traen a celebrar.' }}</small></span><em>Saludar →</em></a>
+            } @else if (canRedeem(current.customer)) {
+              <a class="ct-suggest" data-tone="green" [href]="whatsapp(current.customer, 'points')" target="_blank" rel="noopener"><app-icon name="sparkles" [size]="18" /><span><b>Puede canjear {{ current.customer.points }} puntos</b><small>Equivalen a {{ money(pointsMoney(current.customer.points)) }} de descuento. Avísale.</small></span><em>Avisar →</em></a>
+            }
+
+            <div class="ct-stats">
+              <span><small>Visitas</small><b>{{ current.customer.visits }}</b></span>
+              <span><small>Gasto total</small><b>{{ money(current.customer.totalSpent) }}</b></span>
+              <span><small>Ticket promedio</small><b>{{ money(ticket(current.customer)) }}</b></span>
+              <span><small>Puntos <app-info-tip [text]="'Equivalen a ' + money(pointsMoney(current.customer.points)) + ' de descuento.'" /></small><b class="pts">{{ current.customer.points }}</b></span>
+            </div>
+
+            <div class="ct-split">
+              <div>
+                <h4>Sus favoritos</h4>
+                <div class="ct-favs">
+                  @for (item of current.favorites; track item.name; let index = $index) { <span [style.--d]="index * 50 + 'ms'"><b>{{ item.quantity }}×</b>{{ item.name }}</span> }
+                  @empty { <p class="ct-muted">Aún no hay pedidos asociados.</p> }
+                </div>
+                <h4>Últimas visitas <small>última: {{ ago(current.customer.lastVisitAt) }}</small></h4>
+                <div class="ct-lines">
+                  @for (visit of current.visits.slice(0, 6); track visit.sessionId) { <div><span>{{ date(visit.closedAt) }}<small>{{ visit.label }} · {{ visit.branch }}</small></span><b>{{ money(visit.paid) }}</b></div> }
+                  @empty { <p class="ct-muted">Todavía no tiene visitas cerradas.</p> }
+                </div>
+              </div>
+              <div>
+                <h4>Puntos</h4>
+                <div class="ct-lines">
+                  @for (move of current.points.slice(0, 6); track move.id) { <div><span>{{ move.reason }}<small>{{ date(move.createdAt) }}</small></span><b [class.neg]="move.points < 0" [class.pos]="move.points > 0">{{ move.points > 0 ? '+' : '' }}{{ move.points }}</b></div> }
+                  @empty { <p class="ct-muted">Sin movimientos.</p> }
+                </div>
+                <form class="ct-adjust" (ngSubmit)="adjust()">
+                  <div class="ct-chips mini">@for (chip of pointChips; track chip.reason) { <button type="button" [attr.aria-checked]="adjustReason === chip.reason" (click)="quickPoints(chip)">{{ chip.points > 0 ? '+' : '' }}{{ chip.points }} · {{ chip.reason }}</button> }</div>
+                  <div class="ct-adjust-row">
+                    <input type="number" name="points" [(ngModel)]="adjustPoints" step="1" aria-label="Puntos a sumar o restar" placeholder="± pts">
+                    <input name="reason" [(ngModel)]="adjustReason" maxlength="200" placeholder="Motivo" aria-label="Motivo del ajuste">
+                    <button class="ct-pill small" [disabled]="!adjustPoints || !adjustReason.trim() || busy()">Ajustar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          } @else if (selectedId()) {
+            <div class="ct-skeleton"><i class="ui-skeleton"></i><i class="ui-skeleton"></i><i class="ui-skeleton"></i></div>
+          } @else {
+            <div class="ct-empty center"><span><app-icon name="users" [size]="24" /></span><div><strong>Elige un cliente</strong><small>Verás qué pide, cuánto gasta, sus puntos y qué hacer para que vuelva.</small></div></div>
+          }
+        </article>
+      </section>
+    } @else if (program(); as current) {
+      <!-- Programa de puntos -->
+      <section class="ct-grid ct-view">
+        <article class="lg ct-card ct-program">
+          <div class="ct-head"><h3>Cómo funciona hoy</h3><i class="ct-tag" [attr.data-tone]="current.enabled ? 'green' : 'red'">{{ current.enabled ? 'Activo' : 'Desactivado' }}</i></div>
+          <div class="ct-steps">
+            <div><span>1</span><b>Paga su cuenta</b><small>Asocia al cliente con su celular al cobrar.</small></div>
+            <div><span>2</span><b>Gana {{ example(current).points }} puntos por cada S/ 100</b><small>1 punto por cada {{ money(current.spendPerPoint) }} gastados.</small></div>
+            <div><span>3</span><b>Canjea desde {{ current.minRedeem }} puntos</b><small>Equivalen a {{ money(current.minRedeem * current.pointValue) }} de descuento.</small></div>
+          </div>
+          <div class="ct-stats">
+            <span><small>Devuelves al cliente</small><b>{{ cashback(current) }}%</b></span>
+            <span><small>Puntos sin canjear</small><b class="pts">{{ summary()?.points ?? 0 }}</b></span>
+            <span><small>Equivalen a</small><b>{{ money(pointsValue()) }}</b></span>
+            <span><small>Gasto prom. por cliente</small><b>{{ money(summary()?.avgSpent) }}</b></span>
+          </div>
+          <p class="ct-muted">Un buen programa devuelve entre 2 % y 5 % de lo que gasta el cliente: suficiente para que vuelva sin afectar tu margen.</p>
+        </article>
+        <article class="lg ct-card ct-program-form">
+          <div class="ct-head"><h3>Configurar</h3></div>
+          @if (auth.role() === 'ORGANIZATION_ADMIN') {
+            <form class="ct-form" (ngSubmit)="saveProgram()"><fieldset>
+              <button type="button" class="ct-switch wide" role="switch" [attr.aria-checked]="programDraft.enabled" (click)="programDraft.enabled = !programDraft.enabled"><i></i>Programa activo</button>
+              <label class="wide">Soles gastados por cada punto<input name="spend" type="number" min="0.5" step="0.5" [(ngModel)]="programDraft.spendPerPoint"></label>
+              <label>Valor de un punto (S/)<input name="value" type="number" min="0.001" step="0.01" [(ngModel)]="programDraft.pointValue"></label>
+              <label>Mínimo para canjear<input name="min" type="number" min="1" step="1" [(ngModel)]="programDraft.minRedeem"></label>
+              <p class="ct-preview wide"><app-icon name="sparkles" [size]="16" /><span>{{ programSummary(programDraft) }}.<br>Devuelve al cliente <b>{{ cashback(programDraft) }}%</b> de lo que gasta.</span></p>
+              <button class="ct-pill primary wide">Guardar programa</button>
+            </fieldset></form>
+          } @else {
+            <p class="ct-muted">Solo el dueño de la organización puede cambiar el programa de puntos.</p>
+          }
+        </article>
+      </section>
+    }
+  </div>
+</app-shell>

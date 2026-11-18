@@ -1,0 +1,34 @@
+/* Continuación de admin-summary.scss: se divide para respetar el límite de tamaño por hoja. */
+.stage-label i { width: 6px; height: 6px; flex-shrink: 0; border-radius: 50%; background: var(--stage-color); }
+.kitchen-stage > strong { display: block; font-size: 1.9rem; font-weight: 600; margin: 14px 0; }
+.stage-track { height: 4px; border-radius: 4px; background: var(--surface-3); overflow: hidden; }
+.stage-track > i { display: block; height: 100%; background: var(--stage-color); border-radius: inherit; transition: width .3s ease; }
+.kitchen-note { margin: auto 0 0; color: var(--muted); font-size: .7rem; line-height: 1.6; }
+.recent-list { margin-top: 15px; min-height: 0; max-height: 222px; overflow: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+.recent-row { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.recent-row:last-child { border: 0; }.recent-row strong { font-size: .74rem; font-weight: 600; }
+.recent-symbol { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: var(--surface-2); color: var(--muted); font-size: .7rem; }
+.recent-symbol.is-payment { color: var(--green); background: var(--green-soft); }
+.recent-row p { margin: 4px 0 0; color: var(--muted); font-size: .66rem; line-height: 1.5; overflow-wrap: anywhere; }
+.recent-amount { text-align: right; display: grid; gap: 5px; }.recent-amount small { color: var(--muted); font-size: .59rem; }
+.summary-empty { grid-column: 1 / -1; align-self: center; text-align: center; padding: 32px 0; color: var(--muted); font-size: .8rem; }
+@container summary (max-width: 860px) {
+  .summary-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .summary-layout { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 18px; }
+  .summary-panel { padding: 20px; }.period-label { font-size: .58rem; }
+  .kitchen-panel, .activity-panel { grid-column: 1 / -1; }
+  .summary-stat > strong { font-size: 1.8rem; }
+}
+@container summary (max-width: 600px) {
+  .summary-layout { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .summary-metrics { gap: 12px; }.summary-stat { padding: 16px; }.summary-stat.revenue { padding-top: 14px; }
+  .stat-heading { font-size: .72rem; }.stat-heading svg { display: none; }
+  .summary-stat > strong { font-size: 1.55rem; }.summary-stat > small { font-size: .63rem; }
+  .sales-chart { gap: 6px; }.kitchen-stages { gap: 12px; }
+  .room-tables { justify-content: center; }.panel-top h2 { font-size: .95rem; }
+}
+@container summary (max-width: 350px) {
+  .kitchen-stages { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .period-label { display: none; }.sales-column > span { font-size: .5rem; }
+}
+@media (prefers-reduced-motion: reduce) { .sales-track i, .stage-track > i { transition: none; } }

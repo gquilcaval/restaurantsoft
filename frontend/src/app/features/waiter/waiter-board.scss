@@ -1,0 +1,33 @@
+// Tablero de mesas en Liquid Glass: contadores, vista, zonas y buscador.
+.mz-bar { display: flex; align-items: center; gap: 10px 12px; flex-wrap: wrap; flex: 0 0 auto; margin-bottom: 12px; }
+.mz-tabs { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: color-mix(in srgb, var(--surface) 55%, transparent); backdrop-filter: blur(20px) saturate(170%); box-shadow: var(--elev-1); }
+.mz-tabs button { display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 16px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-weight: 750; font-size: .85rem; transition: background .3s, color .25s, box-shadow .3s; }
+.mz-tabs button:hover { color: var(--text); }
+.mz-tabs button[aria-selected='true'] { color: var(--text); background: var(--surface); box-shadow: var(--elev-2); }
+:host-context([data-theme='dark']) .mz-tabs button[aria-selected='true'] { background: color-mix(in srgb, white 12%, transparent); }
+.mz-zones { display: flex; gap: 6px; flex: 1 0 100%; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.mz-zones button { flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 13px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--text) 7%, transparent); color: var(--muted); font-weight: 750; font-size: .78rem; transition: background .2s, color .2s; }
+.mz-zones button:hover { color: var(--text); }
+.mz-zones button i { width: 8px; height: 8px; border-radius: 50%; background: var(--zone-color, var(--muted)); }
+.mz-zones button b { font-size: .7rem; opacity: .75; }
+.mz-zones button small { padding: 1px 6px; border-radius: 999px; color: var(--bad); background: var(--bad-soft); font-size: .62rem; }
+.mz-zones button.on { color: var(--text); background: color-mix(in srgb, var(--zone-color, var(--brand)) 20%, transparent); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--zone-color, var(--brand)) 70%, transparent); }
+.mz-zones button.closed { opacity: .65; }
+.mz-search { display: flex; align-items: center; gap: 8px; flex: 1 1 130px; min-width: 0; max-width: 220px; height: 40px; margin-left: auto; padding: 0 14px; border-radius: 999px; color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); transition: box-shadow .2s; }
+.mz-search:focus-within { box-shadow: 0 0 0 2px var(--brand); }
+.mz-search input { flex: 1; width: 100%; min-width: 0; height: 100%; border: 0; background: transparent; color: var(--text); font: inherit; font-size: .82rem; font-weight: 600; outline: none; }
+.service-table-list.mz-list { overflow-x: hidden; grid-auto-rows: max-content; grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr)); gap: 10px; padding: 4px 6px 6px 4px; }
+@media (max-width: 760px) { .mz-search { width: 100%; margin-left: 0; } .mz-zones { flex-basis: 100%; } }
+
+.mz-filters { display: flex; gap: 2px; padding: 4px; border-radius: 999px; background: color-mix(in srgb, var(--text) 6%, transparent); overflow-x: auto; scrollbar-width: none; }
+.mz-filters button { --tone: #8b95a7; flex-shrink: 0; display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 13px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-weight: 750; font-size: .82rem; transition: background .25s, color .25s, box-shadow .25s; }
+.mz-filters button[data-tone='orange'] { --tone: #f08a3c; } .mz-filters button[data-tone='green'] { --tone: #3fbf2a; } .mz-filters button[data-tone='teal'] { --tone: #2db8a5; }
+.mz-filters button i { width: 8px; height: 8px; border-radius: 50%; background: var(--tone); }
+.mz-filters button b { min-width: 22px; padding: 1px 6px; border-radius: 999px; font: 800 .74rem var(--font-display); color: var(--text); background: color-mix(in srgb, var(--tone) 18%, transparent); }
+.mz-filters button:hover { color: var(--text); }
+.mz-filters button.on { color: var(--text); background: var(--surface); box-shadow: var(--elev-1); }
+:host-context([data-theme='dark']) .mz-filters button.on { background: color-mix(in srgb, white 12%, transparent); }
+.mz-goal { display: block; flex-shrink: 0; margin: 14px 14px 0; }
+:host ::ng-deep .mz-goal .goal { padding: 10px 12px; border: 0; box-shadow: none; background: color-mix(in srgb, var(--text) 5%, transparent); }
+:host ::ng-deep .mz-goal .goal-mood { display: none; }
+:host ::ng-deep .mz-goal .goal-copy p { font-size: .8rem; }

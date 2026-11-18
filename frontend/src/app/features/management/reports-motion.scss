@@ -1,0 +1,33 @@
+// Entradas suaves de vistas, barras que crecen y respeto por movimiento reducido.
+.rp-view { animation: rp-rise .35s var(--ease-out); }
+.rp-grid > .rp-card { animation: rp-rise .45s var(--ease-spring) backwards; }
+.rp-grid > .rp-card:nth-child(2) { animation-delay: 60ms; }
+.rp-grid > .rp-card:nth-child(3) { animation-delay: 120ms; }
+.rp-grid > .rp-card:nth-child(n+4) { animation-delay: 170ms; }
+@keyframes rp-rise { from { opacity: 0; transform: translateY(10px); } }
+@keyframes rp-grow-y { from { transform: scaleY(0); } }
+@keyframes rp-grow-x { from { transform: scaleX(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .rp-view, .rp-grid > .rp-card, .rp-bar i, .rp-track > i, .rp-donut, .rp-rank, .rp-podium div, .rp-table-wrap tbody tr { animation: none; }
+}
+.rp-podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
+.rp-podium div { display: grid; justify-items: center; align-content: start; gap: 3px; padding: 6px 4px 10px; text-align: center; animation: rp-rise .5s var(--ease-spring) var(--d) backwards; }
+.rp-podium [data-pos='1'] span { font-size: 2.2rem; }
+.rp-podium span { font-size: 1.7rem; } .rp-podium strong { font-size: .86rem; line-height: 1.25; }
+.rp-podium small { color: var(--muted); font-size: .72rem; }
+.rp-empty { display: flex; align-items: center; gap: 14px; padding: 18px 4px; margin: auto 0; }
+.rp-empty > span { width: 44px; height: 44px; display: grid; place-items: center; flex-shrink: 0; border-radius: 15px; color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); }
+.rp-empty div { display: grid; gap: 2px; } .rp-empty small { color: var(--muted); font-size: .8rem; line-height: 1.4; }
+.rp-tabs { display: flex; gap: 4px; flex-wrap: wrap; justify-self: start; padding: 4px; border-radius: 999px; background: color-mix(in srgb, var(--surface) 55%, transparent); backdrop-filter: blur(20px) saturate(170%); box-shadow: var(--elev-1); }
+.rp-tabs button { display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 18px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-weight: 750; font-size: .87rem; transition: background .3s, color .25s, box-shadow .3s; }
+.rp-tabs button:hover { color: var(--text); }
+.rp-tabs button[aria-selected='true'] { color: var(--text); background: var(--surface); box-shadow: var(--elev-2); }
+:host-context([data-theme='dark']) .rp-tabs button[aria-selected='true'] { background: color-mix(in srgb, white 12%, transparent); }
+.rp-tabs button small { padding: 1px 7px; border-radius: 999px; font-size: .7rem; background: color-mix(in srgb, var(--text) 9%, transparent); }
+.rp-alert { display: grid; grid-template-columns: 40px 1fr auto; align-items: center; gap: 12px; padding: 12px 18px; border-radius: 22px; }
+.rp-alert > span { display: grid; place-items: center; color: var(--bad); }
+.rp-alert div { display: grid; gap: 2px; } .rp-alert small { color: var(--muted); font-size: .8rem; }
+.rp-seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: color-mix(in srgb, var(--text) 6%, transparent); flex-wrap: wrap; }
+.rp-seg button { height: 32px; padding: 0 13px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-weight: 750; font-size: .78rem; transition: background .25s, color .25s; }
+.rp-seg button.on { color: var(--text); background: var(--surface); box-shadow: var(--elev-1); }
+:host-context([data-theme='dark']) .rp-seg button.on { background: color-mix(in srgb, white 12%, transparent); }

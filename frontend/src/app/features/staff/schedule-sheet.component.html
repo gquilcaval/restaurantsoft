@@ -1,0 +1,56 @@
+<div class="as-scrim" [class.out]="closing()" (click)="close()"></div>
+<section class="as-sheet" role="dialog" aria-modal="true" [attr.aria-label]="'Horario de ' + person().fullName"
+  [class.out]="closing()" [class.dragging]="dragging()" [style.--drag.px]="dragY()">
+  <div class="as-grab" (touchstart)="onTouchStart($event)" (touchmove)="onTouchMove($event)" (touchend)="onTouchEnd()">
+    <i></i>
+    <header class="as-head">
+      <span class="as-avatar">{{ initials(person().fullName) }}</span>
+      <div><h3>{{ person().fullName }}</h3><small>Horario semanal</small></div>
+      <button class="as-round" (click)="close()" aria-label="Cerrar"><app-icon name="x" [size]="16" /></button>
+    </header>
+  </div>
+
+  <div class="as-body">
+    <span class="sh-label">Días que trabaja</span>
+    <div class="sh-days" role="group" aria-label="Días que trabaja">
+      @for (day of days(); track day.weekday) {
+        <button type="button" [class.on]="day.on" [attr.aria-pressed]="day.on" [attr.aria-label]="names[day.weekday - 1]" (click)="toggleDay(day.weekday)">{{ letters[day.weekday - 1] }}</button>
+      }
+    </div>
+
+    @if (working().length) {
+      <div class="sh-head-row">
+        <span class="sh-label">Horario de cada día</span>
+        @if (mixed()) { <button type="button" class="sh-link" (click)="sameForAll()">Igualar todos a {{ names[working()[0].weekday - 1].toLowerCase() }}</button> }
+      </div>
+      <ul class="sh-list">
+        @for (day of working(); track day.weekday) {
+          <li>
+            <div class="sh-row">
+              <b>{{ names[day.weekday - 1] }}</b>
+              <button type="button" class="sh-time" [class.on]="editKey() === day.weekday + '-start'" (click)="edit(day.weekday, 'start')">{{ twelveHour(day.start) }}</button>
+              <span class="sh-dash">a</span>
+              <button type="button" class="sh-time" [class.on]="editKey() === day.weekday + '-end'" (click)="edit(day.weekday, 'end')">{{ twelveHour(day.end) }}@if (overnight(day)) {<em>día sig.</em>}</button>
+            </div>
+            @if (editing()?.weekday === day.weekday) {
+              <div class="sh-wheel">
+                <small>{{ editing()!.field === 'start' ? 'Hora de entrada' : 'Hora de salida' }}</small>
+                @for (key of [editKey()]; track key) { <app-time-wheel [value]="editValue()" (valueChange)="setTime($event)" /> }
+                <button type="button" class="sh-link" (click)="editing.set(null)">Listo</button>
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="sh-empty">Sin horario fijo: no se calculan tardanzas ni faltas. Elige los días que trabaja.</p>
+    }
+
+    @if (error()) { <p class="sh-error">{{ error() }}</p> }
+    <p class="sh-note">Rige desde hoy. Los días anteriores se siguen evaluando con el horario que tenían.</p>
+    <button class="as-btn" [disabled]="saving()" (click)="save()">{{ saving() ? 'Guardando…' : 'Guardar horario' }}</button>
+    @if (person().validFrom && working().length) {
+      <button type="button" class="sh-link center" [disabled]="saving()" (click)="save(true)">Quitar horario fijo</button>
+    }
+  </div>
+</section>

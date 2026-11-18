@@ -1,0 +1,24 @@
+/* Solo la navegación se desplaza; la marca y el cierre de sesión permanecen accesibles. */
+aside{position:relative;height:100%;min-height:0;min-width:0;overflow:hidden;display:flex;flex-direction:column;padding:24px 14px 14px;background:var(--surface);border:1px solid var(--border);border-radius:24px;box-shadow:0 18px 50px color-mix(in srgb,var(--shadow-color) 55%,transparent)}
+.aside-branding{flex-shrink:0;height:88px;padding:2px 4px 25px;border-bottom:1px solid var(--border);overflow:hidden}
+.brand{display:flex;align-items:center;gap:12px;width:218px;text-decoration:none;color:var(--text)}
+.brand>span,.brand img{width:40px;height:40px;flex-shrink:0;display:grid;place-items:center;border-radius:13px}
+.brand>span{background:var(--surface-2);border:1px solid var(--border);font-size:1.15rem;font-weight:750}
+.brand img{object-fit:contain;background:var(--surface-2)}
+.brand-copy{width:166px;min-width:0;display:grid;gap:6px}
+.brand-copy strong{font-size:1rem;line-height:1.3;font-weight:700;letter-spacing:-.03em;overflow-wrap:anywhere}
+.brand-copy small{font-size:.58rem;color:var(--muted)}
+nav{min-height:0;flex:1;overflow-x:hidden;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent;padding:22px 0 18px}
+.nav-label{height:12px;margin:0 12px 12px;font-size:.57rem;font-weight:650;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.nav-section{height:35px;margin-top:27px;padding-top:22px;border-top:1px solid var(--border)}
+nav a{position:relative;display:flex;align-items:center;gap:12px;min-height:46px;margin-bottom:6px;padding:0 13px;border:1px solid transparent;border-radius:12px;color:var(--muted);text-decoration:none;font-size:.8rem;font-weight:500;transition:background .18s,color .18s,border-color .18s}
+nav a:hover{color:var(--text);background:var(--surface-2)}
+nav a.active{color:var(--text);font-weight:650;background:var(--surface-2);border-color:var(--border);box-shadow:0 2px 5px #00000008}
+.nav-icon{width:20px;height:20px;display:grid;place-items:center;flex-shrink:0}
+.nav-icon svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}
+nav a.active .nav-icon{color:var(--text)}
+.nav-marker{width:5px;height:5px;border-radius:50%;margin-left:auto;flex-shrink:0;background:transparent}
+nav a.active .nav-marker{background:var(--brand)}
+.nav-text{position:absolute;left:46px;white-space:nowrap}
+.aside-footer{flex-shrink:0;margin-top:auto;padding-top:15px;border-top:1px solid var(--border)}
+.sidebar-signature{display:flex;align-items:center;justify-content:space-between;gap:8px;width:226px;height:38px;padding:5px 12px 16px;white-space:nowrap}

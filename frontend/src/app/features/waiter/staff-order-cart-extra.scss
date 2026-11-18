@@ -1,0 +1,26 @@
+// Ronda: lo ya pedido, notas rápidas, totales y el botón de envío.
+.so-prev { margin: 0 14px 10px; border-radius: 16px; background: color-mix(in srgb, var(--text) 5%, transparent); }
+.so-prev summary { display: flex; align-items: center; gap: 8px; padding: 10px 14px; color: var(--muted); font-size: .78rem; font-weight: 750; cursor: pointer; list-style: none; }
+.so-prev summary::-webkit-details-marker { display: none; }
+.so-prev summary::after { content: '⌄'; margin-left: 4px; transition: transform .2s; }
+.so-prev[open] summary::after { transform: rotate(180deg); }
+.so-prev summary b { margin-left: auto; color: var(--text); }
+.so-prev ul { display: grid; gap: 4px; margin: 0; padding: 0 14px 12px; list-style: none; }
+.so-prev li { display: grid; grid-template-columns: 28px 1fr auto; gap: 6px; font-size: .78rem; }
+.so-prev li small { color: var(--muted); font-size: .68rem; font-weight: 700; }
+.so-error { margin: 0 18px 10px; padding: 10px 12px; border-radius: 12px; color: var(--bad, #ef5d55); font-size: .8rem; font-weight: 700; background: color-mix(in srgb, var(--bad, #ef5d55) 12%, transparent); }
+.so-chips { display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; }
+.so-chips button { flex-shrink: 0; padding: 5px 10px; border: 0; border-radius: 999px; color: var(--muted); font-size: .7rem; font-weight: 750; background: color-mix(in srgb, var(--text) 7%, transparent); }
+.so-chips button.on { color: var(--on-brand, #fff); background: var(--brand); }
+.so-cart-empty { display: grid; justify-items: center; gap: 4px; padding: 40px 16px; color: var(--muted); text-align: center; }
+.so-cart-empty span { font-size: 2rem; } .so-cart-empty strong { color: var(--text); } .so-cart-empty p { margin: 0; font-size: .8rem; }
+.so-foot { display: grid; gap: 12px; padding: 14px 18px 18px; }
+.so-sum { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 2px 8px; }
+.so-sum span { color: var(--muted); font-size: .82rem; font-weight: 650; }
+.so-sum strong { font: 800 1.35rem var(--font-display); }
+.so-sum small { grid-column: 1 / -1; color: var(--muted); font-size: .74rem; } .so-sum small b { color: var(--text); }
+.so-send { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 54px; padding: 0 18px; border: 0; border-radius: 18px; color: var(--on-brand, #fff); font-size: .95rem; font-weight: 800; background: var(--brand); box-shadow: 0 10px 24px color-mix(in srgb, var(--brand) 35%, transparent); transition: transform .15s, opacity .2s; }
+.so-send:active:not(:disabled) { transform: scale(.97); }
+.so-send:disabled { opacity: .45; box-shadow: none; }
+.so-cartbar { display: none; }
+@keyframes so-bump { 0% { transform: scale(.6); } 60% { transform: scale(1.25); } 100% { transform: scale(1); } }

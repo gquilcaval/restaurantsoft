@@ -1,0 +1,28 @@
+// Diálogos propios de fecha y hora (los nativos del celular no siguen el tema).
+.pk-backdrop { position: fixed; inset: 0; z-index: 95; background: rgba(5, 7, 6, .55); animation: rv-fade .18s ease-out both; }
+.pk-dialog { position: fixed; inset: 0; z-index: 96; margin: auto; height: fit-content; display: grid; gap: 14px; width: min(340px, calc(100vw - 32px)); padding: 20px 18px 14px; border-radius: 28px; background: var(--surface); color: var(--text); box-shadow: 0 30px 70px rgba(0, 0, 0, .45); animation: pk-in .22s cubic-bezier(.2, .9, .3, 1) both; will-change: transform, opacity; }
+@keyframes pk-in { from { opacity: 0; transform: scale(.96); } }
+.pk-wheels:not(.pk-set) .pk-wheel { visibility: hidden; }
+.pk-kicker { color: var(--muted); font-size: .76rem; font-weight: 700; }
+.pk-cal-head { display: flex; align-items: center; justify-content: space-between; }
+.pk-cal-head b { font: 800 1rem var(--font-display); }
+.pk-cal-head button { width: 38px; height: 38px; border: 0; border-radius: 50%; color: var(--text); background: color-mix(in srgb, var(--text) 7%, transparent); font: 800 1.2rem inherit; }
+.pk-cal-head button:disabled { opacity: .3; }
+.pk-cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; text-align: center; }
+.pk-cal small { color: var(--muted); font-size: .72rem; font-weight: 700; }
+.pk-cal button { aspect-ratio: 1; border: 0; border-radius: 50%; color: var(--text); background: none; font: 700 .9rem inherit; }
+.pk-cal button.today { color: var(--brand); background: color-mix(in srgb, var(--brand) 12%, transparent); }
+.pk-cal button:disabled { opacity: .25; }
+.pk-cal button.on { color: #fff; background: var(--brand); }
+.pk-time { justify-self: center; font: 800 2.6rem var(--font-display); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.pk-time span { margin: 0 2px; color: var(--muted); }
+.pk-wheels { position: relative; display: flex; justify-content: center; align-items: center; gap: 6px; height: 220px; }
+.pk-wheels::before { content: ''; position: absolute; left: 0; right: 0; top: 88px; height: 44px; border-radius: 14px; background: color-mix(in srgb, var(--brand) 16%, transparent); pointer-events: none; }
+.pk-wheel { position: relative; width: 84px; height: 100%; overflow-y: auto; padding: 88px 0; box-sizing: border-box; scroll-snap-type: y mandatory; scrollbar-width: none; overscroll-behavior: contain; mask-image: linear-gradient(transparent, #000 35%, #000 65%, transparent); }
+.pk-wheel::-webkit-scrollbar { display: none; }
+.pk-wheel button { display: block; width: 100%; height: 44px; border: 0; color: var(--muted); background: none; font: 700 1.35rem var(--font-display); font-variant-numeric: tabular-nums; scroll-snap-align: center; transition: color .15s, transform .15s; }
+.pk-wheel button.on { color: var(--text); transform: scale(1.12); }
+.pk-colon { font: 800 1.4rem var(--font-display); color: var(--muted); }
+.pk-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.pk-actions button { height: 42px; padding: 0 18px; border: 0; border-radius: 999px; color: var(--text); background: color-mix(in srgb, var(--text) 7%, transparent); font: 800 .9rem inherit; }
+.pk-actions .ok { color: #fff; background: var(--brand); }

@@ -1,0 +1,32 @@
+// Fórmula, cobros por medio de pago, resultado del cierre y movimientos.
+.cs-formula { display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap; margin: 16px 0 4px; }
+.cs-formula span, .cs-fx { display: grid; gap: 2px; text-align: left; }
+.cs-fx { padding: 6px 10px; margin: -6px -10px; border: 0; border-radius: 14px; background: transparent; color: inherit; transition: background .2s; }
+.cs-fx:hover { background: color-mix(in srgb, var(--text) 7%, transparent); }
+.cs-formula small { color: var(--muted); font-size: .72rem; font-weight: 650; }
+.cs-formula b { font: 700 1.05rem var(--font-display); }
+.cs-formula b.in, .cs-stats b.in { color: var(--ok); } .cs-formula b.out, .cs-stats b.out { color: var(--bad); }
+.cs-formula i { font-style: normal; color: var(--muted); font-size: 1.2rem; font-weight: 300; }
+.cs-scroll { flex: 1; min-height: 0; max-height: max(280px, calc(100dvh - 330px)); margin: 0 -8px; padding: 0 8px 4px; overflow: auto; scrollbar-width: thin; }
+.cs-methods { display: grid; gap: 14px; margin-top: 16px; }
+.cs-method { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 12px; animation: cs-rise .5s var(--ease-spring) var(--d) backwards; }
+.cs-method div { display: grid; gap: 3px; }
+.cs-method small { color: var(--muted); font-size: .74rem; }
+.cs-method > b { font: 700 1rem var(--font-display); }
+.cs-icon { --tone: #ffb347; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 15px; color: var(--tone); background: color-mix(in srgb, var(--tone) 18%, transparent); }
+.cs-icon[data-tone='green'] { --tone: #3fbf2a; } .cs-icon[data-tone='blue'] { --tone: #4f8cff; }
+.cs-icon[data-tone='violet'] { --tone: #a46bff; } .cs-icon[data-tone='teal'] { --tone: #2dd4bf; }
+.cs-bar { display: block; height: 6px; border-radius: 9px; background: color-mix(in srgb, var(--text) 8%, transparent); overflow: hidden; }
+.cs-bar b { display: block; height: 100%; border-radius: 9px; background: #ffb347; transition: width .8s var(--ease-out); animation: cs-grow 1s var(--ease-out) backwards; transform-origin: left; }
+.cs-bar[data-tone='green'] b { background: #44d62c; } .cs-bar[data-tone='blue'] b { background: #4f8cff; }
+.cs-bar[data-tone='violet'] b { background: #a46bff; } .cs-bar[data-tone='teal'] b { background: #2dd4bf; }
+@keyframes cs-grow { from { transform: scaleX(0); } }
+.cs-timeline { display: grid; gap: 12px; margin-top: 16px; }
+.cs-move { display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; align-items: center; gap: 12px; animation: cs-rise .45s var(--ease-out) var(--d) backwards; }
+.cs-move > span { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 13px; font-weight: 900; color: var(--bad); background: var(--bad-soft); }
+.cs-move[data-kind='IN'] > span { color: var(--ok); background: var(--ok-soft); }
+.cs-move div { display: grid; gap: 2px; min-width: 0; }
+.cs-move strong { font-size: .9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cs-move small { color: var(--muted); font-size: .74rem; }
+.cs-move > b { color: var(--bad); font: 700 .98rem var(--font-display); white-space: nowrap; }
+.cs-move[data-kind='IN'] > b { color: var(--ok); }

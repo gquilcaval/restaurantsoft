@@ -1,0 +1,30 @@
+// Asistente: pasos a la izquierda con progreso y el paso abierto a la derecha.
+.su { flex: 1; min-height: 0; display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 16px; }
+.su-steps { min-height: 0; display: flex; flex-direction: column; gap: 12px; padding: 16px 12px; border-radius: 24px; overflow-y: auto; scrollbar-width: thin; }
+.su-progress { display: flex; align-items: center; gap: 14px; padding: 0 6px 4px; }
+.su-ring { flex-shrink: 0; width: 68px; aspect-ratio: 1; display: grid; place-items: center; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--surface) 92%, transparent) 76%, transparent 78%), conic-gradient(var(--brand) calc(var(--p) * 1%), color-mix(in srgb, var(--text) 10%, transparent) 0); }
+.su-ring b { font: 800 1.05rem var(--font-display); }
+.su-progress div { display: grid; gap: 2px; } .su-progress strong { font: 800 1rem var(--font-display); line-height: 1.25; }
+.su-progress small { color: var(--muted); font-size: .72rem; }
+.su-list { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.su-list button { display: grid; grid-template-columns: 30px minmax(0, 1fr); align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border: 0; border-radius: 14px; text-align: left; color: var(--text); background: transparent; transition: background .2s; }
+.su-list button:hover { background: color-mix(in srgb, var(--text) 5%, transparent); }
+.su-list button.on { background: color-mix(in srgb, var(--brand) 15%, transparent); }
+.su-check { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; font: 800 .76rem var(--font-display); color: var(--muted); background: color-mix(in srgb, var(--text) 8%, transparent); }
+.su-check i { font-style: normal; }
+.su-list button.done .su-check { color: #fff; background: var(--ok); }
+.su-list button.on:not(.done) .su-check { color: var(--on-brand, #04110a); background: var(--brand); }
+.su-step-text { display: grid; gap: 1px; min-width: 0; }
+.su-step-text strong { display: flex; align-items: center; gap: 6px; font: 750 .86rem var(--font-display); }
+.su-step-text em { font-style: normal; padding: 0 6px; border-radius: 999px; font-weight: 700; font-size: .6rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); background: color-mix(in srgb, var(--text) 8%, transparent); }
+.su-step-text small { color: var(--muted); font-size: .7rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.su-list button.done .su-step-text strong { color: var(--muted); }
+.su-work { min-height: 0; display: flex; flex-direction: column; gap: 16px; padding: 20px 22px; border-radius: 24px; overflow: hidden; }
+.su-head { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+.su-head > div { flex: 1; min-width: 0; } .su-head small { color: var(--muted); font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+.su-head h2 { margin: 2px 0 0; font: 800 1.4rem var(--font-display); letter-spacing: -.02em; }
+.su-head-ico { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 16px; color: var(--on-brand, #04110a); background: var(--brand); }
+.su-head-ico.done { color: #fff; background: var(--ok); }
+.su-body { flex: 1; min-height: 0; display: grid; align-content: start; gap: 14px; overflow-y: auto; margin: 0 -6px; padding: 0 6px 4px; scrollbar-width: thin; animation: su-in .35s var(--ease-spring); }
+@keyframes su-in { from { opacity: 0; transform: translateX(14px); } }
+@media (max-width: 1000px) { .su { grid-template-columns: minmax(0, 1fr); } .su-steps { max-height: 320px; } }

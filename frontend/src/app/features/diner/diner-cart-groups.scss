@@ -1,0 +1,25 @@
+// Agrupaciones del pedido (otras personas y rondas): chevrón redondo y despliegue animado.
+.cs-group { margin: 2px 0 6px; border-radius: 18px; background: var(--cs-soft); transition: background .25s; }
+.cs-group.open, .cs-round.open { background: color-mix(in srgb, var(--brand) 7%, var(--surface)); }
+.cs-group-head { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; gap: 10px; width: 100%; padding: 11px 12px 11px 14px; border: 0; color: var(--text); background: none; text-align: left; font: inherit; }
+.cs-group-head .cs-ini.sm { width: 28px; height: 28px; font-size: .64rem; }
+.cs-group-head span { display: grid; min-width: 0; }
+.cs-group-head b { font-size: .9rem; }
+.cs-group-head small { color: var(--muted); font-size: .72rem; }
+.cs-chev { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; color: var(--muted); background: var(--surface); box-shadow: 0 1px 4px rgba(0, 0, 0, .08); transition: transform .3s cubic-bezier(.3, 1.3, .5, 1), color .2s, background .2s; }
+.cs-chev svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.open > button .cs-chev { color: #fff; background: var(--brand); transform: rotate(180deg); }
+.cs-collapse { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s cubic-bezier(.2, .9, .3, 1); }
+.open > .cs-collapse { grid-template-rows: 1fr; }
+.cs-sub { min-height: 0; overflow: hidden; display: grid; align-content: start; margin: 0 10px; border-radius: 14px; background: var(--surface); opacity: 0; transition: opacity .2s, margin .3s; }
+.open > .cs-collapse .cs-sub { margin: 0 10px 10px; opacity: 1; max-height: 196px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--text) 18%, transparent) transparent; -webkit-mask-image: linear-gradient(#000 calc(100% - 18px), transparent); mask-image: linear-gradient(#000 calc(100% - 18px), transparent); }
+.open > .cs-collapse .cs-sub.dn-end { -webkit-mask-image: none; mask-image: none; }
+.cs-sub-row { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 9px; padding: 7px 11px; }
+.cs-sub-row + .cs-sub-row { box-shadow: 0 -1px 0 color-mix(in srgb, var(--text) 6%, transparent); }
+.cs-q { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 7px; color: var(--brand); background: var(--brand-soft); font-size: .7rem; font-style: normal; font-weight: 850; }
+.cs-sub-row > span { display: grid; min-width: 0; }
+.cs-sub-row b { overflow: hidden; font-size: .8rem; font-weight: 700; white-space: nowrap; text-overflow: ellipsis; }
+.cs-sub-row small { overflow: hidden; color: var(--muted); font-size: .66rem; white-space: nowrap; text-overflow: ellipsis; }
+.cs-sub-row em { color: var(--muted); font-size: .74rem; font-style: normal; font-weight: 750; }
+.cs-st { font-style: normal; font-weight: 750; }
+.cs-st[data-s='PREPARING'] { color: #b86e00; } .cs-st[data-s='READY'] { color: #1f7a3c; } .cs-st[data-s='DELIVERED'] { color: #2f5f78; }

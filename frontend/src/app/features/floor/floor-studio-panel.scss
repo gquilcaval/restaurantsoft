@@ -1,0 +1,30 @@
+// Panel del estudio: pestañas, ajustes, configuraciones, listas y meseros.
+.fe-ptabs, .fe-seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px; padding: 3px; border-radius: 999px; background: color-mix(in srgb, var(--text) 6%, transparent); }
+.fe-ptabs button, .fe-seg button { height: 32px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-weight: 750; font-size: .76rem; }
+.fe-ptabs button[aria-selected='true'], .fe-seg button.on { color: var(--text); background: var(--surface); box-shadow: var(--elev-1); }
+:root[data-theme='dark'] :is(.fe-ptabs button[aria-selected='true'], .fe-seg button.on) { background: color-mix(in srgb, white 12%, transparent); }
+.fe-pill.small { height: 32px; padding: 0 12px; font-size: .76rem; cursor: pointer; } .fe-pill.wide { width: 100%; }
+.fe-link { border: 0; background: none; color: var(--muted); font-size: .76rem; font-weight: 700; }
+.fe-icon-btn { width: 30px; height: 30px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; color: var(--muted); background: transparent; }
+.fe-icon-btn:hover { color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); }
+.fe-bg-edit { display: flex; align-items: center; gap: 12px; }
+.fe-bg-edit > img, .fe-bg-edit > span { width: 72px; height: 54px; flex-shrink: 0; display: grid; place-items: center; border-radius: 12px; object-fit: cover; color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); }
+.fe-bg-edit div { display: grid; gap: 4px; justify-items: start; }
+.fe-input input[type='range'] { height: auto; padding: 0; background: none; accent-color: var(--brand); }
+.fe-layouts { display: grid; gap: 4px; }
+.fe-layout-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; align-items: center; gap: 4px; padding: 8px 6px 8px 10px; border-radius: 14px; background: color-mix(in srgb, var(--text) 4%, transparent); }
+.fe-layout-row.active { background: color-mix(in srgb, var(--ok) 12%, transparent); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--ok) 50%, transparent); }
+.fe-layout-row span { display: grid; min-width: 0; } .fe-layout-row strong { font-size: .86rem; } .fe-layout-row small { color: var(--muted); font-size: .7rem; }
+.fe-layout-row em { font-style: normal; padding: 2px 9px; border-radius: 999px; color: var(--ok); background: var(--ok-soft); font-size: .7rem; font-weight: 800; }
+.fe-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fe-stat-grid span { display: grid; gap: 1px; } .fe-stat-grid small { color: var(--muted); font-size: .7rem; font-weight: 650; } .fe-stat-grid b { font: 800 1.2rem var(--font-display); }
+.fe-issues { display: grid; gap: 4px; }
+.fe-issues > div { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 10px; border-radius: 12px; font-size: .82rem; font-weight: 650; background: color-mix(in srgb, var(--text) 4%, transparent); }
+.fe-issues > div span { display: inline-flex; align-items: center; gap: 7px; }
+.fe-issues b { font-family: var(--font-display); color: var(--warn); } .fe-issues b.bad { color: var(--bad); }
+.fe-ok { display: flex; align-items: center; gap: 8px; margin: 0; padding: 10px 12px; border-radius: 12px; color: var(--ok); background: var(--ok-soft); font-size: .82rem; font-weight: 700; }
+.fe-dot { width: 10px; height: 10px; border-radius: 50%; }
+.fe-gap { margin: 0; text-align: center; color: var(--muted); }
+.fe-heat-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: .7rem; color: var(--muted); font-weight: 650; }
+.fe-heat-legend i { grid-column: 1 / -1; height: 8px; border-radius: 9px; background: linear-gradient(90deg, hsl(210 80% 55%), hsl(110 80% 55%), hsl(10 80% 55%)); }
+.fe-heat-legend span:last-child { text-align: right; }

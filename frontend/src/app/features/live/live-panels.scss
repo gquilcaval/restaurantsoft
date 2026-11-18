@@ -1,0 +1,35 @@
+.tv-panel { padding: 22px 24px; animation: tv-in .5s ease-out backwards; }
+.tv-panel h2 { margin: 0 0 12px; font: 700 1.05rem var(--font-display); }
+.tv-caption { margin: -6px 0 12px; color: var(--muted); font-size: .78rem; }
+.tv-product, .tv-rank { display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 10px; padding: 8px 0; animation: tv-slide .45s ease-out var(--delay) backwards; }
+.tv-rank { grid-template-columns: 28px 1fr; }
+.tv-product strong, .tv-rank strong { display: flex; align-items: center; gap: 7px; font-size: .9rem; }
+.tv-rank strong i { width: 10px; height: 10px; border-radius: 50%; }
+.tv-rank small { color: var(--muted); font-size: .74rem; }
+.tv-product > b { font-size: 1.2rem; font-variant-numeric: tabular-nums; }
+.tv-rank-pos { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 9px; background: color-mix(in srgb, var(--text) 8%, transparent); font-weight: 900; font-size: .8rem; }
+.tv-product:first-child .tv-rank-pos, .tv-rank:nth-of-type(1) .tv-rank-pos { background: #f5c542; color: #3b2a00; }
+.tv-bar { display: block; height: 7px; margin-top: 5px; border-radius: 9px; background: color-mix(in srgb, var(--text) 8%, transparent); overflow: hidden; }
+.tv-bar i { display: block; height: 100%; border-radius: 9px; background: var(--brand); transform-origin: left; animation: tv-grow .9s cubic-bezier(.2, .9, .3, 1) backwards; transition: width .6s ease; }
+.tv-sales { display: flex; align-items: flex-end; gap: 5px; height: 130px; }
+.tv-sale { flex: 1; display: grid; grid-template-rows: 1fr auto; height: 100%; gap: 4px; text-align: center; }
+.tv-sale i { align-self: end; display: block; min-height: 3px; border-radius: 6px 6px 2px 2px; background: color-mix(in srgb, var(--brand) 55%, var(--surface-3)); transform-origin: bottom; animation: tv-grow-y .8s cubic-bezier(.2, .9, .3, 1) backwards; transition: height .6s ease; }
+.tv-sale.now i { background: var(--brand); box-shadow: 0 0 14px color-mix(in srgb, var(--brand) 60%, transparent); }
+.tv-sale small { font-size: .66rem; color: var(--muted); }
+.tv-payment { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 10px; padding: 9px 8px; margin: 0 -8px; border-radius: 12px; animation: tv-slide .4s ease-out backwards; }
+.tv-payment > span { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 12px; background: rgba(68, 214, 44, .2); }
+.tv-payment div { display: grid; }
+.tv-payment small { color: var(--muted); font-size: .74rem; }
+.tv-payment b { font-variant-numeric: tabular-nums; }
+.tv-payment.fresh { animation: tv-cash .9s cubic-bezier(.2, 1.4, .4, 1) backwards, tv-flash 1.2s ease-in-out .9s 2; }
+.tv-facts p { margin: 0 0 8px; line-height: 1.45; }
+.tv-facts p:last-child { margin: 0; }
+@keyframes tv-in { from { opacity: 0; transform: translateY(10px); } }
+@keyframes tv-slide { from { opacity: 0; transform: translateX(14px); } }
+@keyframes tv-grow { from { transform: scaleX(0); } }
+@keyframes tv-grow-y { from { transform: scaleY(0); } }
+@keyframes tv-cash { from { opacity: 0; transform: translateY(-16px) scale(.9); } }
+@keyframes tv-flash { 50% { background: var(--green-soft); } }
+
+// Mesas por mesero, bajo el plano en vivo.
+.tv-load { display: block; margin-top: 10px; }

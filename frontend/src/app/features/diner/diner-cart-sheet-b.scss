@@ -1,0 +1,38 @@
+// Hoja del pedido: «Ya en cocina», vacío, iniciales y pie con total + envío.
+.cs-rounds { display: grid; gap: 6px; }
+.cs-round { border-radius: 18px; background: var(--cs-soft); transition: background .25s; }
+.cs-round-head { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 10px; width: 100%; padding: 13px 14px; border: 0; color: var(--text); background: none; text-align: left; font: inherit; }
+.cs-round-head span { display: grid; min-width: 0; }
+.cs-round-head b { font-size: .9rem; }
+.cs-round-head small { color: var(--muted); font-size: .72rem; }
+.cs-pill { padding: 4px 10px; border-radius: 999px; color: #5b6673; background: color-mix(in srgb, #5b6673 12%, transparent); font-size: .7rem; font-style: normal; font-weight: 800; }
+.cs-pill[data-step='2'] { color: #b86e00; background: #fff0d6; }
+.cs-pill[data-step='3'] { color: #1f7a3c; background: #dff5e6; }
+.cs-pill[data-step='4'] { color: #2f5f78; background: #e2eef5; }
+.cs-lines { display: grid; gap: 4px; padding: 0 14px 12px; animation: dn-drop .22s ease-out; }
+.cs-line { display: grid; grid-template-columns: 8px minmax(0, 1fr) auto; align-items: center; gap: 8px; font-size: .82rem; }
+.cs-line span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.cs-line b { color: var(--muted); font-size: .76rem; }
+.cs-line.with-ini { grid-template-columns: 8px 20px minmax(0, 1fr) auto; }
+.ct-dot { width: 8px; height: 8px; border-radius: 50%; background: #9aa5b1; }
+.ct-dot[data-s='PREPARING'] { background: #e8920c; }
+.ct-dot[data-s='READY'] { background: #2e9b4f; }
+.ct-dot[data-s='DELIVERED'] { background: #3d6f89; }
+.cs-ini { position: absolute; right: -4px; bottom: -4px; width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; color: var(--text); background: var(--surface); box-shadow: 0 0 0 2px var(--surface), 0 2px 6px rgba(0, 0, 0, .15); font-size: .58rem; font-style: normal; font-weight: 850; }
+.cs-ini.me { color: #fff; background: var(--brand); }
+.cs-ini.staff { font-size: .7rem; }
+.cs-ini.sm { position: static; width: 20px; height: 20px; box-shadow: none; background: var(--surface); font-size: .55rem; }
+.cs-ini.sm.me { background: var(--brand); }
+.cs-tip { position: absolute; z-index: 3; left: calc(100% + 4px); bottom: -6px; padding: 4px 9px; border-radius: 999px; color: #fff; background: rgba(20, 20, 20, .88); font-size: .68rem; font-style: normal; font-weight: 750; white-space: nowrap; animation: dn-drop .18s ease-out; }
+.cs-empty { display: grid; justify-items: center; gap: 4px; padding: 30px 0; text-align: center; }
+.cs-empty span { font-size: 2rem; }
+.cs-empty small { color: var(--muted); font-size: .8rem; }
+.cs-foot { flex-shrink: 0; display: flex; align-items: center; gap: 14px; padding: 14px 20px calc(14px + env(safe-area-inset-bottom)); box-shadow: 0 -10px 24px color-mix(in srgb, var(--text) 6%, transparent); touch-action: none; }
+.cs-total { display: grid; flex: 1; min-width: 0; }
+.cs-total small { color: var(--muted); font-size: .72rem; font-weight: 650; }
+.cs-total b { font-size: 1.2rem; letter-spacing: -.02em; }
+.cs-send { flex-shrink: 0; display: inline-flex; align-items: center; gap: 10px; height: 52px; padding: 0 20px; border: 0; border-radius: 999px; color: #fff; background: var(--brand); font: 800 .95rem inherit; box-shadow: 0 10px 24px color-mix(in srgb, var(--brand) 34%, transparent); }
+.cs-send i { min-width: 24px; height: 24px; display: grid; place-items: center; border-radius: 999px; background: rgba(255, 255, 255, .25); font-size: .78rem; font-style: normal; }
+.cs-send:active { transform: scale(.97); }
+.cs-wait { margin: 0; color: var(--muted); font-size: .82rem; font-weight: 700; }
+.cs-bill { flex-shrink: 0; height: 48px; padding: 0 18px; border: 0; border-radius: 999px; color: var(--text); background: var(--cs-soft); font: 800 .88rem inherit; }

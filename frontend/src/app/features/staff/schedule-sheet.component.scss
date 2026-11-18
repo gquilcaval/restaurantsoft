@@ -1,0 +1,23 @@
+// Editor del horario semanal.
+.sh-label { color: var(--muted); font-size: .76rem; font-weight: 750; }
+.sh-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin-top: -4px; }
+.sh-days button { aspect-ratio: 1; max-height: 48px; border: 0; border-radius: 14px; color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); font: 800 .95rem var(--font-display); transition: background .15s, color .15s, transform .15s; }
+.sh-days button:active { transform: scale(.94); }
+.sh-days button.on { color: var(--on-brand, #04110a); background: var(--brand); }
+.sh-head-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
+.sh-link { padding: 6px 2px; border: 0; color: var(--brand); background: none; font-size: .8rem; font-weight: 750; }
+.sh-link.center { align-self: center; color: var(--muted); }
+.sh-list { display: grid; gap: 4px; margin: -4px 0 0; padding: 0; list-style: none; }
+.sh-list li { display: grid; gap: 2px; padding: 6px 10px; border-radius: 16px; background: color-mix(in srgb, var(--text) 4%, transparent); }
+.sh-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; align-items: center; gap: 6px; }
+.sh-row b { font-size: .9rem; }
+.sh-dash { color: var(--muted); font-size: .78rem; }
+.sh-time { height: 36px; padding: 0 12px; border: 0; border-radius: 999px; color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); font-size: .84rem; font-weight: 750; font-variant-numeric: tabular-nums; }
+.sh-time.on { color: var(--on-brand, #04110a); background: var(--brand); }
+.sh-time em { margin-left: 5px; color: var(--warn); font-size: .66rem; font-style: normal; font-weight: 800; }
+.sh-time.on em { color: inherit; }
+.sh-wheel { display: grid; justify-items: center; gap: 2px; padding-top: 6px; }
+.sh-wheel small { color: var(--muted); font-size: .74rem; font-weight: 700; }
+.sh-wheel app-time-wheel { width: 100%; }
+.sh-empty, .sh-note { margin: 0; color: var(--muted); font-size: .8rem; line-height: 1.4; text-align: center; }
+.sh-error { margin: 0; color: var(--bad); font-size: .82rem; font-weight: 650; text-align: center; }

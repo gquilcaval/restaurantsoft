@@ -1,0 +1,41 @@
+/* Superficies administrativas compartidas; no alcanza estilos ni rutas del comensal. */
+:host{display:block;min-width:0}
+.management-grid{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:22px;align-items:start}
+.management-stack{display:grid;gap:20px;min-width:0}
+.management-panel{min-width:0;padding:24px;border:1px solid var(--border);border-radius:20px;background:var(--surface)}
+.management-panel>header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}
+h2{margin:0;font-size:1.03rem;letter-spacing:-.025em}
+.management-caption{color:var(--muted);font-size:.75rem;line-height:1.6;overflow-wrap:anywhere}
+.management-caption small{font:inherit}
+.management-badge{padding:6px 10px;border:1px solid var(--border);border-radius:8px;color:var(--muted);font-size:.7rem}
+.management-note{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 20px;margin-bottom:20px;border:1px solid var(--border);border-left:3px solid var(--orange);border-radius:13px;background:var(--surface);font-size:.8rem}
+.management-note p{margin:5px 0 0;color:var(--muted);line-height:1.6}
+.management-note a{color:var(--text);white-space:nowrap}
+.management-note.error{border-left-color:var(--danger)}
+.cash-hero{font-size:clamp(2rem,4vw,3rem);font-weight:650;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.management-totals>div{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--border);font-size:.8rem}
+.management-totals small{color:var(--muted)}
+.management-totals strong{white-space:nowrap;font-variant-numeric:tabular-nums}
+.management-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:20px}
+.management-actions button{min-height:42px}
+.management-form fieldset{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:0;padding:0;border:0;min-width:0}
+.management-form label{display:grid;gap:8px;font-size:.76rem;font-weight:600;min-width:0}
+.management-form input,.management-form select,.management-form textarea{width:100%;min-width:0;min-height:44px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;color:var(--text);background:var(--bg);outline:none}
+.management-form textarea{min-height:78px;resize:vertical}
+.management-form :is(input,select,textarea):focus{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand-soft)}
+.management-form .wide{grid-column:1/-1}
+button:disabled{opacity:.5;cursor:not-allowed}
+button:focus-visible,a:focus-visible{outline:2px solid var(--brand);outline-offset:3px}
+.cash-reconciliation{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:20px 0}
+.cash-reconciliation>div{display:grid;gap:6px}
+.cash-reconciliation small{color:var(--muted)}
+.cash-reconciliation strong{font-size:1.3rem}
+.negative{color:var(--danger)}
+.history-panel{padding:20px}
+.history-row{display:flex;justify-content:space-between;gap:14px;width:100%;padding:15px 10px;border:0;border-bottom:1px solid var(--border);background:transparent;color:var(--text);text-align:left;border-radius:8px}
+.history-row.selected{background:var(--surface-2)}
+.history-row span{display:grid;gap:5px;min-width:0}
+.history-row span:last-child{text-align:right}
+.history-row strong,.history-row b{font-size:.74rem;font-weight:600}
+.history-row small{color:var(--muted);font-size:.65rem;overflow-wrap:anywhere}
+.management-entry{display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid var(--border);padding:16px 0;font-size:.8rem}

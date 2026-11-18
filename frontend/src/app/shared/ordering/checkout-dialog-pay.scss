@@ -1,0 +1,30 @@
+// Cobro: secciones del pago (método, monto, propina, efectivo y vuelto) sin bordes, con chips.
+.ck-section { display: grid; gap: 10px; }
+.ck-section h3 { display: flex; align-items: baseline; gap: 6px; margin: 0; font-size: .9rem; font-weight: 800; }
+.ck-section h3 small { color: var(--muted); font-size: .72rem; font-weight: 650; }
+.ck-methods { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.ck-methods button { display: grid; justify-items: center; gap: 5px; padding: 12px 4px; border: 0; border-radius: 16px; color: var(--text); font-size: .76rem; font-weight: 750; background: color-mix(in srgb, var(--text) 5%, transparent); transition: background .2s, box-shadow .2s, transform .12s; }
+.ck-methods button:active { transform: scale(.96); }
+.ck-methods button span { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 12px; font-size: 1.15rem; font-weight: 900; background: color-mix(in srgb, var(--text) 7%, transparent); }
+.ck-methods [data-method='YAPE'] span { color: #fff; background: #742284; }
+.ck-methods [data-method='PLIN'] span { color: #fff; background: #00b9b4; }
+.ck-methods button[aria-checked='true'] { background: color-mix(in srgb, var(--brand) 13%, transparent); box-shadow: inset 0 0 0 2px var(--brand); }
+.ck-amount { display: flex; align-items: center; gap: 8px; height: 58px; padding: 0 16px; border-radius: 16px; background: color-mix(in srgb, var(--text) 6%, transparent); }
+.ck-amount:focus-within { box-shadow: 0 0 0 2px var(--brand); }
+.ck-amount span { color: var(--muted); font: 800 1.1rem var(--font-display); }
+.ck-amount input { flex: 1; min-width: 0; border: 0; color: var(--text); font: 800 1.5rem var(--font-display); background: transparent; outline: none; }
+.ck-amount.small { height: 48px; } .ck-amount.small input { font-size: 1.1rem; }
+.ck-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ck-chip { height: 38px; padding: 0 14px; border: 0; border-radius: 999px; color: var(--text); font-size: .8rem; font-weight: 750; white-space: nowrap; background: color-mix(in srgb, var(--text) 7%, transparent); transition: background .2s, color .2s; }
+.ck-chip.on { color: var(--on-brand, #fff); background: var(--brand); }
+.ck-chip.strong { color: var(--on-brand, #fff); background: var(--brand); }
+.ck-chip:disabled { opacity: .45; }
+.ck-change { display: flex; align-items: baseline; justify-content: space-between; padding: 12px 16px; border-radius: 16px; color: #16a34a; background: rgba(63, 191, 42, .13); animation: ck-in .25s ease; }
+.ck-change small { font-size: .82rem; font-weight: 800; }
+.ck-change strong { font: 800 1.5rem var(--font-display); }
+.ck-change.short { color: #ef4444; background: rgba(239, 68, 68, .12); }
+.ck-input { width: 100%; height: 46px; padding: 0 14px; border: 0; border-radius: 14px; color: var(--text); font: inherit; font-size: .88rem; background: color-mix(in srgb, var(--text) 6%, transparent); outline: none; }
+.ck-input:focus { box-shadow: 0 0 0 2px var(--brand); }
+.ck-tips { flex-wrap: nowrap; } .ck-tips .ck-chip { flex: 1; padding: 0 8px; }
+.ck-section > * { min-width: 0; } .ck-amount input { width: 100%; }
+.ck-foot-note { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0 0 10px; color: var(--muted); font-size: .76rem; font-weight: 650; text-align: center; }

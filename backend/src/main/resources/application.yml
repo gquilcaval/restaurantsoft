@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: restos-backend
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/restos}
+    username: ${DB_USERNAME:restos}
+    password: ${DB_PASSWORD:restos}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: never
+
+restos:
+  demo-data-enabled: ${DEMO_DATA_ENABLED:true}
+  production-mode: ${PRODUCTION_MODE:false}
+  # URL que se codifica en los QR; debe ser accesible desde el móvil del restaurante.
+  public-base-url: ${PUBLIC_BASE_URL:http://localhost:8081}
+  # Carpeta persistente para fotos de productos y logotipos.
+  uploads-dir: ${UPLOADS_DIR:./uploads}
+  security:
+    # Debe reemplazarse por un secreto aleatorio de al menos 32 caracteres en producción.
+    jwt-secret: ${JWT_SECRET:restos-development-secret-change-me-now}
+    access-token-minutes: ${JWT_ACCESS_MINUTES:30}
+    refresh-token-days: ${JWT_REFRESH_DAYS:7}
+    login-max-attempts: ${LOGIN_MAX_ATTEMPTS:5}
+    login-block-minutes: ${LOGIN_BLOCK_MINUTES:15}
+    bootstrap-admin-email: ${PLATFORM_ADMIN_EMAIL:}
+    bootstrap-admin-password: ${PLATFORM_ADMIN_PASSWORD:}
+  sessions:
+    # Solo se cierran automáticamente sesiones QR sin rondas enviadas.
+    inactivity-minutes: ${SESSION_INACTIVITY_MINUTES:120}
+    # Si sale el último comensal y no hay pedidos enviados, se libera la mesa tras esta gracia.
+    last-guest-grace-minutes: ${LAST_GUEST_GRACE_MINUTES:5}
+    # Una atención con consumo que supera este tiempo se bloquea para revisión humana.
+    stale-review-hours: ${SESSION_STALE_REVIEW_HOURS:12}
+    cleanup-delay-ms: ${SESSION_CLEANUP_DELAY_MS:60000}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

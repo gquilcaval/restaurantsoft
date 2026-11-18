@@ -1,0 +1,36 @@
+// Pendientes accionables, salón, cocina, lo más vendido y equipo.
+.rs-badge { min-width: 26px; height: 26px; padding: 0 9px; display: inline-grid; place-items: center; border-radius: 999px; background: #ff5f6d; color: #fff; font-size: .78rem; font-weight: 800; box-shadow: 0 0 16px rgba(255, 95, 109, .5); }
+.rs-tasks { display: grid; gap: 10px; margin-top: 14px; }
+.rs-task {
+  display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 11px 11px 11px 13px; border-radius: 22px;
+  background: rgba(255, 255, 255, .06); box-shadow: var(--elev-1);
+  transition: transform .4s var(--ease-spring), background .25s; animation: rs-in .55s var(--ease-spring) var(--d) backwards;
+}
+.rs-task:hover { transform: translateX(5px); background: rgba(255, 255, 255, .11); box-shadow: var(--elev-2); }
+.rs-task-icon { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 16px; font-size: 1.3rem; background: rgba(79, 140, 255, .22); }
+.rs-task[data-tone='danger'] .rs-task-icon { background: rgba(255, 95, 109, .25); }
+.rs-task[data-tone='warn'] .rs-task-icon { background: rgba(255, 179, 71, .25); }
+.rs-task[data-tone='ok'] .rs-task-icon { background: rgba(68, 214, 44, .22); }
+.rs-task div { display: grid; gap: 2px; min-width: 0; }
+.rs-task strong { font-size: .92rem; }
+.rs-task small { color: var(--muted); font-size: .78rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rs-calm { display: flex; align-items: center; gap: 14px; padding: 18px; border-radius: 22px; background: var(--ok-soft); }
+.rs-calm span { font-size: 1.8rem; }
+.rs-calm div { display: grid; gap: 2px; }
+.rs-calm small { color: var(--muted); }
+@keyframes rs-in { from { opacity: 0; transform: translateY(12px); } }
+.rs-floor { display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); gap: 9px; margin-top: 16px; }
+.rs-table {
+  aspect-ratio: 1; display: grid; place-items: center; padding: 0; border: 0; border-radius: 15px; font-size: .74rem; font-weight: 800; color: var(--text);
+  background: rgba(255, 255, 255, .07); box-shadow: var(--elev-1); transition: transform .35s var(--ease-spring);
+}
+.rs-table:hover { transform: scale(1.12); }
+.rs-table[data-state='busy'] { background: rgba(79, 140, 255, .3); box-shadow: var(--elev-1); }
+.rs-table[data-state='call'] { background: rgba(255, 95, 109, .34); animation: rs-call 1.6s infinite; }
+.rs-table[data-state='ready'] { background: rgba(68, 214, 44, .3); box-shadow: 0 0 16px rgba(68, 214, 44, .45); }
+.rs-table[data-state='bill'] { background: color-mix(in srgb, var(--bill) 35%, transparent); }
+@keyframes rs-call { 0% { box-shadow: 0 0 0 0 rgba(255, 95, 109, .55); } 70% { box-shadow: 0 0 0 9px transparent; } }
+.rs-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; font-size: .72rem; color: var(--muted); }
+.rs-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.rs-legend i { width: 8px; height: 8px; border-radius: 50%; background: #4f8cff; }
+.rs-legend [data-s='call'] i { background: #ff5f6d; } .rs-legend [data-s='ready'] i { background: #44d62c; } .rs-legend [data-s='bill'] i { background: var(--bill); }

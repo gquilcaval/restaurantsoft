@@ -1,0 +1,26 @@
+// Ficha de una persona: campos, puestos y PIN.
+.ps-sheet { width: min(480px, calc(100vw - 32px)); }
+.ps-field { display: grid; gap: 7px; min-width: 0; }
+.ps-field > span { display: flex; align-items: center; gap: 8px; color: var(--text); font-size: .84rem; font-weight: 750; }
+em { color: var(--muted); font-size: .72rem; font-style: normal; font-weight: 650; }
+em.need { color: var(--warn); }
+input { width: 100%; min-width: 0; height: 50px; padding: 0 16px; border: 0; border-radius: 16px; outline: 2px solid transparent; color: var(--text); background: color-mix(in srgb, var(--text) 7%, transparent); font: inherit; font-size: 1rem; transition: outline-color .15s, background .15s; }
+input::placeholder { color: color-mix(in srgb, var(--muted) 75%, transparent); }
+input:focus { outline-color: color-mix(in srgb, var(--brand) 70%, transparent); background: color-mix(in srgb, var(--text) 4%, transparent); }
+.ps-posts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.ps-posts button { --tone: var(--muted); display: grid; grid-template-columns: 36px minmax(0, 1fr); align-items: center; gap: 0 10px; padding: 12px; border: 0; border-radius: 18px; outline: 2px solid transparent; color: var(--text); background: color-mix(in srgb, var(--text) 5%, transparent); text-align: left; font: inherit; transition: background .2s, outline-color .2s, transform .3s var(--ease-spring); }
+.ps-posts button:active { transform: scale(.97); }
+.ps-posts i { grid-row: span 2; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 12px; color: var(--tone); background: color-mix(in srgb, var(--tone) 16%, transparent); }
+.ps-posts b { font-size: .92rem; } .ps-posts small { color: var(--muted); font-size: .72rem; line-height: 1.25; }
+.ps-posts button.on { outline-color: var(--tone); background: color-mix(in srgb, var(--tone) 13%, transparent); }
+.ps-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ps-chips button { height: 38px; padding: 0 14px; border: 0; border-radius: 999px; color: var(--text); background: color-mix(in srgb, var(--text) 7%, transparent); font-size: .82rem; font-weight: 700; }
+.ps-chips button.on { color: var(--on-brand, #04110a); background: var(--brand); }
+.ps-pin { display: flex; gap: 8px; }
+.ps-pin input { flex: 1; font: 800 1.25rem var(--font-display); letter-spacing: .3em; }
+.ps-pin input::placeholder { font-size: 1rem; font-weight: 500; letter-spacing: 0; }
+.ps-pin button, .ps-date button { flex-shrink: 0; height: 50px; padding: 0 16px; border: 0; border-radius: 16px; color: var(--text); background: color-mix(in srgb, var(--text) 9%, transparent); font-size: .86rem; font-weight: 750; }
+.ps-hint { color: var(--muted); font-size: .76rem; line-height: 1.4; }
+.ps-set { display: flex; align-items: center; gap: 6px; height: 50px; padding: 0 8px 0 16px; border-radius: 16px; background: color-mix(in srgb, var(--text) 5%, transparent); }
+.ps-set b { display: inline-flex; align-items: center; gap: 6px; margin-right: auto; color: var(--ok); font-size: .9rem; }
+.ps-set button { height: 36px; padding: 0 12px; border: 0; border-radius: 999px; color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); font-size: .8rem; font-weight: 750; }

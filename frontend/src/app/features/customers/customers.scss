@@ -1,0 +1,39 @@
+// Clientes en Liquid Glass: estructura, cifras y pestañas.
+.ct { display: grid; gap: 16px; }
+.ct-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 18px; align-items: stretch; }
+.ct-card { padding: 22px 24px; min-width: 0; }
+.ct-list { grid-column: span 5; display: flex; flex-direction: column; min-height: 0; }
+.ct-detail { grid-column: span 7; min-width: 0; }
+.ct-program { grid-column: span 7; } .ct-program-form { grid-column: span 5; }
+.ct-head { display: flex; align-items: center; gap: 10px; }
+.ct-head h3 { margin: 0 auto 0 0; font: 700 1.05rem var(--font-display); }
+.ct-pill {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 40px; padding: 0 18px; border: 0; border-radius: 999px;
+  font-weight: 750; font-size: .85rem; color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); text-decoration: none;
+  transition: transform .35s var(--ease-spring), background .2s;
+}
+.ct-pill:hover:not(:disabled) { background: color-mix(in srgb, var(--text) 13%, transparent); transform: translateY(-1px); }
+.ct-pill:active:not(:disabled) { transform: scale(.95); }
+.ct-pill:disabled { opacity: .5; }
+.ct-pill.primary { background: var(--brand); color: var(--on-brand, #04110a); }
+.ct-pill.small { height: 38px; padding: 0 14px; font-size: .8rem; }
+.ct-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.ct-kpi { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border: 0; color: var(--text); text-align: left; font: inherit; cursor: pointer; transition: transform .4s var(--ease-spring), box-shadow .25s; }
+.ct-kpi:hover { transform: translateY(-2px); }
+.ct-kpi.on { box-shadow: var(--elev-2), inset 0 0 0 2px color-mix(in srgb, var(--brand) 70%, transparent); }
+.ct-kpi div { display: grid; gap: 1px; min-width: 0; }
+.ct-kpi small { color: var(--muted); font-size: .76rem; font-weight: 650; }
+.ct-kpi strong { font: 800 1.7rem var(--font-display); letter-spacing: -.02em; line-height: 1.1; }
+.ct-kpi em { font-style: normal; color: var(--muted); font-size: .72rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ct-kpi-ico { --tone: #4f8cff; flex-shrink: 0; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 15px; color: var(--tone); background: color-mix(in srgb, var(--tone) 16%, transparent); }
+.ct-kpi-ico[data-tone='green'] { --tone: #3fbf2a; } .ct-kpi-ico[data-tone='red'] { --tone: #ef5d55; } .ct-kpi-ico[data-tone='pink'] { --tone: #ec4899; }
+.ct-navrow { display: flex; align-items: center; gap: 10px 18px; flex-wrap: wrap; }
+.ct-tabs { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: color-mix(in srgb, var(--surface) 55%, transparent); backdrop-filter: blur(20px) saturate(170%); box-shadow: var(--elev-1); }
+.ct-tabs button { display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 18px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-weight: 750; font-size: .87rem; transition: background .3s, color .25s, box-shadow .3s; }
+.ct-tabs button:hover { color: var(--text); }
+.ct-tabs button[aria-selected='true'] { color: var(--text); background: var(--surface); box-shadow: var(--elev-2); }
+:host-context([data-theme='dark']) .ct-tabs button[aria-selected='true'] { background: color-mix(in srgb, white 12%, transparent); }
+.ct-purpose { margin: 0; color: var(--muted); font-size: .84rem; font-weight: 600; }
+.ct-view { animation: ct-rise .35s var(--ease-out); }
+@keyframes ct-rise { from { opacity: 0; transform: translateY(10px); } }
+@media (max-width: 1100px) { .ct-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ct-list, .ct-detail, .ct-program, .ct-program-form { grid-column: span 12; } }

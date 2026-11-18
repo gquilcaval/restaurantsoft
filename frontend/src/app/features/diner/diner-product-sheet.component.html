@@ -1,0 +1,93 @@
+<div class="modal-backdrop diner-sheet-backdrop" [class.dn-closing]="closing()" (click)="close()">
+  <section
+    class="qr-dialog diner-product-sheet ps"
+    [class.dn-expanded]="expanded()"
+    [class.dn-dragging]="dragging()"
+    [style.transform]="sheetY() ? 'translateY(' + sheetY() + 'px)' : null"
+    (click)="$event.stopPropagation()"
+    (touchstart)="dragStart($event)"
+    (touchmove)="dragMove($event)"
+    (touchend)="dragEnd()"
+    (touchcancel)="dragEnd()"
+    aria-labelledby="dish-detail-title"
+  >
+    <div class="ps-grip" aria-hidden="true"><i></i></div>
+    <button class="ps-close" (click)="close()" aria-label="Cerrar detalle">×</button>
+    @if (dish(); as item) {
+      <div class="ps-hero" [class.noimg]="!item.imageUrl">
+        @if (item.imageUrl) { <img [src]="item.imageUrl" [alt]="item.name" /> } @else { <span>🍽️</span> }
+      </div>
+      <header class="ps-head">
+        <div class="ps-title">
+          <h2 id="dish-detail-title">{{ item.name }}</h2>
+          <strong>{{ item.price | currency: 'PEN' : 'S/ ' }}</strong>
+        </div>
+        @if (item.description) { <p>{{ item.description }}</p> }
+        @if (item.popular || item.tags?.length) {
+          <div class="ps-tags">
+            @if (item.popular) { <span class="hot">🔥 Popular{{ item.soldToday ? ' · ' + item.soldToday + ' hoy' : '' }}</span> }
+            @for (tag of item.tags; track tag) { <span>{{ tagText(tag) }}</span> }
+          </div>
+        }
+      </header>
+    } @else {
+      <header class="ps-head ps-edit">
+        <small>Editar producto</small>
+        <h2 id="dish-detail-title">{{ editing()!.name }}</h2>
+        @if (editing()!.modifiers) { <p>{{ editing()!.modifiers }}</p> }
+      </header>
+    }
+
+    @if (dish()?.modifierGroups?.length) {
+      <div class="ps-options">
+        <app-modifier-picker [groups]="dish()!.modifierGroups" [(selected)]="options" />
+      </div>
+    }
+
+    <footer class="ps-foot">
+      @if (notesPanel()) {
+        <section class="ps-notes" aria-label="Indicaciones para cocina">
+          <header><strong>Nota para cocina</strong><button type="button" class="ps-notes-done" (click)="notesPanel.set(false)">Listo</button></header>
+          <div class="ps-note-chips">
+            @for (chip of noteChips(); track chip) {
+              <button type="button" [class.on]="hasNote(chip)" [attr.aria-pressed]="hasNote(chip)" (click)="toggleNote(chip)">@if (hasNote(chip)) {<i>✓</i>}{{ chip }}</button>
+            }
+          </div>
+          <div class="ps-note-custom">
+            <textarea [(ngModel)]="customNote" (ngModelChange)="composeNotes()" maxlength="200" rows="2" placeholder="O escribe otra cosa, ej. salsa aparte"></textarea>
+            @if (customNote) { <button type="button" (click)="customNote = ''; composeNotes()" aria-label="Borrar lo escrito">×</button> }
+          </div>
+        </section>
+      } @else {
+        <button type="button" class="ps-note-pill" [class.filled]="!!notes" (click)="notesPanel.set(true)">
+          <span class="ps-note-ico" aria-hidden="true">📝</span>
+          @if (notes) { <span class="ps-note-text">{{ notes }}</span><small>Editar</small> }
+          @else { <span class="ps-note-text">¿Algo especial para cocina?</span><small>Opcional</small> }
+        </button>
+      }
+      <div class="ps-foot-row">
+      <div class="ps-qty" role="group" aria-label="Cantidad">
+        <button type="button" (click)="adjust(-1)" [disabled]="quantity() <= 1" aria-label="Uno menos">−</button>
+        <strong>{{ quantity() }}</strong>
+        <button type="button" (click)="adjust(1)" aria-label="Uno más">+</button>
+      </div>
+      <button
+        class="ps-submit"
+        [class.dn-pending]="!!dish() && !optionsValid()"
+        [disabled]="busy()"
+        (click)="submit()"
+      >
+        @if (busy()) {
+          Guardando…
+        } @else if (editing()) {
+          Guardar cambios
+        } @else if (!optionsValid()) {
+          Elige {{ (missingGroup() || 'una opción').toLowerCase() }}
+        } @else {
+          <span>Agregar</span><b>{{ unitPrice() * quantity() | currency: 'PEN' : 'S/ ' }}</b>
+        }
+      </button>
+      </div>
+    </footer>
+  </section>
+</div>

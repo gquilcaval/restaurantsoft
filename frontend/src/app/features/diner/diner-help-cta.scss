@@ -1,0 +1,8 @@
+// Botón «Ayuda» un poco más visible: ícono en círculo de marca, texto en color de marca y un leve «timbre».
+.diner-page .dn-help { gap: 9px; height: 48px; padding: 0 18px 0 6px; color: var(--brand); box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--brand) 28%, transparent), 0 10px 28px rgba(0, 0, 0, .16); }
+.diner-page .dn-help .dn-help-ico { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; background: var(--brand); font-size: 1.05rem; box-shadow: 0 4px 12px color-mix(in srgb, var(--brand) 40%, transparent); animation: dn-bell 7s ease-in-out 1.2s infinite; transform-origin: 50% 20%; }
+.diner-page .dn-help.pending .dn-help-ico { animation: none; }
+@keyframes dn-bell { 0%, 86%, 100% { transform: rotate(0); } 88% { transform: rotate(-16deg); } 90% { transform: rotate(14deg); } 92% { transform: rotate(-10deg); } 94% { transform: rotate(6deg); } 96% { transform: rotate(-2deg); } }
+// Fondo levemente desenfocado detrás del carrito.
+.cs-backdrop, .dn-help-backdrop { -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); transition: opacity .26s; }
+.dn-help-backdrop.closing { opacity: 0; }

@@ -1,0 +1,8 @@
+// Cobro: cliente frecuente, canje de puntos y descuento (dentro de «Más opciones»).
+.ck-discount, .ck-customer { display: grid; gap: 8px; padding: 10px; border-radius: 14px; background: var(--surface); }
+.ck-search, .ck-redeem { display: flex; align-items: center; gap: 8px; } .ck-redeem { flex-wrap: wrap; font-size: .82rem; } .ck-redeem .ck-input { width: 90px; }
+.ck-results { display: grid; gap: 4px; } .ck-results button { display: grid; gap: 1px; padding: 8px 10px; border: 0; border-radius: 12px; color: var(--text); text-align: left; background: color-mix(in srgb, var(--text) 5%, transparent); } .ck-results small { color: var(--muted); font-size: .72rem; }
+.ck-customer-linked { display: flex; align-items: center; gap: 10px; } .ck-customer-linked span:nth-child(2) { display: grid; flex: 1; } .ck-customer-linked small { color: var(--muted); font-size: .72rem; }
+.ck-points { padding: 4px 10px; border-radius: 999px; color: #b45309; font-size: .76rem; font-weight: 800; background: rgba(245, 179, 1, .18); }
+.ck-link { padding: 0; border: 0; color: var(--brand-accent, var(--brand)); font-size: .78rem; font-weight: 800; background: none; }
+.ck-muted { color: var(--muted); font-size: .76rem; }

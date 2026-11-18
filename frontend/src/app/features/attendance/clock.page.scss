@@ -1,0 +1,45 @@
+// Marcación en la tablet: reloj y una tarjeta por persona.
+:host { display: block; min-height: 100dvh; background: var(--bg); color: var(--text); }
+.ck { display: flex; flex-direction: column; align-items: center; gap: 14px; width: min(1040px, 100%); min-height: 100dvh; margin: 0 auto; padding: 18px 20px 32px; }
+.ck-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; }
+.ck-place { display: grid; min-width: 0; line-height: 1.2; }
+.ck-place strong { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 800 1.05rem var(--font-display); }
+.ck-place small { color: var(--muted); font-size: .78rem; font-weight: 650; }
+.ck-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; white-space: nowrap; }
+.ck-link { height: 40px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 999px; color: var(--muted); font-size: .82rem; font-weight: 700; text-decoration: none; }
+.ck-link:hover { color: var(--text); background: color-mix(in srgb, var(--text) 7%, transparent); }
+.ck-theme { width: 40px; height: 40px; border: 0; border-radius: 50%; color: var(--text); background: color-mix(in srgb, var(--text) 7%, transparent); }
+
+.ck-clock { display: grid; justify-items: center; gap: 2px; margin: 10px 0 6px; }
+.ck-time { display: flex; align-items: baseline; gap: 6px; margin: 0; font-family: var(--font-display); font-variant-numeric: tabular-nums; }
+.ck-time b { font-size: clamp(3.4rem, 11vw, 6rem); font-weight: 800; letter-spacing: -.04em; line-height: 1; }
+.ck-time i { color: var(--muted); font-size: clamp(1.2rem, 3.4vw, 1.9rem); font-style: normal; font-weight: 700; }
+.ck-time span { color: var(--muted); font-size: clamp(1rem, 2.6vw, 1.4rem); font-weight: 700; }
+.ck-date { margin: 0; color: var(--muted); font-size: .98rem; font-weight: 650; }
+.ck-date::first-letter { text-transform: uppercase; }
+
+.ck-ask { margin: 10px 0 0; font: 800 1.25rem var(--font-display); letter-spacing: -.01em; }
+.ck-note { margin: 24px 0; color: var(--muted); text-align: center; }
+.ck-search { display: flex; align-items: center; gap: 8px; width: min(380px, 100%); height: 46px; padding: 0 16px; border-radius: 999px; color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); }
+.ck-search input { flex: 1; min-width: 0; border: 0; outline: 0; color: var(--text); background: transparent; font-size: .95rem; }
+
+.ck-people { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 12px; width: 100%; }
+.ck-person { --tone: var(--muted); display: grid; justify-items: center; gap: 4px; min-height: 148px; padding: 18px 12px 14px; border: 0; border-radius: 24px; color: var(--text); text-align: center; }
+.ck-person:active:not(:disabled) { transform: scale(.97); }
+:host-context([data-theme='dark']) .ck-person { background-color: color-mix(in srgb, white 5%, transparent); }
+.ck-person:disabled { opacity: .5; }
+.ck-person strong { font-size: .98rem; line-height: 1.25; }
+.ck-person small { min-height: 1.1em; color: var(--tone); font-size: .78rem; font-weight: 700; }
+.ck-person[data-state='WORKING'] { --tone: var(--ok); }
+.ck-person[data-state='ON_BREAK'] { --tone: var(--warn); }
+.ck-avatar { width: 58px; height: 58px; display: grid; place-items: center; flex-shrink: 0; margin-bottom: 6px; border-radius: 50%; font: 800 1.1rem var(--font-display); color: var(--tone, var(--muted)); background: color-mix(in srgb, var(--tone, var(--muted)) 15%, transparent); }
+
+.ck-card { display: grid; justify-items: center; gap: 10px; width: min(460px, 100%); margin-top: 20px; padding: 32px 24px; border-radius: 28px; text-align: center; }
+.ck-card h2 { margin: 0; font: 800 1.25rem var(--font-display); }
+.ck-card p { margin: 0; color: var(--muted); font-size: .92rem; line-height: 1.5; }
+.ck-card-ico { width: 60px; height: 60px; display: grid; place-items: center; border-radius: 20px; color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); }
+@media (max-width: 520px) {
+  .ck { padding: 14px 16px 28px; }
+  .ck-people { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .ck-person { min-height: 136px; }
+}

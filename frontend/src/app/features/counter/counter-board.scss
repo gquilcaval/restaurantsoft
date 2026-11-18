@@ -1,0 +1,31 @@
+// Tablero del mostrador: tres columnas por etapa, cada una con su propio scroll.
+.cn-layout { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; }
+.cn-board { min-height: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 14px; }
+.cn-col { --tone: #4f8cff; min-height: 0; display: flex; flex-direction: column; padding: 14px 10px 10px; border-radius: 22px; }
+.cn-col[data-tone='green'] { --tone: #3fbf2a; } .cn-col[data-tone='violet'] { --tone: #a46bff; }
+.cn-col-head { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 0 6px 10px; }
+.cn-col-ico { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 11px; color: var(--tone); background: color-mix(in srgb, var(--tone) 16%, transparent); }
+.cn-col-head h3 { margin: 0; font: 750 .92rem var(--font-display); }
+.cn-col-head small { color: var(--muted); font-size: .7rem; }
+.cn-col-head > b { min-width: 26px; height: 26px; display: grid; place-items: center; padding: 0 7px; border-radius: 999px; font: 800 .78rem var(--font-display); color: var(--tone); background: color-mix(in srgb, var(--tone) 16%, transparent); }
+.cn-col-list { flex: 1; min-height: 0; display: grid; align-content: start; gap: 8px; overflow-y: auto; padding: 2px 2px 4px; scrollbar-width: thin; }
+.cn-col-empty { margin: 10px 6px; color: var(--muted); font-size: .78rem; }
+.cn-card { position: relative; display: grid; gap: 5px; width: 100%; padding: 11px 12px; border: 0; border-radius: 16px; color: var(--text); text-align: left; font: inherit; background: color-mix(in srgb, var(--text) 5%, transparent); cursor: pointer; animation: cn-in .35s var(--ease-spring) var(--d) backwards; transition: background .2s, transform .3s var(--ease-spring), box-shadow .2s; }
+.cn-card:hover { background: color-mix(in srgb, var(--text) 8%, transparent); transform: translateY(-1px); }
+.cn-card.selected { box-shadow: inset 0 0 0 2px var(--brand); background: color-mix(in srgb, var(--brand) 10%, transparent); }
+.cn-card.late .cn-time { color: var(--bad); }
+.cn-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.cn-channel { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px; border-radius: 999px; font-size: .7rem; font-weight: 800; color: #0ea5e9; background: rgba(14, 165, 233, .14); }
+.cn-channel.delivery { color: #f08a3c; background: rgba(240, 138, 60, .15); }
+.cn-time { display: inline-flex; align-items: center; gap: 3px; color: var(--muted); font-size: .72rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.cn-name { font: 750 .95rem var(--font-display); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.cn-addr { display: flex; align-items: center; gap: 4px; color: var(--muted); font-size: .72rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.cn-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 2px; }
+.cn-card-foot > small { color: var(--muted); font-size: .72rem; }
+.cn-money { display: inline-flex; align-items: center; gap: 6px; }
+.cn-money b { font: 800 .9rem var(--font-display); }
+.cn-money i { padding: 1px 7px; border-radius: 999px; font-style: normal; font-size: .64rem; font-weight: 800; }
+.cn-money i.due { color: var(--warn); background: var(--warn-soft); } .cn-money i.paid { color: var(--ok); background: var(--ok-soft); }
+@keyframes cn-in { from { opacity: 0; transform: translateY(8px); } }
+@media (max-width: 1200px) { .cn-layout { grid-template-columns: minmax(0, 1fr); } .cn-detail:not(:has(.cn-detail-head)) { display: none; } }
+@media (max-width: 860px) { .cn-board { grid-auto-flow: row; grid-template-columns: minmax(0, 1fr); } }

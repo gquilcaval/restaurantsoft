@@ -1,0 +1,36 @@
+// Editor de planos en Liquid Glass: todo cabe en pantalla y el lienzo se ajusta al alto.
+.fe { display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0; }
+.fe-pill { display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 40px; padding: 0 16px; border: 0; border-radius: 999px; font-weight: 750; font-size: .84rem; color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); transition: transform .35s var(--ease-spring), background .2s; }
+.fe-pill:hover:not(:disabled) { background: color-mix(in srgb, var(--text) 13%, transparent); }
+.fe-pill:disabled { opacity: .5; }
+.fe-pill.primary { color: var(--on-brand, #04110a); background: var(--brand); }
+.fe-pill.primary:disabled { opacity: 1; color: var(--ok); background: var(--ok-soft); }
+.fe-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex-shrink: 0; }
+.fe-zones { display: flex; gap: 4px; flex-wrap: nowrap; margin: 0; padding: 4px; border-radius: 999px; overflow-x: auto; scrollbar-width: none; background: color-mix(in srgb, var(--surface) 55%, transparent); -webkit-backdrop-filter: blur(20px) saturate(170%); backdrop-filter: blur(20px) saturate(170%); box-shadow: var(--elev-1); }
+.fe-zones button { flex-shrink: 0; height: 38px; padding: 0 16px; border: 0; background: transparent; color: var(--muted); font-size: .85rem; }
+.fe-zones button:hover { color: var(--text); transform: none; }
+.fe-zones button.active { color: var(--text); border: 0; background: var(--surface); box-shadow: var(--elev-2); }
+:root[data-theme='dark'] .fe-zones button.active { background: color-mix(in srgb, white 12%, transparent); }
+.fe-new-plan { border: 0 !important; color: var(--brand) !important; }
+.fe-plan-actions button { border-radius: 999px; }
+.fe-toolbar { flex-shrink: 0; gap: 4px; margin: 0; padding: 4px 6px; border-radius: 999px; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; background: color-mix(in srgb, var(--text) 5%, transparent); }
+.fe-toolbar > span { flex-shrink: 0; margin: 0 4px 0 8px; font-size: .72rem; }
+.fe-toolbar button { flex-shrink: 0; height: 34px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; font-size: .78rem; }
+.fe-toolbar button:hover { transform: translateY(-1px); background: color-mix(in srgb, var(--text) 8%, transparent); }
+.fe-templates-button { border: 0 !important; color: var(--on-brand, #04110a); background: var(--brand) !important; }
+.fe-layout { flex: 1; min-height: 0; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: stretch; }
+.fe-stage { min-height: 0; display: flex; align-items: center; justify-content: center; }
+.fe-stage .fp-svg { width: auto; height: 100%; max-width: 100%; border: 0; border-radius: 22px; box-shadow: var(--elev-1); }
+.fe-inspector { position: static; min-height: 0; overflow-y: auto; align-content: start; padding: 18px; border-radius: 24px; scrollbar-width: thin; }
+.fe-inspector .eyebrow { color: var(--muted); font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+.fe-inspector h2 { font: 800 1.2rem var(--font-display); }
+.fe-segmented button, .fe-chips button, .fe-other button { border: 0 !important; background: color-mix(in srgb, var(--text) 6%, transparent) !important; }
+.fe-segmented button.active { background: color-mix(in srgb, var(--brand) 18%, transparent) !important; box-shadow: inset 0 0 0 2px var(--brand); }
+.fe-input input { height: 38px; border: 0; border-radius: 12px; background: color-mix(in srgb, var(--text) 7%, transparent); }
+.fe-other { max-height: none; }
+.fe-other b { color: var(--brand); }
+.fe-warning { border-radius: 12px; }
+.fe-templates { border: 0; border-radius: 26px; background: color-mix(in srgb, var(--surface) 88%, transparent); -webkit-backdrop-filter: blur(30px); backdrop-filter: blur(30px); box-shadow: var(--elev-4); }
+.fe-template, .fe-template-preview { border: 0 !important; }
+.fe-template { background: color-mix(in srgb, var(--text) 5%, transparent); }
+@media (max-width: 1100px) { .fe-layout { grid-template-columns: minmax(0, 1fr); } .fe-stage .fp-svg { width: 100%; height: auto; } }

@@ -1,0 +1,24 @@
+// Campos, horarios y plano de la reserva online.
+.bk-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.bk-field { display: grid; gap: 6px; font-size: .82rem; font-weight: 700; }
+.bk-field small { color: var(--muted); font-weight: 600; }
+.bk-field input { width: 100%; min-width: 0; height: 46px; padding: 0 14px; border: 0; border-radius: 14px; background: color-mix(in srgb, var(--text) 7%, transparent); color: var(--text); font: inherit; font-size: 16px; font-weight: 600; outline: none; }
+.bk-field input:focus { box-shadow: 0 0 0 2px var(--brand); }
+.bk-stepper { display: flex; align-items: center; justify-content: space-between; height: 46px; padding: 0 6px; border-radius: 14px; background: color-mix(in srgb, var(--text) 7%, transparent); }
+.bk-stepper button { width: 36px; height: 36px; border: 0; border-radius: 50%; color: var(--text); font-size: 1.2rem; font-weight: 800; background: color-mix(in srgb, var(--text) 10%, transparent); }
+.bk-stepper b { font: 800 1.2rem var(--font-display); }
+.bk-times { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.bk-times button { flex-shrink: 0; height: 40px; padding: 0 14px; border: 0; border-radius: 999px; color: var(--text); font-weight: 750; background: color-mix(in srgb, var(--text) 7%, transparent); transition: transform .3s, background .2s; }
+.bk-times button[aria-checked='true'] { color: var(--on-brand, #fff); background: var(--brand); transform: scale(1.05); }
+.bk-plan { position: relative; border-radius: 18px; overflow: hidden; }
+.bk-hint { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); margin: 0; padding: 8px 14px; border-radius: 999px; color: #fff; font-size: .8rem; font-weight: 700; background: rgba(0, 0, 0, .75); white-space: nowrap; }
+.bk-legend { display: flex; gap: 14px; flex-wrap: wrap; color: var(--muted); font-size: .76rem; font-weight: 650; }
+.bk-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.bk-legend i { width: 12px; height: 12px; border-radius: 4px; border: 2px solid; }
+.bk-legend .free { border-color: var(--green, #3fbf2a); } .bk-legend .busy { border-color: var(--info, #4f8cff); background: color-mix(in srgb, #4f8cff 25%, transparent); } .bk-legend .chosen { border-color: var(--green, #3fbf2a); background: var(--green, #3fbf2a); }
+.bk-chosen { display: flex; align-items: center; gap: 8px; margin: 0; padding: 10px 14px; border-radius: 14px; color: var(--ok, #3fbf2a); font-size: .86rem; font-weight: 700; background: color-mix(in srgb, var(--ok, #3fbf2a) 12%, transparent); }
+.bk-chosen b { color: var(--text); }
+.bk-error { margin: 0; padding: 10px 14px; border-radius: 14px; color: var(--bad, #ef5d55); font-size: .84rem; font-weight: 700; background: color-mix(in srgb, #ef5d55 12%, transparent); }
+.bk-send { height: 54px; border: 0; border-radius: 999px; color: var(--on-brand, #fff); font: 800 1rem var(--font-display); background: var(--brand); box-shadow: 0 10px 30px color-mix(in srgb, var(--brand) 35%, transparent); transition: transform .3s, opacity .2s; }
+.bk-send:disabled { opacity: .45; box-shadow: none; } .bk-send:not(:disabled):active { transform: scale(.97); }
+@media (max-width: 560px) { .bk-row { grid-template-columns: 1fr; } .bk-card { padding: 16px; border-radius: 22px; } }

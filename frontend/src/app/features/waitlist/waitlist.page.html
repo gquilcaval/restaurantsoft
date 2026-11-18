@@ -1,0 +1,109 @@
+<main class="wt">
+  @if (error()) {
+    <section class="wt-card">
+      <span class="wt-emoji">🔗</span>
+      <h1>Enlace no disponible</h1>
+      <p>{{ error() }}</p>
+    </section>
+  } @else if (data(); as turn) {
+    <header class="wt-brand">
+      @if (turn.logoUrl) {
+        <img [src]="turn.logoUrl" [alt]="turn.restaurant" />
+      } @else {
+        <span>{{ initial(turn.restaurant) }}</span>
+      }
+      <div>
+        <strong>{{ turn.restaurant }}</strong
+        ><small>{{ turn.branchName }}</small>
+      </div>
+    </header>
+
+    @switch (turn.status) {
+      @case ('NOTIFIED') {
+        <section class="wt-card wt-ready">
+          <div class="wt-burst" aria-hidden="true">
+            @for (ray of [1, 2, 3, 4, 5, 6, 7, 8]; track ray) {
+              <i [style.--r]="ray * 45 + 'deg'"></i>
+            }
+          </div>
+          <span class="wt-emoji big">🎉</span>
+          <h1>¡Tu mesa está lista!</h1>
+          <p>
+            {{ turn.customerName }}, acércate a la entrada{{
+              turn.tableLabel ? ': te esperamos en ' + turn.tableLabel : ''
+            }}.
+          </p>
+          <b class="wt-table">{{ turn.tableLabel || 'Ya puedes pasar' }}</b>
+        </section>
+      }
+      @case ('WAITING') {
+        <section class="wt-card">
+          <p class="wt-eyebrow">Hola, {{ turn.customerName }} 👋</p>
+          <h1>Estás en la lista de espera</h1>
+          <div class="wt-position">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="wt-track" cx="60" cy="60" r="52" />
+              <circle
+                class="wt-fill"
+                cx="60"
+                cy="60"
+                r="52"
+                [style.stroke-dashoffset]="327 - (327 * progress()) / 100"
+              />
+            </svg>
+            <div>
+              <strong>{{ turn.position }}</strong
+              ><small>{{
+                turn.position === 1 ? '¡Eres el siguiente!' : 'tu lugar en la fila'
+              }}</small>
+            </div>
+          </div>
+          <div class="wt-facts">
+            <span
+              ><b>{{ turn.estimatedMinutes ? '~' + turn.estimatedMinutes + ' min' : 'En breve' }}</b
+              ><small>espera estimada</small></span
+            >
+            <span
+              ><b>{{ turn.partySize }}</b
+              ><small>{{ turn.partySize === 1 ? 'persona' : 'personas' }}</small></span
+            >
+          </div>
+          <p class="wt-note">
+            Puedes esperar donde quieras: esta pantalla se actualiza sola y te avisará cuando tu
+            mesa esté lista.
+          </p>
+          @if (!soundReady()) {
+            <button class="wt-sound" (click)="enableSound()">🔔 Activar aviso con sonido</button>
+          } @else {
+            <p class="wt-sound-on">🔔 Aviso con sonido activado. Mantén esta pestaña abierta.</p>
+          }
+          <button class="wt-cancel" [disabled]="cancelling()" (click)="cancel()">
+            Ya no voy a esperar
+          </button>
+        </section>
+      }
+      @case ('SEATED') {
+        <section class="wt-card">
+          <span class="wt-emoji">🍽️</span>
+          <h1>¡Buen provecho!</h1>
+          <p>
+            Ya estás en tu mesa{{ turn.tableLabel ? ' (' + turn.tableLabel + ')' : '' }}. Escanea el
+            QR para ver la carta y pedir.
+          </p>
+        </section>
+      }
+      @default {
+        <section class="wt-card">
+          <span class="wt-emoji">👋</span>
+          <h1>Saliste de la lista</h1>
+          <p>Tu turno ya no está activo. ¡Esperamos verte pronto!</p>
+        </section>
+      }
+    }
+  } @else {
+    <section class="wt-card">
+      <span class="wt-loader"></span>
+      <p>Cargando tu turno…</p>
+    </section>
+  }
+</main>

@@ -1,0 +1,20 @@
+// RestOS Glass en la carta QR: fondo ambiental y superficies flotantes translúcidas.
+.diner-page {
+  background:
+    radial-gradient(80vw 45vh at -10% -5%, color-mix(in srgb, var(--brand) 16%, transparent), transparent 62%),
+    radial-gradient(70vw 40vh at 110% 35%, color-mix(in srgb, var(--info) 12%, transparent), transparent 62%), var(--bg);
+  background-attachment: fixed;
+}
+.diner-page .diner-header { background: var(--glass); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border-bottom-color: var(--glass-border); }
+.diner-page .diner-cart-bar {
+  background: color-mix(in srgb, var(--brand) 82%, transparent); -webkit-backdrop-filter: blur(18px) saturate(170%); backdrop-filter: blur(18px) saturate(170%);
+  border-color: rgba(255, 255, 255, .28); box-shadow: 0 18px 40px color-mix(in srgb, var(--brand) 32%, transparent), inset 0 1px 0 rgba(255, 255, 255, .4);
+}
+.diner-page :is(.quick-actions-menu, .quick-actions-trigger, .diner-search, .diner-categories button:not(.active), .diner-tag-filter button:not(.active)) {
+  background: var(--glass-strong); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border-color: var(--glass-border);
+}
+.diner-page .diner-product-card { background: color-mix(in srgb, var(--surface) 90%, transparent); border-color: var(--glass-border); }
+.diner-page :is(.diner-order-summary, .guest-order-group, .diner-inline-state) { background: var(--glass-strong); border-color: var(--glass-border); }
+.diner-page .diner-product-sheet { background: var(--glass-strong); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); }
+:root.solid-ui .diner-page .diner-cart-bar { background: var(--brand); backdrop-filter: none; }
+:root.solid-ui .diner-page { background: var(--bg); }

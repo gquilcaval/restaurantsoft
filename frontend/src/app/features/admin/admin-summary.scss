@@ -1,0 +1,60 @@
+/* La cuadrícula responde al espacio del main, incluso al expandir el menú lateral. */
+.admin-dashboard.overview {
+  display: block;
+  container: summary / inline-size;
+  width: 100%;
+  max-width: none;
+  min-height: 100%;
+  margin: 0;
+  color: var(--text);
+}
+.summary-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 22px;
+  min-height: 100%;
+}
+.summary-metrics {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+.summary-stat, .summary-panel {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--shadow-color) 30%, transparent);
+}
+.summary-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 21px;
+}
+.stat-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: .78rem;
+  font-weight: 600;
+}
+.stat-heading svg { width: 19px; height: 19px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.stat-symbol { font-size: .8rem; font-weight: 750; }
+.summary-stat > strong { font-size: clamp(1.6rem, 2.8cqi, 2.3rem); font-weight: 650; letter-spacing: -.05em; line-height: 1.1; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.summary-stat em { color: var(--muted); font-size: .55em; font-style: normal; font-weight: 500; letter-spacing: 0; }
+.summary-stat > small { color: var(--muted); font-size: .68rem; line-height: 1.4; }
+.summary-stat.revenue { border-top: 3px solid var(--brand); padding-top: 19px; }
+.revenue small i { display: inline-block; width: 6px; height: 6px; margin-right: 4px; border-radius: 50%; background: var(--brand); }
+.summary-panel { padding: 24px; display: flex; flex-direction: column; }
+.panel-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+.section-label { color: var(--muted); font-size: .59rem; font-weight: 650; letter-spacing: .15em; }
+.panel-top h2 { margin: 7px 0 0; font-size: 1rem; font-weight: 650; letter-spacing: -.02em; }
+.period-label { flex-shrink: 0; color: var(--muted); font-size: .63rem; padding: 6px 9px; border: 1px solid var(--border); border-radius: 7px; }
+.sales-total { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px; margin: 25px 0 0; }
+.sales-total strong { font-size: 1.85rem; font-weight: 600; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.sales-total > span { font-size: .68rem; color: var(--muted); }
+.sales-chart { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 12px; min-height: 200px; flex: 1; margin-top: 22px; background: repeating-linear-gradient(to top, transparent 0, transparent 49px, var(--border) 50px); }

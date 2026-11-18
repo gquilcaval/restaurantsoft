@@ -1,0 +1,36 @@
+// Carta con más espacio para los platos: barra que se esconde, búsqueda bajo demanda y tarjetas más grandes.
+.diner-page .diner-header { transition: margin-top .3s cubic-bezier(.2, .9, .3, 1), opacity .2s; }
+.diner-page.dn-compact .diner-header { margin-top: -76px; opacity: 0; pointer-events: none; }
+.diner-page .diner-menu-view { padding-top: 10px; transition: height .3s cubic-bezier(.2, .9, .3, 1); }
+.diner-page.dn-compact .diner-menu-view { height: 100dvh; }
+.diner-page:not(.dn-has-cart) .diner-menu-view { padding-bottom: 0; }
+.diner-page .diner-menu-view > .diner-categories { margin-top: 0; margin-bottom: 4px; }
+.dn-search-toggle { font-size: 1.05rem; }
+.dn-search-toggle.on { color: #fff; background: var(--brand) !important; border-color: var(--brand) !important; }
+.diner-page .dn-search-open { flex: 0 0 auto; margin-bottom: 10px; animation: dn-drop .25s cubic-bezier(.2, .9, .3, 1); }
+@keyframes dn-drop { from { opacity: 0; transform: translateY(-6px); } }
+.diner-categories .dn-filter-chip { border-style: dashed; }
+.diner-categories .dn-filter-chip.active { border-style: solid; border-color: var(--brand); background: var(--brand-soft); color: var(--brand); box-shadow: none; }
+.diner-page .dn-diet { flex: 0 0 auto; align-items: center; padding-bottom: 8px; animation: dn-drop .22s ease-out; }
+.dn-diet small { flex-shrink: 0; color: var(--muted); font-size: .7rem; font-weight: 800; }
+.diner-page .diner-dishes-scroll { padding-top: 4px; scrollbar-width: none; }
+.diner-page .diner-dishes-scroll::-webkit-scrollbar { display: none; }
+.diner-page .diner-dishes-scroll > app-diner-tracker { display: block; margin-bottom: 10px; }
+// Tarjeta: foto grande, descripción y botón «+».
+.diner-page .diner-menu-list.grid-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.diner-page .diner-menu-list.grid-layout .diner-product-card { grid-template-columns: 1fr; grid-template-rows: auto 1fr; min-height: 0; gap: 0; padding: 0; }
+.diner-page .grid-layout .diner-product-media { width: 100%; height: auto; aspect-ratio: 1 / .64; border-radius: 0; }
+.diner-page .grid-layout .diner-product-copy { display: flex; flex-direction: column; padding: 8px 10px 9px; }
+.diner-page .grid-layout .diner-product-copy h2 { display: -webkit-box; min-height: 0; margin: 0 0 1px; overflow: hidden; font-size: .88rem; line-height: 1.2; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
+.diner-page .grid-layout .diner-product-copy .dn-desc { display: -webkit-box; margin: 0; overflow: hidden; color: var(--muted); font-size: .7rem; line-height: 1.3; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
+.diner-page .grid-layout .diner-product-meta { justify-content: space-between; margin-top: auto; padding-top: 6px; }
+.diner-page .grid-layout .diner-product-meta > strong { font-size: .9rem; }
+.diner-page .diner-menu-list.grid-layout .diner-product-card { border-radius: 16px; }
+.diner-page .grid-layout .diner-badges { top: 6px; right: 6px; transform: scale(.88); transform-origin: top right; }
+.dn-add { flex-shrink: 0; width: 30px; height: 30px; display: grid; place-items: center; border: 0; border-radius: 50%; color: #fff; background: var(--brand); font: 700 1.15rem/1 inherit; box-shadow: 0 4px 12px color-mix(in srgb, var(--brand) 35%, transparent); transition: transform .25s cubic-bezier(.3, 1.5, .5, 1); }
+.dn-add:active { transform: scale(.86); }
+.dn-add:disabled { opacity: .5; }
+@media (max-width: 360px) { .diner-page .diner-menu-list.grid-layout { gap: 8px; } .diner-page .grid-layout .diner-product-copy { padding: 9px 10px 10px; } }
+.diner-page .diner-dishes-scroll { overscroll-behavior-y: contain; }
+// Ficha del plato abierta: sin «deslizar para recargar» ni rebote de la página.
+:root.dn-sheet-open, :root.dn-sheet-open body { overscroll-behavior: none; }

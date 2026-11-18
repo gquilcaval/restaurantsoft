@@ -1,0 +1,30 @@
+// Estudio de planos: modos, 3D y capas sobre el lienzo (guías, pasillos, recorridos, calor, meseros).
+.fe-modebar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex-shrink: 0; }
+.fe-modes { display: flex; gap: 2px; padding: 4px; border-radius: 999px; overflow-x: auto; scrollbar-width: none; background: color-mix(in srgb, var(--surface) 55%, transparent); -webkit-backdrop-filter: blur(20px) saturate(170%); backdrop-filter: blur(20px) saturate(170%); box-shadow: var(--elev-1); }
+.fe-modes button { position: relative; flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-weight: 750; font-size: .82rem; transition: background .25s, color .25s, box-shadow .25s; }
+.fe-modes button:hover { color: var(--text); }
+.fe-modes button[aria-selected='true'] { color: var(--text); background: var(--surface); box-shadow: var(--elev-1); }
+:root[data-theme='dark'] .fe-modes button[aria-selected='true'] { background: color-mix(in srgb, white 12%, transparent); }
+.fe-badge { min-width: 18px; height: 18px; display: grid; place-items: center; padding: 0 5px; border-radius: 999px; color: #fff; background: #ef5d55; font-size: .66rem; }
+.fe-3d { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 16px; border: 0; border-radius: 999px; font-weight: 750; font-size: .82rem; color: var(--text); background: linear-gradient(135deg, color-mix(in srgb, #a46bff 22%, transparent), color-mix(in srgb, #4f8cff 22%, transparent)); transition: transform .35s var(--ease-spring); }
+.fe-3d:hover { transform: translateY(-1px); } .fe-3d.on { color: #fff; background: linear-gradient(135deg, #a46bff, #4f8cff); }
+.fe-capacity { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; padding: 7px 14px; border-radius: 999px; color: var(--muted); font-size: .8rem; font-weight: 650; background: color-mix(in srgb, var(--text) 6%, transparent); }
+.fe-capacity b { color: var(--text); font-family: var(--font-display); }
+.fe-capacity.over { color: var(--bad); background: var(--bad-soft); } .fe-capacity.over b { color: var(--bad); }
+.fe-align { display: inline-flex; align-items: center; gap: 2px; margin-left: auto; padding-left: 10px; }
+.fe-align em { font-style: normal; color: var(--brand); font-size: .74rem; font-weight: 800; margin-right: 4px; }
+.fe-stage { perspective: 1600px; }
+.fe-stage .fp-svg { transition: transform .9s var(--ease-spring), box-shadow .6s; transform-origin: 50% 60%; }
+.fe-bg { pointer-events: none; }
+.fe-guide { stroke: #ec4899; stroke-width: 1.5; stroke-dasharray: 6 5; pointer-events: none; }
+.fe-marquee { fill: color-mix(in srgb, var(--brand) 12%, transparent); stroke: var(--brand); stroke-width: 1.5; stroke-dasharray: 6 4; pointer-events: none; }
+.fe-table.multi .fp-top { stroke: var(--brand); stroke-width: 4; stroke-dasharray: 8 5; }
+.fe-table.heat .fp-top { fill: color-mix(in srgb, var(--heat) 65%, transparent); stroke: var(--heat); stroke-width: 3; }
+.fe-heat-text { fill: var(--text) !important; font-weight: 800 !important; }
+.fe-stage[data-mode='WAITERS'] .fe-table .fp-top { stroke: var(--waiter, #8b95a7); stroke-width: 4; fill: color-mix(in srgb, var(--waiter, #8b95a7) 18%, transparent); }
+.fe-stage[data-mode='WAITERS'] .fe-table { cursor: pointer; }
+.fe-waiter-badge circle { fill: var(--waiter, #8b95a7); stroke: var(--surface); stroke-width: 3; }
+.fe-waiter-badge text { fill: #fff; font-size: 11px; font-weight: 900; text-anchor: middle; dominant-baseline: central; }
+
+.fe-stage.is-3d .fp-svg { transform: rotateX(50deg) rotateZ(-22deg) scale(.9); box-shadow: 0 60px 90px rgba(0, 0, 0, .4); pointer-events: none; }
+.fe-stage.is-3d .fp-top { filter: drop-shadow(0 2px 0 color-mix(in srgb, var(--zone-color, #55758a) 60%, #000)) drop-shadow(0 2px 0 color-mix(in srgb, var(--zone-color, #55758a) 55%, #000)) drop-shadow(0 2px 0 color-mix(in srgb, var(--zone-color, #55758a) 50%, #000)) drop-shadow(0 2px 0 color-mix(in srgb, var(--zone-color, #55758a) 45%, #000)) drop-shadow(0 10px 8px rgba(0, 0, 0, .45)); }

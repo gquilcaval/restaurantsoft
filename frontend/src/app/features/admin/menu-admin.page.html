@@ -1,0 +1,183 @@
+<app-shell title="Menú" eyebrow="Tu carta">
+  <button shell-actions class="mn-pill primary" (click)="newProduct()"><app-icon name="plus" [size]="16" />Nuevo producto</button>
+
+  <div class="mn">
+    <div class="mn-navrow">
+      <div class="mn-filters" role="group" aria-label="Filtrar productos">
+        <button [class.on]="filter() === 'ALL'" (click)="filter.set('ALL')">Todos<small>{{ stats().total }}</small></button>
+        <button [class.on]="filter() === 'AVAILABLE'" data-tone="ok" (click)="filter.set('AVAILABLE')"><i></i>Disponibles<small>{{ stats().available }}</small></button>
+        <button [class.on]="filter() === 'SOLD_OUT'" data-tone="bad" (click)="filter.set('SOLD_OUT')"><i></i>Agotados hoy<small>{{ stats().soldOut }}</small></button>
+        <button [class.on]="filter() === 'HIDDEN'" data-tone="muted" (click)="filter.set('HIDDEN')"><i></i>Ocultos<small>{{ stats().hidden }}</small></button>
+        @if (stats().noPhoto) { <button [class.on]="filter() === 'NO_PHOTO'" data-tone="warn" (click)="filter.set('NO_PHOTO')"><i></i>Sin foto<small>{{ stats().noPhoto }}</small></button> }
+      </div>
+      <label class="mn-search"><app-icon name="search" [size]="16" /><input type="search" placeholder="Buscar plato" aria-label="Buscar plato" [ngModel]="search()" (ngModelChange)="search.set($event)"></label>
+    </div>
+
+    <div class="mn-layout">
+      <!-- Categorías y estaciones -->
+      <aside class="lg mn-cats">
+        <header class="mn-cats-head"><h3>Categorías</h3><button class="mn-icon" (click)="newCategory()" aria-label="Nueva categoría" title="Nueva categoría"><app-icon name="plus" [size]="16" /></button></header>
+        @if (categoryForm()) {
+          <form class="mn-cat-form" (ngSubmit)="saveCategory()">
+            <input name="categoryName" [(ngModel)]="categoryName" required maxlength="80" placeholder="Nombre de la categoría" aria-label="Nombre">
+            <div class="mn-cat-row"><label>Orden<input type="number" min="0" name="categoryOrder" [(ngModel)]="categoryOrder"></label>
+              <label>Estación<select name="categoryStation" [(ngModel)]="categoryStationId"><option value="">Todas</option>@for (station of stations(); track station.id) { <option [value]="station.id">{{ station.name }}</option> }</select></label></div>
+            <button type="button" class="mn-switch" role="switch" [attr.aria-checked]="categoryActive" (click)="categoryActive = !categoryActive"><i></i>Visible en la carta</button>
+            <div class="mn-cat-row"><button type="button" class="mn-pill small" (click)="categoryForm.set(false)">Cancelar</button><button class="mn-pill small primary">Guardar</button></div>
+          </form>
+        }
+        <div class="mn-cat-list">
+          <button class="mn-cat" [class.on]="!selectedCategory()" (click)="selectedCategory.set('')"><span>Toda la carta</span><small>{{ stats().total }}</small></button>
+          @for (category of categories(); track category.id) {
+            <div class="mn-cat" [class.on]="selectedCategory() === category.id" [class.off]="!category.active" (click)="selectedCategory.set(category.id)">
+              <span>{{ category.name }}<em>{{ category.active ? (stationName(category.stationId) || 'Todas las estaciones') : 'Oculta' }}</em></span>
+              <small>{{ countIn(category.id) }}</small>
+              <button class="mn-cat-edit" (click)="$event.stopPropagation(); editCategory(category)" aria-label="Editar categoría"><app-icon name="edit" [size]="13" /></button>
+            </div>
+          }
+        </div>
+        <div class="mn-stations">
+          <header><h4>Estaciones de cocina</h4><button class="mn-icon small" (click)="editStation()" aria-label="Nueva estación"><app-icon name="plus" [size]="14" /></button></header>
+          <div class="mn-station-chips">@for (station of stations(); track station.id) { <button type="button" (click)="editStation(station)" title="Renombrar"><app-icon name="chef" [size]="12" />{{ station.name }}</button> } @empty { <small>Todo se ve en una sola pantalla de cocina.</small> }</div>
+        </div>
+      </aside>
+
+      <!-- Productos -->
+      <section class="mn-grid-wrap">
+        <div class="mn-grid">
+          @for (product of visibleProducts(); track product.id; let index = $index) {
+            <article class="lg mn-card" [class.selected]="editingProductId === product.id" [class.hidden]="!product.active" [class.soldout]="product.active && !product.available" [style.--d]="(index < 18 ? index * 25 : 0) + 'ms'" (click)="editProduct(product)">
+              <div class="mn-photo">
+                @if (product.imageUrl) { <img [src]="product.imageUrl" [alt]="product.name" loading="lazy"> } @else { <span>{{ product.name.slice(0, 1) }}</span> }
+                @if (!product.active) { <b class="mn-flag">Oculto</b> } @else if (!product.available) { <b class="mn-flag bad">Agotado</b> }
+              </div>
+              <div class="mn-card-body">
+                <strong>{{ product.name }}@for (tag of product.tags; track tag) {<i>{{ tagIcon(tag) }}</i>}</strong>
+                <small>{{ selectedCategory() ? (product.description || 'Sin descripción') : product.categoryName }}</small>
+                <div class="mn-card-foot">
+                  <b>{{ product.price | currency:'PEN':'S/ ' }}</b>
+                  @if (product.active) {
+                    <button class="mn-avail" role="switch" [attr.aria-checked]="product.available" [disabled]="togglingId() === product.id" (click)="toggleAvailability(product, $event)" [title]="product.available ? 'Marcar agotado hoy' : 'Marcar disponible'"><i></i></button>
+                  }
+                </div>
+              </div>
+            </article>
+          } @empty {
+            <div class="mn-empty"><span><app-icon name="search" [size]="22" /></span><div><strong>No hay platos con este filtro</strong><small>Cambia la categoría o el filtro, o crea un producto nuevo.</small></div></div>
+          }
+        </div>
+      </section>
+
+      <!-- Editor del producto -->
+      <aside class="lg mn-editor">
+        @if (panel() === 'PRODUCT') {
+          <header class="mn-editor-head">
+            <div><small>{{ editingProductId ? categoryLabel(productCategoryId) : 'Nuevo producto' }}</small><h2>{{ editingProductId ? productName : 'Crea un plato' }}</h2></div>
+            <button class="mn-icon" (click)="closePanel()" aria-label="Cerrar editor"><app-icon name="x" [size]="17" /></button>
+          </header>
+          @if (editingProductId) {
+            <nav class="mn-tabs" role="tablist">
+              <button role="tab" [attr.aria-selected]="editorTab() === 'DATA'" (click)="editorTab.set('DATA')">Datos</button>
+              <button role="tab" [attr.aria-selected]="editorTab() === 'OPTIONS'" (click)="editorTab.set('OPTIONS')">Opciones @if (groups().length) {<small>{{ groups().length }}</small>}</button>
+              <button role="tab" [attr.aria-selected]="editorTab() === 'RECIPE'" (click)="editorTab.set('RECIPE')">Receta @if (recipeLines().length) {<small>{{ foodCostPercent() | number:'1.0-0' }}%</small>}</button>
+            </nav>
+          }
+          <div class="mn-editor-body">
+            @if (editorTab() === 'DATA' || !editingProductId) {
+              <form class="mn-form" (ngSubmit)="saveProduct()">
+                <div class="mn-photo-edit">
+                  @if (productImageUrl) { <img [src]="productImageUrl" alt="Foto del producto"> } @else { <span><app-icon name="utensils" [size]="22" /></span> }
+                  <div>
+                    <label class="mn-pill small upload-button" [class.disabled]="uploading()">{{ uploading() ? 'Subiendo…' : (productImageUrl ? 'Cambiar foto' : 'Subir foto') }}<input type="file" accept="image/jpeg,image/png,image/webp" (change)="uploadImage($event)" [disabled]="uploading()" hidden></label>
+                    @if (productImageUrl) { <button type="button" class="mn-link" (click)="productImageUrl = ''">Quitar</button> }
+                    <small>Las fotos venden más en la carta QR.</small>
+                  </div>
+                </div>
+                <label>Nombre<input name="productName" [(ngModel)]="productName" required maxlength="120" placeholder="Lomo saltado"></label>
+                <div class="mn-row"><label>Categoría<select name="productCategory" [(ngModel)]="productCategoryId" required>@for (category of activeCategories(); track category.id) { <option [value]="category.id">{{ category.name }}</option> }</select></label>
+                  <label>Precio<span class="mn-money"><b>S/</b><input type="number" min="0" step="0.01" name="productPrice" [(ngModel)]="productPrice" required></span></label></div>
+                <label>Descripción<textarea name="productDescription" [(ngModel)]="productDescription" maxlength="600" rows="2" placeholder="Lo que hace especial a este plato"></textarea></label>
+                <div class="mn-tags"><span>Etiquetas</span><div>@for (tag of menuTags; track tag.value) { <button type="button" [class.on]="productTags.has(tag.value)" [attr.aria-pressed]="productTags.has(tag.value)" (click)="toggleTag(tag.value)">{{ tag.icon }} {{ tag.label }}</button> }</div></div>
+                <button type="button" class="mn-switch" role="switch" [attr.aria-checked]="productActive" (click)="productActive = !productActive"><i></i>Visible en la carta</button>
+                <button class="mn-pill primary wide">{{ editingProductId ? 'Guardar cambios' : 'Crear producto' }}</button>
+              </form>
+            } @else if (editorTab() === 'OPTIONS') {
+        <section class="modifier-editor" aria-labelledby="modifier-editor-title">
+          <header><div><h3 id="modifier-editor-title">Opciones y extras</h3></div><button type="button" class="mn-pill small" (click)="addGroup()"><app-icon name="plus" [size]="14" />Grupo</button></header>
+          <p class="muted">Ej. «Término» obligatorio con Medio / Tres cuartos, o «Extras» opcional con Queso (+S/ 3).</p>
+          @for (group of groups(); track $index; let groupIndex = $index) {
+            <div class="modifier-editor-group">
+              <div class="modifier-editor-row">
+                <input [(ngModel)]="group.name" [name]="'group-' + groupIndex" maxlength="80" placeholder="Nombre del grupo" aria-label="Nombre del grupo">
+                <label class="inline-check"><input type="checkbox" [(ngModel)]="group.required" [name]="'required-' + groupIndex"> Obligatorio</label>
+                <label class="inline-number">Máx.<input type="number" min="1" max="20" [(ngModel)]="group.maxSelect" [name]="'max-' + groupIndex"></label>
+                <button type="button" class="icon-remove" (click)="removeGroup(groupIndex)" aria-label="Eliminar grupo">×</button>
+              </div>
+              @for (option of group.options; track $index; let optionIndex = $index) {
+                <div class="modifier-editor-option">
+                  <input [(ngModel)]="option.name" [name]="'option-' + groupIndex + '-' + optionIndex" maxlength="80" placeholder="Opción" aria-label="Nombre de la opción">
+                  <label class="inline-number">+S/<input type="number" min="0" step="0.50" [(ngModel)]="option.priceDelta" [name]="'price-' + groupIndex + '-' + optionIndex" aria-label="Recargo"></label>
+                  <button type="button" class="icon-remove" (click)="removeOption(group, optionIndex)" aria-label="Eliminar opción">×</button>
+                </div>
+                @if (ingredients().length) {
+                  <div class="modifier-editor-option option-stock">
+                    <span>Descuenta</span>
+                    <select [(ngModel)]="option.ingredientId" [name]="'option-ingredient-' + groupIndex + '-' + optionIndex" aria-label="Insumo que consume la opción"><option value="">Ningún insumo</option>@for (item of ingredients(); track item.id) { <option [value]="item.id">{{ item.name }}</option> }</select>
+                    @if (option.ingredientId) { <label class="inline-number"><input type="number" min="0" step="0.001" [(ngModel)]="option.ingredientQuantity" [name]="'option-qty-' + groupIndex + '-' + optionIndex" aria-label="Cantidad del insumo">{{ unitLabel(option.ingredientId) }}</label> }
+                  </div>
+                }
+              }
+              <button type="button" class="link-button" (click)="addOption(group)">+ Agregar opción</button>
+            </div>
+          } @empty {
+            <p class="modifier-editor-empty">Este producto se pide tal cual, sin opciones.</p>
+          }
+          <button type="button" class="mn-pill primary wide" [disabled]="savingGroups()" (click)="saveGroups()">{{ savingGroups() ? 'Guardando…' : 'Guardar opciones' }}</button>
+        </section>
+
+            } @else {
+        <section class="modifier-editor recipe-editor" aria-labelledby="recipe-editor-title">
+          <header><div><h3 id="recipe-editor-title">Receta y costo</h3></div><button type="button" class="mn-pill small" (click)="addRecipeLine()"><app-icon name="plus" [size]="14" />Insumo</button></header>
+          <p class="muted">Cantidad de cada insumo para <strong>una</strong> porción. Se descuenta del stock cuando el plato llega a cocina.</p>
+          @for (line of recipeLines(); track $index; let index = $index) {
+            <div class="modifier-editor-option recipe-line">
+              <select [(ngModel)]="line.ingredientId" (ngModelChange)="touchRecipe()" [name]="'recipe-ingredient-' + index" aria-label="Insumo">@for (item of ingredients(); track item.id) { <option [value]="item.id">{{ item.name }}</option> }</select>
+              <label class="inline-number"><input type="number" min="0" step="0.001" [(ngModel)]="line.quantity" (ngModelChange)="touchRecipe()" [name]="'recipe-qty-' + index" aria-label="Cantidad">{{ unitLabel(line.ingredientId) }}</label>
+              <span class="recipe-line-cost">{{ (ingredient(line.ingredientId)?.costPerUnit || 0) * (line.quantity || 0) | currency:'PEN':'S/ ' }}</span>
+              <button type="button" class="icon-remove" (click)="removeRecipeLine(index)" aria-label="Quitar insumo">×</button>
+            </div>
+          } @empty {
+            <p class="modifier-editor-empty">{{ ingredients().length ? 'Sin receta: este plato no descuenta inventario.' : 'Primero registra tus insumos en Inventario.' }}</p>
+          }
+          @if (recipeLines().length) {
+            <div class="recipe-summary" [class.warn]="foodCostPercent() > 35" [class.bad]="foodCostPercent() > 45">
+              <span>Costo <strong>{{ recipeCost() | currency:'PEN':'S/ ' }}</strong></span>
+              <span>Margen <strong>{{ productPrice - recipeCost() | currency:'PEN':'S/ ' }}</strong></span>
+              <span>Costo de insumos <strong>{{ foodCostPercent() | number:'1.0-1' }} %</strong></span>
+            </div>
+          }
+          <button type="button" class="mn-pill primary wide" [disabled]="savingRecipe()" (click)="saveRecipe()">{{ savingRecipe() ? 'Guardando…' : 'Guardar receta' }}</button>
+        </section>
+            }
+          </div>
+        } @else {
+          <div class="mn-summary">
+            <h3>Tu carta</h3>
+            <div class="mn-summary-stats">
+              <span><small>Productos</small><b>{{ stats().total }}</b></span>
+              <span><small>Con opciones</small><b>{{ stats().withOptions }}</b></span>
+              <span><small>Agotados hoy</small><b class="bad">{{ stats().soldOut }}</b></span>
+              <span><small>Ocultos</small><b>{{ stats().hidden }}</b></span>
+            </div>
+            @if (stats().noPhoto || stats().noDescription) {
+              <h4>Para vender más</h4>
+              @if (stats().noPhoto) { <button class="mn-hint" (click)="filter.set('NO_PHOTO'); selectedCategory.set('')"><app-icon name="sparkles" [size]="16" /><span><b>{{ stats().noPhoto }} platos sin foto</b><small>Los platos con foto se piden más en la carta QR.</small></span></button> }
+              @if (stats().noDescription) { <div class="mn-hint"><app-icon name="edit" [size]="16" /><span><b>{{ stats().noDescription }} sin descripción</b><small>Una línea que antoje ayuda a decidir.</small></span></div> }
+            }
+            <p class="mn-tip">Toca un plato para editarlo. El interruptor de cada tarjeta lo marca <b>agotado hoy</b> sin quitarlo de la carta.</p>
+          </div>
+        }
+      </aside>
+    </div>
+  </div>
+</app-shell>

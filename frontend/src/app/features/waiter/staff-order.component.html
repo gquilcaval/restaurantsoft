@@ -1,0 +1,191 @@
+<div class="so-backdrop" (click)="closed.emit()">
+  <section class="so" [class.cart-open]="showCart()" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="so-title">
+    <!-- Carta -->
+    <div class="so-menu">
+      <header class="so-head">
+        <div class="so-title"><small>Tomar pedido</small><h2 id="so-title">{{ tableLabel() }}</h2></div>
+        <label class="so-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+          <input type="search" placeholder="Buscar plato o bebida" aria-label="Buscar producto" [ngModel]="search()" (ngModelChange)="search.set($event)"></label>
+        <button class="so-close" type="button" (click)="closed.emit()" aria-label="Cerrar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+      </header>
+      <nav class="so-cats" aria-label="Categorías">
+        <button type="button" [class.on]="!category()" (click)="category.set('')">Todo</button>
+        @if (hasPopular()) { <button type="button" [class.on]="category() === POPULAR" (click)="category.set(POPULAR)">🔥 Más pedidos</button> }
+        @for (name of categories(); track name) {
+          <button type="button" [class.on]="category() === name" (click)="category.set(name)">{{ name }}</button>
+        }
+      </nav>
+      @if (loading()) {
+        <div class="so-empty"><span class="service-loader"></span><p>Cargando carta…</p></div>
+      } @else {
+        <div class="so-grid">
+          @for (item of visible(); track item.id) {
+            <article class="so-card" [class.in]="quantityInCart(item) > 0" [class.off]="!item.available" [class.pop]="justAdded().has(item.id)">
+              <button type="button" class="so-card-main" [disabled]="!item.available" (click)="choose(item, $event)" [attr.aria-label]="'Agregar ' + item.name">
+                <span class="so-photo" [class.noimg]="!item.imageUrl" [style.--h]="hue(item.name)">
+                  @if (item.imageUrl) { <img [src]="item.imageUrl" [alt]="item.name" loading="lazy"> } @else { <b>{{ item.name.slice(0, 1) }}</b> }
+                  @if (!item.available) { <em class="so-badge off">Agotado</em> } @else if (item.popular) { <em class="so-badge">🔥 Popular</em> }
+                </span>
+                <span class="so-info">
+                  <strong>{{ item.name }}</strong>
+                  <span class="so-tags">@for (tag of item.tags.slice(0, 2); track tag) {<i>{{ tagLabel(tag) }}</i>}@if (item.modifierGroups.length) {<i class="opt">Con opciones</i>}</span>
+                  <b class="so-price">{{ item.price | currency:'PEN':'S/ ' }}</b>
+                </span>
+              </button>
+              @if (justAdded().has(item.id)) { <span class="so-plus1" aria-hidden="true">+1</span> }
+              @if (item.available) {
+                @if (quantityInCart(item) > 0) {
+                  <span class="so-stepper">
+                    <button type="button" (click)="decrease(item)" [attr.aria-label]="'Quitar uno de ' + item.name"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+                    <b>{{ quantityInCart(item) }}</b>
+                    <button type="button" (click)="choose(item, $event)" [attr.aria-label]="'Agregar otro ' + item.name"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+                  </span>
+                } @else {
+                  <button type="button" class="so-add" [class.guide]="!count() && item.id === firstAvailableId()" (click)="choose(item, $event)" [attr.aria-label]="'Agregar ' + item.name"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+                }
+              }
+            </article>
+          } @empty {
+            <div class="so-empty"><strong>Sin resultados</strong><p>Prueba con otro nombre o categoría.</p></div>
+          }
+        </div>
+      }
+      @if (count()) {
+        <button type="button" class="so-cartbar" (click)="showCart.set(true)" [attr.aria-label]="'Ver pedido: ' + count() + ' productos'">
+          <span class="so-cb-stack">
+            @for (line of recentLines(); track line.key) {
+              <i [style.--h]="hue(line.item.name)">@if (line.item.imageUrl) {<img [src]="line.item.imageUrl" alt="">} @else { {{ line.item.name.slice(0, 1) }} }</i>
+            }
+            @for (tick of [bump()]; track tick) {<b class="so-cartbar-n">{{ count() }}</b>}
+          </span>
+          <span class="so-cb-text"><b>Ver pedido</b><small>{{ count() }} {{ count() === 1 ? 'producto' : 'productos' }}</small></span>
+          <span class="so-cb-total">{{ total() | currency:'PEN':'S/ ' }}</span>
+          <span class="so-cb-go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span>
+        </button>
+      } @else {
+        <p class="so-cartbar-hint" role="status"><span aria-hidden="true">👆</span>Toca un plato para agregarlo</p>
+      }
+    </div>
+
+    <!-- Pedido en preparación -->
+    @if (showCart()) { <button type="button" class="so-cart-scrim" (click)="showCart.set(false)" aria-label="Volver a la carta"></button> }
+    <aside class="so-cart" aria-label="Pedido en preparación" [class.expanded]="sheetExpanded()" [class.sheet-dragging]="sheetDragging()"
+      [style.transform]="sheetY() > 0 ? 'translateY(' + sheetY() + 'px)' : null" [style.height]="sheetHeight() ? sheetHeight() + 'px' : null">
+      <div class="so-cart-drag" (pointerdown)="sheetStart($event)" (pointermove)="sheetMove($event)" (pointerup)="sheetEnd($event)" (pointercancel)="sheetEnd($event)">
+      <span class="so-cart-grip" aria-hidden="true"></span>
+      <header class="so-cart-head">
+        <button type="button" class="so-back" (click)="showCart.set(false)" aria-label="Seguir agregando"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>
+        <div><h3>Tu pedido @if (count()) {@for (tick of [bump()]; track tick) {<span class="so-count">{{ count() }}</span>}}</h3><small>{{ tableLabel() }} · se envía junto a cocina</small></div>
+        @if (lines().length) { <button type="button" class="so-clear" (click)="clearAll()">Vaciar</button> }
+      </header>
+      </div>
+      @if (previousCount()) {
+        <details class="so-prev">
+          <summary><span>Ya pedido en esta cuenta</span><b>{{ previousCount() }} · {{ previousTotal() | currency:'PEN':'S/ ' }}</b></summary>
+          <ul>
+            @for (item of previousItems(); track item.id) { <li><b>{{ item.quantity }}×</b><span>{{ item.name }}</span><small>{{ item.status === 'DELIVERED' ? 'Servido' : item.status === 'READY' ? 'Listo' : 'En cocina' }}</small></li> }
+          </ul>
+        </details>
+      }
+      @if (error()) { <p class="so-error">{{ error() }}</p> }
+      <div class="so-lines">
+        @for (line of lines(); track line.key) {
+          <div class="so-swipe" [class.removing]="removingKey() === line.key" [class.open]="swipeOffset(line.key) < 0" [class.fresh]="freshKey() === line.key">
+            <button type="button" class="so-swipe-del" (click)="removeLine(line)" [attr.aria-label]="'Eliminar ' + line.item.name" tabindex="-1">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg><span>Eliminar</span>
+            </button>
+            <article class="so-line" [class.dragging]="draggingKey() === line.key" [style.transform]="swipeOffset(line.key) ? 'translateX(' + swipeOffset(line.key) + 'px)' : null"
+              (pointerdown)="swipeStart($event, line)" (pointermove)="swipeMove($event)" (pointerup)="swipeEnd($event, line)" (pointercancel)="swipeEnd($event, line)">
+            <span class="so-thumb" [style.--h]="hue(line.item.name)">@if (line.item.imageUrl) {<img [src]="line.item.imageUrl" alt="">} @else {<b>{{ line.item.name.slice(0, 1) }}</b>}</span>
+            <div class="so-line-main">
+              <div class="so-line-top"><strong>{{ line.item.name }}</strong><b class="so-line-price">{{ line.unitPrice * line.quantity | currency:'PEN':'S/ ' }}</b></div>
+              @if (line.summary) { <small class="so-mods">{{ line.summary }}</small> }
+              @if (noteEditing() === line.key) {
+                <div class="so-note-edit">
+                  <input type="text" maxlength="300" placeholder="Escribe una nota para cocina" [ngModel]="line.notes" (ngModelChange)="updateNotes(line, $event)" (keydown.enter)="noteEditing.set(null)" [attr.aria-label]="'Nota para ' + line.item.name">
+                  <div class="so-chips">@for (note of quickNotes; track note) {<button type="button" [class.on]="hasNote(line.notes, note)" (click)="toggleLineNote(line, note)">{{ note }}</button>}</div>
+                  <div class="so-note-actions">
+                    @if (line.notes) { <button type="button" class="so-note-remove" (click)="updateNotes(line, ''); noteEditing.set(null)">Quitar nota</button> }
+                    <button type="button" class="so-note-done" (click)="noteEditing.set(null)">Listo</button>
+                  </div>
+                </div>
+              } @else if (line.notes) {
+                <span class="so-note-pill"><button type="button" (click)="noteEditing.set(line.key)" [attr.aria-label]="'Editar nota de ' + line.item.name">📝 {{ line.notes }}</button><button type="button" class="x" (click)="updateNotes(line, '')" [attr.aria-label]="'Quitar nota de ' + line.item.name">✕</button></span>
+              }
+              <div class="so-line-foot">
+                <span class="so-stepper small">
+                  <button type="button" (click)="changeLine(line, -1)" [attr.aria-label]="(line.quantity === 1 ? 'Quitar ' : 'Quitar uno de ') + line.item.name" [class.trash]="line.quantity === 1">@if (line.quantity === 1) {<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>} @else {<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>}</button>
+                  @for (q of [line.quantity]; track q) {<b class="so-qty">{{ q }}</b>}
+                  <button type="button" (click)="changeLine(line, 1)" [attr.aria-label]="'Agregar uno de ' + line.item.name"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+                </span>
+                @if (!line.notes && noteEditing() !== line.key) { <button type="button" class="so-note" (click)="noteEditing.set(line.key)">+ Nota para cocina</button> }
+                @else if (line.quantity > 1) { <small class="so-unit">{{ line.unitPrice | currency:'PEN':'S/ ' }} c/u</small> }
+              </div>
+            </div>
+          </article>
+          </div>
+        } @empty {
+          <div class="so-cart-empty"><span>🍽️</span><strong>Aún no hay productos</strong><p>Toca un plato de la carta para agregarlo a esta ronda.</p></div>
+        }
+      </div>
+      <footer class="so-foot">
+        <div class="so-sum">
+          <span>Esta ronda</span>@for (t of [total()]; track t) {<strong class="so-total">{{ t | currency:'PEN':'S/ ' }}</strong>}
+          @if (previousTotal() && total()) { <small>La cuenta quedará en <b>{{ previousTotal() + total() | currency:'PEN':'S/ ' }}</b></small> }
+        </div>
+        <button type="button" class="so-send" [disabled]="!lines().length || sending()" (click)="send()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 12 16-8-6 16-2-6z"/></svg>{{ sending() ? 'Enviando…' : 'Enviar a cocina' + (count() ? ' (' + count() + ')' : '') }}
+        </button>
+      </footer>
+    </aside>
+
+    @if (editing(); as item) {
+      <div class="so-opt-backdrop" (click)="editing.set(null)">
+        <section class="so-opt" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="so-opt-title">
+          <header class="so-opt-hero" [style.--h]="hue(item.name)">
+            @if (item.imageUrl) { <img [src]="item.imageUrl" [alt]="item.name"> } @else { <b class="so-opt-letter">{{ item.name.slice(0, 1) }}</b> }
+            <div class="so-opt-hero-text"><small>{{ item.categoryName }}</small><h3 id="so-opt-title">{{ item.name }}</h3><span>{{ item.price | currency:'PEN':'S/ ' }}</span></div>
+            <button class="so-close floating" type="button" (click)="editing.set(null)" aria-label="Cerrar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+          </header>
+          <div class="so-opt-body">
+            @if (item.description) { <p class="so-opt-desc">{{ item.description }}</p> }
+            @for (group of item.modifierGroups; track group.id) {
+              <section class="so-mod" [class.missing]="groupCount(group) < group.minSelect">
+                <header>
+                  <div><b>{{ group.name }}</b><small>{{ groupRule(group) }}</small></div>
+                  @if (group.minSelect > 0) { <span class="so-req" [class.ok]="groupCount(group) >= group.minSelect">{{ groupCount(group) >= group.minSelect ? '✓ Listo' : 'Obligatorio' }}</span> }
+                  @else { <span class="so-req optional">Opcional</span> }
+                </header>
+                <div class="so-mod-opts" [class.single]="group.maxSelect === 1">
+                  @for (option of group.options; track option.id) {
+                    <button type="button" class="so-mod-opt" [class.on]="isOpt(option.id)" [attr.aria-pressed]="isOpt(option.id)"
+                      [disabled]="!isOpt(option.id) && group.maxSelect > 1 && groupCount(group) >= group.maxSelect" (click)="toggleOpt(group, option.id)">
+                      <i class="so-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></i>
+                      <span>{{ option.name }}</span>
+                      @if (option.priceDelta > 0) { <b>+{{ option.priceDelta | currency:'PEN':'S/ ' }}</b> }
+                    </button>
+                  }
+                </div>
+              </section>
+            }
+            <section class="so-mod">
+              <header><div><b>Nota para cocina</b><small>Opcional</small></div></header>
+              <div class="so-chips">@for (note of quickNotes; track note) {<button type="button" [class.on]="hasNote(notes, note)" (click)="notes = toggleNoteText(notes, note)">{{ note }}</button>}</div>
+              <textarea class="so-opt-note" [(ngModel)]="notes" maxlength="300" rows="2" placeholder="Escribe algo más para cocina"></textarea>
+            </section>
+          </div>
+          <footer class="so-opt-foot">
+            <span class="so-stepper">
+              <button type="button" (click)="adjustQuantity(-1)" aria-label="Menos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+              <b>{{ quantity }}</b>
+              <button type="button" (click)="adjustQuantity(1)" aria-label="Más"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+            </span>
+            <button type="button" class="so-send" [disabled]="!optionsValid()" (click)="confirmOptions($event)">
+              @if (missingGroup(); as name) { Elige: {{ name }} } @else { Agregar · {{ editingUnitPrice() * quantity | currency:'PEN':'S/ ' }} }
+            </button>
+          </footer>
+        </section>
+      </div>
+    }
+  </section>
+</div>

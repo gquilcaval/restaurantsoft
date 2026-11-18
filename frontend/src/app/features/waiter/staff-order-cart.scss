@@ -1,0 +1,26 @@
+// Ronda: lo ya pedido, cada línea con foto, − / + (o papelera), notas rápidas y el total que quedará.
+.so-cart { display: flex; flex-direction: column; min-height: 0; background: color-mix(in srgb, var(--text) 3%, transparent); }
+.so-cart-head { display: flex; align-items: center; gap: 10px; padding: 22px 18px 10px; }
+.so-cart-head > div { flex: 1; min-width: 0; }
+.so-cart-head h3 { display: flex; align-items: center; gap: 8px; margin: 0; font: 800 1.05rem var(--font-display); }
+.so-cart-head small { color: var(--muted); font-size: .72rem; }
+.so-count, .so-cartbar-n { animation: so-bump .35s cubic-bezier(.2, 1.6, .4, 1); }
+.so-count { min-width: 24px; height: 24px; display: inline-grid; place-items: center; padding: 0 7px; border-radius: 999px; color: var(--on-brand, #fff); font-size: .74rem; background: var(--brand); }
+.so-clear { padding: 6px 12px; border: 0; border-radius: 999px; color: var(--muted); font-size: .76rem; font-weight: 800; background: transparent; }
+.so-clear:hover { color: var(--bad, #ef5d55); background: color-mix(in srgb, var(--bad, #ef5d55) 10%, transparent); }
+.so-back { display: none; }
+.so-lines { flex: 1; min-height: 0; display: grid; grid-auto-rows: max-content; align-content: start; gap: 8px; padding: 0 14px 8px; overflow-y: auto; scrollbar-width: thin; }
+.so-line { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; padding: 10px; border-radius: 18px; background: var(--surface); box-shadow: var(--elev-1, 0 2px 6px rgba(0, 0, 0, .1)); animation: so-in .25s ease; }
+.so-thumb { width: 44px; height: 44px; display: grid; place-items: center; overflow: hidden; border-radius: 13px; background: linear-gradient(135deg, hsl(var(--h) 55% 42%), hsl(calc(var(--h) + 40) 60% 30%)); }
+.so-thumb img { width: 100%; height: 100%; object-fit: cover; } .so-thumb b { color: rgba(255, 255, 255, .9); font: 800 1rem var(--font-display); }
+.so-line-main { display: grid; gap: 4px; min-width: 0; }
+.so-line-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.so-line-top strong { font-size: .88rem; line-height: 1.25; }
+.so-line-price { font: 800 .88rem var(--font-display); white-space: nowrap; }
+.so-mods { color: var(--brand-accent, var(--brand)); font-size: .72rem; font-weight: 700; }
+.so-line-main input { width: 100%; padding: 8px 10px; border: 0; border-radius: 10px; color: var(--text); font: inherit; font-size: .78rem; background: color-mix(in srgb, var(--text) 6%, transparent); outline: none; }
+.so-line-main input:focus { box-shadow: 0 0 0 2px var(--brand); }
+.so-line-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 2px; }
+.so-note { padding: 4px 0; border: 0; color: var(--muted); font-size: .72rem; font-weight: 750; background: none; }
+.so-unit { color: var(--muted); font-size: .7rem; font-weight: 650; }
+.so-stepper button.trash { color: var(--bad, #ef5d55); }

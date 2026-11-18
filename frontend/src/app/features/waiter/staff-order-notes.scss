@@ -1,0 +1,12 @@
+// Notas para cocina: etiqueta con ✕ para quitarla, chips que se activan y desactivan, y «Listo» para cerrar.
+.so-note-pill { display: flex; align-items: stretch; width: 100%; min-height: 34px; border-radius: 10px; background: color-mix(in srgb, #f5b301 16%, transparent); cursor: pointer; transition: background .2s; }
+.so-note-pill:active { background: color-mix(in srgb, #f5b301 26%, transparent); }
+.so-note-pill button { flex: 1; min-width: 0; padding: 7px 4px 7px 10px; border: 0; overflow: hidden; color: var(--text); font: inherit; font-size: .74rem; font-weight: 700; text-align: left; white-space: nowrap; text-overflow: ellipsis; background: none; }
+.so-note-pill button.x { flex: 0 0 auto; padding: 7px 12px 7px 8px; color: var(--muted); font-size: .72rem; }
+.so-note-pill button.x:active { color: var(--bad, #ef5d55); }
+.so-note-edit { display: grid; gap: 6px; padding: 8px; border-radius: 14px; background: color-mix(in srgb, var(--text) 4%, transparent); }
+.so-note-edit input { background: var(--surface) !important; }
+.so-note-actions { display: flex; justify-content: flex-end; gap: 6px; }
+.so-note-remove, .so-note-done { height: 32px; padding: 0 12px; border: 0; border-radius: 999px; font-size: .74rem; font-weight: 800; }
+.so-note-remove { color: var(--bad, #ef5d55); background: color-mix(in srgb, var(--bad, #ef5d55) 12%, transparent); }
+.so-note-done { color: var(--on-brand, #fff); background: var(--brand); }

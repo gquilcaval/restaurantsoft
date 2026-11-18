@@ -1,0 +1,40 @@
+// Menú de tu cuenta: preferencias de este equipo (apariencia, sonido) y la sesión.
+.user-menu { position: relative; }
+button.user-chip { padding: 4px 10px 4px 16px; border: 0; border-radius: 999px; color: var(--text); text-align: left; background: transparent; cursor: pointer; transition: background .2s; }
+button.user-chip:hover, button.user-chip[aria-expanded='true'] { background: color-mix(in srgb, var(--text) 7%, transparent); }
+button.user-chip > svg, .um-chevron svg, .um-back svg, .um-action svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+button.user-chip > svg { color: var(--muted); transition: transform .3s var(--ease-spring); }
+button.user-chip[aria-expanded='true'] > svg { transform: rotate(180deg); }
+.um-head { display: flex; align-items: center; gap: 12px; }
+.um-avatar { width: 44px; height: 44px; flex-shrink: 0; display: grid; place-items: center; border-radius: 15px; color: var(--on-brand, #fff); font-weight: 800; background: var(--brand); }
+.um-head div { display: grid; gap: 1px; min-width: 0; }
+.um-head strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 800 1rem var(--font-display); }
+.um-head small { color: var(--muted); font-size: .74rem; }
+.fx-ico.look { color: #a46bff; background: rgba(164, 107, 255, .16); }
+.fx-ico.sound { color: #2db8a5; background: rgba(45, 184, 165, .16); }
+.fx-ico svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.um-chevron { color: var(--muted); display: grid; transition: transform .25s; }
+.um-row:hover .um-chevron { transform: translateX(3px); color: var(--text); }
+.um-back { width: 40px; height: 40px; display: grid; place-items: center; border: 0; border-radius: 14px; color: var(--text); background: color-mix(in srgb, var(--text) 6%, transparent); }
+.um-back:hover { background: color-mix(in srgb, var(--text) 11%, transparent); }
+.um-actions { display: grid; padding-top: 2px; }
+.um-action { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border: 0; border-radius: 14px; color: var(--muted); font-size: .84rem; font-weight: 700; text-align: left; background: transparent; transition: background .2s, color .2s; }
+.um-action:hover { color: var(--danger); background: var(--danger-soft); }
+.effects-pop > * { animation: um-view .28s ease both; }
+@keyframes um-view { from { opacity: 0; transform: translateX(8px); } }
+@media (max-width: 1100px) { button.user-chip { padding: 4px; } button.user-chip > svg { display: none; } }
+@media (max-width: 620px) { .user-menu .user-chip { display: flex; padding: 0; border-left: 0; } .user-menu .user-chip > span { width: 36px; height: 36px; } }
+.fx-ico.brand { color: var(--brand); background: color-mix(in srgb, var(--brand) 16%, transparent); }
+@media (max-width: 620px) { .demo-banner { padding: 7px 12px; font-size: .78rem; } .demo-banner .db-long { display: none; } }
+@media (max-width: 620px) { .sound-control { display: none !important; } }
+.title-menu { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; padding: 4px 10px 4px 6px; border: 0; border-radius: 16px; color: var(--text); text-align: left; font: inherit; background: transparent; -webkit-tap-highlight-color: transparent; transition: background .2s, transform .15s; }
+.title-menu:hover { background: color-mix(in srgb, var(--text) 6%, transparent); }
+.title-menu:active { transform: scale(.97); }
+.title-menu h1 { display: flex; align-items: center; gap: 6px; max-width: 100%; }
+.title-chevron { width: 18px !important; height: 18px !important; flex-shrink: 0; padding: 2px; border-radius: 50%; color: var(--muted); stroke-width: 2.4 !important; background: color-mix(in srgb, var(--text) 8%, transparent); }
+.fx-ico.team { color: #f5b301; background: rgba(245, 179, 1, .16); }
+.shell-team-dialog { width: min(760px, 100%); max-height: calc(100dvh - 32px); overflow: auto; text-align: left; }
+.shell-team-backdrop { z-index: 95 !important; }
+.shell-team-dialog { background: var(--surface) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+/* En celular, sin otros módulos a dónde ir, el menú ☰ sobra. */
+.sidebar-toggle.no-menu { display: none !important; }

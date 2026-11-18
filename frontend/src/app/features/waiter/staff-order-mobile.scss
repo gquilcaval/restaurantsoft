@@ -1,0 +1,11 @@
+// Opciones del plato y versión celular: carta a pantalla completa, barra «Ver pedido» y la ronda como segunda vista.
+@media (max-width: 860px) {
+  .so-backdrop { padding: 0; }
+  .so { grid-template-columns: minmax(0, 1fr); width: 100%; height: 100dvh; border-radius: 0; }
+  .so-head { flex-wrap: wrap; gap: 10px; padding: 14px 14px 8px; }
+  .so-title { flex: 1; } .so-search { order: 3; flex-basis: 100%; max-width: none; margin: 0; }
+  .so-cats { padding: 4px 14px 10px; }
+  .so-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 2px 14px 100px; }
+  .so-card .so-stepper { position: static; justify-content: space-between; margin: 0 10px 10px; }
+  .so-card.in .so-info strong { padding-right: 0; }
+}

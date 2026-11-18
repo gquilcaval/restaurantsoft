@@ -1,0 +1,24 @@
+// Ficha de una persona: secciones opcionales plegables y pie.
+.ps-fold { border-radius: 18px; background: color-mix(in srgb, var(--text) 4%, transparent); }
+.ps-fold-head { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 58px; padding: 8px 14px; border: 0; border-radius: 18px; color: var(--text); background: none; text-align: left; font: inherit; }
+.ps-fold-head > span { flex: 1; min-width: 0; display: grid; }
+.ps-fold-head b { font-size: .88rem; }
+.ps-fold-head small { overflow: hidden; color: var(--muted); font-size: .74rem; white-space: nowrap; text-overflow: ellipsis; }
+.ps-fold-head > app-icon:first-child { color: var(--muted); }
+.ps-fold-head > app-icon:last-child { color: var(--muted); transition: transform .25s var(--ease-out); }
+.ps-fold.open .ps-fold-head > app-icon:last-child { transform: rotate(180deg); }
+.ps-fold-body { display: grid; gap: 12px; padding: 4px 14px 14px; animation: ps-in .25s var(--ease-out); }
+.ps-two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.ps-date { display: grid; grid-template-columns: 1fr 1fr 1.3fr auto; gap: 6px; }
+.ps-date input { padding: 0 8px; text-align: center; }
+.ps-switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 54px; padding: 8px 12px 8px 14px; border: 0; border-radius: 16px; color: var(--text); background: color-mix(in srgb, var(--text) 5%, transparent); text-align: left; font: inherit; }
+.ps-switch span { display: grid; } .ps-switch b { font-size: .86rem; } .ps-switch small { color: var(--muted); font-size: .72rem; }
+.ps-switch i { position: relative; flex-shrink: 0; width: 44px; height: 26px; border-radius: 999px; background: color-mix(in srgb, var(--text) 20%, transparent); transition: background .2s; }
+.ps-switch i::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .25); transition: transform .2s; }
+.ps-switch[aria-checked='true'] i { background: var(--brand); } .ps-switch[aria-checked='true'] i::after { transform: translateX(18px); }
+.ps-foot { position: sticky; bottom: -18px; display: grid; gap: 8px; margin: 0 -16px -18px; padding: 10px 16px 18px; background: linear-gradient(transparent, var(--surface) 14px); }
+.ps-missing, .ps-error { margin: 0; font-size: .82rem; font-weight: 650; text-align: center; }
+.ps-missing { color: var(--muted); } .ps-error { color: var(--bad); }
+.ps-link { justify-self: center; height: 40px; padding: 0 14px; border: 0; border-radius: 999px; color: var(--muted); background: none; font-size: .84rem; font-weight: 750; }
+.ps-link.danger { color: var(--bad); }
+@keyframes ps-in { from { opacity: 0; transform: translateY(-4px); } }

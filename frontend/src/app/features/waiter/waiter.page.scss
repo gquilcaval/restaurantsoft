@@ -1,0 +1,57 @@
+/* El detalle conserva las acciones existentes, con superficies neutras y texto legible. */
+.service-detail { background: var(--surface); }
+.service-detail .waiter-detail-summary-total { position: sticky; top: 0; z-index: 5; padding: 22px 24px 18px; background: var(--surface); border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+.service-detail .total { padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
+.service-detail .total strong { color: var(--text); font-size: 1.8rem; letter-spacing: -.05em; }
+.service-detail .total small { color: var(--muted); font-size: .74rem; font-weight: 500; }
+.service-detail .waiter-detail-content { grid-template-columns: minmax(0, 1.5fr) minmax(230px, 1fr); gap: 20px; }
+.service-detail .waiter-detail-orders, .service-detail .waiter-detail-guests { box-shadow: none; align-self: start; }
+.service-detail .waiter-detail-orders>header, .service-detail .waiter-detail-guests>header { background: transparent; }
+.service-detail .eyebrow { display: none; }
+.service-detail .waiter-order-item { padding: 17px 2px; align-items: start; }
+.service-detail .waiter-order-item>span>strong { white-space: normal; font-size: .83rem; line-height: 1.4; }
+.service-detail .waiter-order-item>span>small { font-size: .69rem; line-height: 1.5; }
+.service-detail .waiter-order-quantity { background: var(--surface-2); color: var(--text); border-radius: 8px; }
+.service-detail .item-state { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
+.service-detail .item-state button { min-height: 40px; }
+.service-detail .waiter-guest-row { padding: 14px 12px; }
+.service-detail .waiter-guest-row>div strong { font-size: .78rem; }
+.service-detail .waiter-guest-row>div small { font-size: .67rem; }
+.service-detail .waiter-guest-action { width: 36px; height: 36px; }
+@media (hover: hover) {
+  .service-table:hover { border-color: color-mix(in srgb, var(--table-tone) 50%, var(--border)); box-shadow: 0 5px 18px #0000000c; }
+  .service-table-foot button:hover, .service-filters button:hover { background: var(--surface-2); color: var(--text); }
+}
+@media (max-width: 1100px) {
+  .service-board { display: block; }
+  .service-board .service-queue { display: none; }
+  .service-board.show-mobile-alerts { overflow: hidden; }
+  .service-board.show-mobile-alerts .service-queue { display: flex; height: 100%; min-height: 0; overflow: hidden; }
+  .service-queue-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-content: start; }
+  .queue-group, .queue-empty { grid-column: 1/-1; }
+  .queue-card { margin: 0; }
+}
+@media (max-width: 980px) {
+  .service-detail .waiter-detail-summary-total { top: 22px; padding: 14px 20px 18px; }
+  .service-detail>.waiter-detail-handle { width: 100%; background: var(--surface); }
+}
+@media (max-width: 720px) {
+  .service-detail .waiter-detail-content { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 540px) {
+  .service-toolbar { padding-bottom: 14px; gap: 10px; }
+  .service-toolbar h2 { font-size: 1.1rem; }
+  .table-search { width: 48%; padding: 0 10px; }
+  .service-filters { gap: 3px; padding-bottom: 13px; }
+  .service-filters button { gap: 4px; padding: 8px; font-size: .68rem; }
+  .service-table-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .service-queue-list { display: block; }
+  .queue-card { margin-bottom: 12px; }
+  .service-detail .total strong { font-size: 1.5rem; }
+  .service-detail .waiter-detail-summary-total { padding: 10px 15px 15px; }
+}
+@media (max-width: 359px) {
+  .service-table-list { grid-template-columns: minmax(0, 1fr); }
+  .service-toolbar { flex-wrap: wrap; }
+  .table-search { width: 100%; }
+}

@@ -1,0 +1,33 @@
+// Lista de marcas y formularios de corrección.
+.as-marks { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.as-mark { --tone: var(--muted); width: 100%; display: grid; grid-template-columns: 12px auto 1fr; align-items: center; gap: 2px 12px; padding: 10px 12px; border: 0; border-radius: 16px; color: var(--text); background: transparent; text-align: left; font: inherit; }
+.as-mark:not(.fixed):hover, li.open .as-mark { background: color-mix(in srgb, var(--text) 6%, transparent); }
+.as-mark.fixed { cursor: default; }
+.as-mark i { width: 10px; height: 10px; border-radius: 50%; background: var(--tone); }
+.as-mark b { display: flex; align-items: baseline; gap: 6px; font-size: .98rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.as-mark em { color: var(--muted); font-size: .68rem; font-style: normal; font-weight: 700; }
+.as-mark span { color: var(--tone); font-size: .84rem; font-weight: 800; }
+.as-mark small { grid-column: 2 / -1; color: var(--muted); font-size: .74rem; line-height: 1.35; }
+.as-mark[data-kind='IN'] { --tone: var(--ok); } .as-mark[data-kind='OUT'] { --tone: var(--info); }
+.as-mark[data-kind='BREAK_START'], .as-mark[data-kind='BREAK_END'] { --tone: var(--warn); }
+li.void .as-mark { --tone: var(--muted); opacity: .7; } li.void .as-mark b, li.void .as-mark span { text-decoration: line-through; }
+.as-mark-actions { display: flex; gap: 8px; padding: 4px 12px 10px 34px; }
+.as-mark-actions button { height: 38px; display: inline-flex; align-items: center; gap: 6px; padding: 0 14px; border: 0; border-radius: 999px; color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); font-size: .8rem; font-weight: 750; }
+.as-mark-actions .danger { color: var(--bad); background: var(--bad-soft); }
+.as-empty { padding: 18px; color: var(--muted); font-size: .86rem; text-align: center; }
+.as-seg { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; padding: 4px; border-radius: 999px; background: color-mix(in srgb, var(--text) 6%, transparent); }
+.as-seg button { height: 38px; padding: 0 4px; border: 0; border-radius: 999px; color: var(--muted); background: transparent; font-size: .78rem; font-weight: 750; }
+.as-seg button.on { color: var(--text); background: var(--surface); box-shadow: var(--elev-1); }
+:host-context([data-theme='dark']) .as-seg button.on { background: color-mix(in srgb, white 12%, transparent); }
+.as-clock { display: grid; justify-items: center; margin: 4px 0 -6px; font: 800 2rem var(--font-display); font-variant-numeric: tabular-nums; }
+.as-clock small { color: var(--warn); font: 700 .74rem var(--font-body, inherit); }
+.as-void-info { display: grid; gap: 4px; margin: 0; padding: 14px; border-radius: 16px; color: var(--muted); background: color-mix(in srgb, var(--text) 5%, transparent); font-size: .84rem; text-align: center; }
+.as-void-info b { color: var(--text); font-size: 1.05rem; }
+.as-label { color: var(--muted); font-size: .76rem; font-weight: 750; }
+.as-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: -6px; }
+.as-chips button { height: 38px; padding: 0 14px; border: 0; border-radius: 999px; color: var(--text); background: color-mix(in srgb, var(--text) 7%, transparent); font-size: .82rem; font-weight: 700; }
+.as-chips button.on { color: var(--on-brand, #04110a); background: var(--brand); }
+.as-input { height: 46px; padding: 0 14px; border: 0; border-radius: 14px; outline: 0; color: var(--text); background: color-mix(in srgb, var(--text) 7%, transparent); font-size: .92rem; }
+.as-error { margin: 0; color: var(--bad); font-size: .82rem; font-weight: 650; text-align: center; }
+.as-shift { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--muted); font-size: .8rem; font-weight: 650; }
+.as-shift b { margin-left: auto; padding: 3px 10px; border-radius: 999px; color: var(--warn); background: color-mix(in srgb, var(--warn) 15%, transparent); font-size: .72rem; }

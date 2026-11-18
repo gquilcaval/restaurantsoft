@@ -1,0 +1,21 @@
+// Barra inferior del mesero (celular y tablet): igual en Mesas, Mostrador y Reservas, al alcance del pulgar.
+.w-dock { display: none; }
+@media (max-width: 1100px) {
+  .shell.has-dock main > .page-content { padding-bottom: 96px; }
+  .w-dock {
+    position: fixed; z-index: 40; left: 12px; right: 12px; bottom: max(12px, env(safe-area-inset-bottom));
+    display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 2px; height: 66px; margin: 0 auto; max-width: 520px; padding: 6px;
+    border-radius: 26px; background: color-mix(in srgb, var(--surface) 88%, transparent);
+    -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, .28), 0 2px 8px rgba(0, 0, 0, .12);
+  }
+  .w-dock button { display: grid; justify-items: center; align-content: center; gap: 3px; min-width: 0; height: 100%; padding: 0; border: 0; border-radius: 20px; color: var(--muted); font-size: .66rem; font-weight: 750; background: transparent; -webkit-tap-highlight-color: transparent; transition: color .2s; }
+  .w-dock span { max-width: 100%; overflow: hidden; line-height: 1; white-space: nowrap; text-overflow: ellipsis; }
+  .w-dock-ico { position: relative; display: grid; place-items: center; width: 50px; height: 30px; border-radius: 999px; font-style: normal; line-height: 0; transition: background .3s var(--ease-spring, ease), transform .15s; }
+  .w-dock-ico app-icon { display: grid; place-items: center; }
+  .w-dock button.active { color: var(--text); }
+  .w-dock button.active .w-dock-ico { color: var(--brand-accent, var(--brand)); background: color-mix(in srgb, var(--brand) 18%, transparent); }
+  .w-dock button:active .w-dock-ico { transform: scale(.92); }
+  .w-dock-ico b { position: absolute; top: -3px; right: 4px; min-width: 18px; height: 18px; display: grid; place-items: center; padding: 0 5px; border-radius: 999px; color: #fff; font-size: .62rem; background: var(--bad, #ef5d55); box-shadow: 0 0 0 2px var(--surface); }
+}
+@media (max-width: 380px) { .w-dock-ico { width: 44px; } .w-dock button { font-size: .62rem; } }

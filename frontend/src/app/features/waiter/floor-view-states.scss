@@ -1,0 +1,62 @@
+// Estados animados de cada mesa del plano en vivo.
+.fv-table { outline: none; transition: opacity .35s ease; }
+.fv-table .fp-body { transition: transform .25s cubic-bezier(.3, 1.5, .5, 1); }
+.fv-table:hover .fp-body, .fv-table:focus-visible .fp-body { transform: scale(1.05); }
+.fv-table:focus-visible .fp-top { stroke: var(--brand); stroke-width: 4; }
+.fv-table.dimmed { opacity: .28; }
+.fv-table.drag-source { opacity: .45; }
+.fv-table.drop-target .fp-body { transform: scale(1.12); }
+.fv-table.drop-target .fp-top { stroke-width: 5; stroke: var(--green); fill: var(--green-soft); }
+.fv-table.drop-target[data-tone='busy'] .fp-top,
+.fv-table.drop-target[data-tone='ready'] .fp-top,
+.fv-table.drop-target[data-tone='bill'] .fp-top,
+.fv-table.drop-target[data-tone='call'] .fp-top { stroke: var(--orange); fill: var(--orange-soft); }
+
+// Libre: verde tranquilo. Ocupada: color de su zona; las sillas se encienden por comensal.
+.fv-table[data-tone='free'] .fp-top { fill: color-mix(in srgb, var(--green-soft) 70%, var(--surface)); stroke: color-mix(in srgb, var(--green) 55%, transparent); }
+.fv-table:not([data-tone='free']) .fp-top { fill: color-mix(in srgb, var(--zone-color) 24%, var(--surface)); stroke: var(--zone-color); }
+.fp-chair.taken { fill: var(--zone-color); animation: fv-seat .5s cubic-bezier(.3, 1.6, .5, 1) both; animation-delay: var(--seat); }
+.fv-total { fill: var(--text); }
+
+// Reserva próxima en una mesa libre: borde punteado que avanza.
+.fv-table.reserved[data-tone='free'] .fp-top { stroke: var(--orange); stroke-dasharray: 7 5; animation: fv-march 1.2s linear infinite; }
+.fv-reserved-time { fill: var(--orange); }
+
+// Llamada al mesero y cuenta: ondas que se expanden.
+.fv-ring {
+  fill: none; stroke-width: 3; pointer-events: none; transform-box: fill-box; transform-origin: center;
+  animation: fv-ring 1.8s ease-out infinite;
+}
+.fv-ring.second { animation-delay: .9s; }
+[data-tone='call'] .fv-ring { stroke: var(--danger); }
+[data-tone='bill'] .fv-ring { stroke: var(--bill); }
+[data-tone='call'] .fp-top { stroke: var(--danger); }
+[data-tone='bill'] .fp-top { stroke: var(--bill); }
+
+// Plato listo: brillo verde que respira.
+.fv-glow { fill: color-mix(in srgb, var(--green) 30%, transparent); pointer-events: none; transform-box: fill-box; transform-origin: center; animation: fv-breathe 1.6s ease-in-out infinite; }
+[data-tone='ready'] .fp-top { stroke: var(--green); stroke-width: 3.5; }
+
+// Revisión pendiente: borde ámbar en movimiento.
+[data-tone='review'] .fp-top { stroke: var(--orange); stroke-dasharray: 6 4; animation: fv-march .9s linear infinite; }
+
+// Insignias que rebotan.
+.fv-badge { pointer-events: none; }
+.fv-badge > * { transform-box: fill-box; transform-origin: center; }
+.fv-badge circle { stroke: var(--surface); stroke-width: 3; animation: fv-pop-badge 1.2s ease-in-out infinite; }
+.fv-badge text { text-anchor: middle; dominant-baseline: central; fill: #fff; font-weight: 900; font-size: 12px; }
+[data-tone='call'] .fv-badge circle { fill: var(--danger); }
+[data-tone='bill'] .fv-badge circle { fill: var(--bill); }
+[data-tone='ready'] .fv-badge circle { fill: var(--green); }
+[data-tone='review'] .fv-badge circle { fill: var(--orange); animation: none; }
+.fv-steam { font-size: 16px; fill: var(--orange); pointer-events: none; animation: fv-flicker 1.4s ease-in-out infinite; }
+
+@keyframes fv-ring { from { transform: scale(.92); opacity: .85; } to { transform: scale(1.45); opacity: 0; } }
+@keyframes fv-breathe { 0%, 100% { opacity: .35; transform: scale(.96); } 50% { opacity: .85; transform: scale(1.06); } }
+@keyframes fv-pop-badge { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.22); } 60% { transform: scale(.95); } }
+@keyframes fv-flicker { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+@keyframes fv-seat { from { fill: var(--surface-3); opacity: .3; } }
+@keyframes fv-march { to { stroke-dashoffset: -24; } }
+@media (prefers-reduced-motion: reduce) {
+  .fv-ring, .fv-glow, .fv-badge circle, .fv-steam, .fp-chair.taken, .fp-top { animation: none !important; }
+}

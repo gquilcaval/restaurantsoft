@@ -1,0 +1,32 @@
+// Acciones rápidas del turno y arqueo por billetes y monedas.
+.cs-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: auto; padding-top: 22px; }
+.cs-tile { --tone: var(--bad); position: relative; display: grid; justify-items: start; gap: 2px; padding: 14px; border: 0; border-radius: 20px; background: color-mix(in srgb, var(--tone) 10%, transparent); color: var(--text); text-align: left; transition: transform .4s var(--ease-spring), background .2s, box-shadow .2s; }
+.cs-tile[data-tone='in'] { --tone: var(--ok); } .cs-tile[data-tone='close'] { --tone: var(--brand); }
+.cs-tile:hover:not(:disabled) { transform: translateY(-3px); background: color-mix(in srgb, var(--tone) 16%, transparent); }
+.cs-tile:active:not(:disabled) { transform: scale(.96); }
+.cs-tile:disabled { opacity: .5; }
+.cs-tile.on { background: color-mix(in srgb, var(--tone) 22%, transparent); box-shadow: inset 0 0 0 2px var(--tone); }
+.cs-tile > span { width: 38px; height: 38px; display: grid; place-items: center; margin-bottom: 6px; border-radius: 13px; font-weight: 900; font-size: 1.1rem; color: #fff; background: var(--tone); }
+.cs-tile[data-tone='close'] > span { color: var(--on-brand, #04110a); }
+.cs-tile b { font: 750 .98rem var(--font-display); }
+.cs-tile small { color: var(--muted); font-size: .74rem; }
+.cs-tile kbd { position: absolute; top: 12px; right: 12px; margin: 0; }
+.cs-denoms { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.cs-denom { display: grid; grid-template-columns: 58px 30px minmax(0, 1fr) 30px; align-items: center; gap: 4px; padding: 5px; border-radius: 14px; background: color-mix(in srgb, var(--text) 5%, transparent); transition: background .2s; }
+.cs-denom.has { background: color-mix(in srgb, var(--brand) 13%, transparent); }
+.cs-face { display: grid; place-items: center; height: 30px; border-radius: 8px; font: 800 .8rem var(--font-display); color: #0d3b22; background: linear-gradient(135deg, #a7e3b9, #6fcf97); }
+.cs-denom.coin .cs-face { border-radius: 999px; color: #4a3a0b; background: linear-gradient(135deg, #f6e19a, #d9b44a); }
+.cs-denom button { width: 30px; height: 30px; display: grid; place-items: center; border: 0; border-radius: 50%; background: color-mix(in srgb, var(--text) 8%, transparent); color: var(--text); font-weight: 800; transition: transform .25s var(--ease-spring); }
+.cs-denom button:active:not(:disabled) { transform: scale(.85); }
+.cs-denom button:disabled { opacity: .35; }
+.cs-denom input { width: 100%; min-width: 0; height: 30px; border: 0; background: transparent; color: var(--text); text-align: center; font: 800 1rem var(--font-display); outline: none; border-radius: 8px; }
+.cs-denom input:focus { box-shadow: 0 0 0 2px var(--brand); }
+.cs-subtotals { display: flex; justify-content: space-between; margin: -4px 2px 0; color: var(--muted); font-size: .78rem; }
+.cs-subtotals b { color: var(--text); }
+@media (max-width: 600px) { .cs-tiles { grid-template-columns: 1fr; } .cs-denoms { grid-template-columns: 1fr; } }
+@media (min-width: 1101px) {
+  .cs-view:has(.cs-work[data-action='CLOSE']) .cs-hero { grid-column: span 5; }
+  .cs-view:has(.cs-work[data-action='CLOSE']) .cs-work { grid-column: span 7; }
+  .cs-work[data-action='CLOSE'] .cs-denoms { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cs-work[data-action='CLOSE'] fieldset { gap: 12px; }
+}

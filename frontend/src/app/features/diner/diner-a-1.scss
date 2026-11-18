@@ -1,0 +1,39 @@
+// Estilos propios de la pantalla del comensal (fuera del paquete inicial).
+.diner-page{width:min(560px,100%);margin:auto;min-height:100vh;background:var(--bg);padding-bottom:160px}
+.diner-header{height:76px;padding:0 20px;display:flex;align-items:center;gap:10px;background:var(--surface);border-bottom:1px solid var(--border)}
+.diner-header>div:nth-child(2){display:grid}
+.diner-header small{color:var(--muted)}
+.diner-header .icon-button{margin-left:auto}
+.diner-hero{padding:24px 20px 16px}
+.diner-hero p{margin:0;color:var(--brand);font-weight:750}
+.diner-hero h1{margin:5px 0 20px;font-size:1.7rem}
+.dish-list{padding:0 20px;display:grid;gap:12px}
+.dish-card{display:grid;grid-template-columns:92px 1fr 38px;gap:13px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:17px;padding:12px}
+.dish-image{height:92px;display:grid;place-items:center;border-radius:13px;background:var(--brand-soft);font-size:2.4rem}
+.dish-card h2{font-size:1rem;margin:0}
+.dish-card p{color:var(--muted);font-size:.78rem;margin:5px 0 9px}
+.dish-card strong{color:var(--brand)}
+.dish-card button{width:34px;aspect-ratio:1;border-radius:10px;border:1px solid var(--brand);background:transparent;color:var(--brand);font-size:1.3rem}
+.cart-bar{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);width:min(520px,calc(100% - 24px));background:var(--brand);color:white;border-radius:16px;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 15px 35px #0003;z-index:3}
+.cart-bar>div{display:grid}
+.cart-bar button{border:0;background:white;color:var(--brand);border-radius:10px;padding:10px 14px;font-weight:800}
+.diner-page>.notice{margin:0 20px 16px}
+.diner-actions{display:grid;gap:12px;margin:0 20px}
+.diner-actions>div{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.diner-actions>.primary{width:100%}
+.diner-header .live-dot{margin-left:auto}
+.diner-header .icon-button{margin-left:0}
+.diner-order-line{padding:14px 10px;border-left:3px solid transparent;border-radius:9px}
+.diner-order-line.state-preparing{border-left-color:var(--orange);background:color-mix(in srgb,var(--orange-soft) 45%,transparent)}
+.diner-order-line.state-ready{border-left-color:var(--green);background:color-mix(in srgb,var(--green-soft) 55%,transparent)}
+.diner-item-state{display:grid;justify-items:end;gap:8px}
+.diner-item-state>.status{white-space:nowrap}
+.diner-item-state .quantity-actions{justify-content:flex-end}
+.dish-image{width:100%;object-fit:cover}
+@media(max-width:600px){.dish-card{grid-template-columns:80px 1fr 34px}.dish-image{height:80px}}
+.diner-page{width:min(640px,100%);padding-bottom:104px;overflow:hidden;background:linear-gradient(180deg,var(--surface) 0, var(--bg) 230px);box-shadow:0 0 80px #0000000a}
+.diner-header{position:sticky;top:0;z-index:12;height:70px;padding:0 18px;border-bottom:1px solid color-mix(in srgb,var(--border) 75%,transparent);background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(18px);transition:background .25s ease,border-color .25s ease}
+.diner-header .restaurant-mark{width:38px;border-radius:11px;box-shadow:0 7px 18px color-mix(in srgb,var(--brand) 25%,transparent)}
+.diner-user-avatar{width:36px;height:36px;display:grid;place-items:center;flex:0 0 auto;border:1px solid color-mix(in srgb,var(--brand) 18%,var(--border));border-radius:50%;background:var(--brand-soft);color:var(--brand);font-size:.65rem;font-weight:900;letter-spacing:.025em;box-shadow:0 3px 10px #00000012}
+.diner-cart-bar>span,.diner-cart-bar>b{position:relative;z-index:1}
+.diner-cart-bar.added{animation:cart-added .72s cubic-bezier(.2,.85,.25,1)}

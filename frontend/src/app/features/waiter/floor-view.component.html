@@ -1,0 +1,290 @@
+<aside class="fv-top" aria-label="Zonas, mesas fuera del plano y leyenda">
+  @if (tabs().length > 1) {
+    <section class="fv-group fv-group-zones">
+      <h4 class="fv-h">Zonas</h4>
+      <nav class="fv-tabs" aria-label="Plano por zona">
+        @for (tab of tabs(); track tab.id) {
+          <button [class.active]="activeTab()?.id === tab.id" [class.closed]="!tab.open" [style.--zone-color]="tab.color" (click)="selectTab(tab.id)">
+            <i></i><span class="fv-tab-name">{{ tab.name }}</span><small>{{ tab.busy }}/{{ tab.total }}<span class="fv-tab-word"> {{ picker() ? 'reservadas' : 'ocupadas' }}</span></small>
+            @if (tab.alerts && activeTab()?.id !== tab.id) {
+              <b class="fv-tab-alert">{{ tab.alerts }}</b>
+            }
+          </button>
+        }
+      </nav>
+    </section>
+  }
+
+  @if (outside().length) {
+    <section class="fv-group">
+      <h4 class="fv-h">Fuera del plano <small>{{ outside().length }}</small></h4>
+      <div class="fv-outside" aria-label="Mesas fuera del plano">
+        <span class="fv-inline-h">Fuera del plano</span>
+        @for (state of outside(); track state.table.id) {
+          <button [attr.data-tone]="state.tone" [class.dimmed]="state.dimmed" [style.--zone-color]="zoneColor(state.table.zoneId)" (click)="open.emit(state.table)">
+            <i></i>{{ state.table.label }}
+            @if (state.table.status === 'OPEN') {
+              <small>{{ state.total | currency: 'PEN' : 'S/ ' : '1.0-0' }}</small>
+            }
+          </button>
+        }
+      </div>
+      <p class="fv-note">Ubícalas en el editor de planos para verlas en su lugar.</p>
+    </section>
+  }
+
+  @if (mode() === 'live' && interactive() && !picker()) {
+    <section class="fv-group fv-group-legend">
+      <h4 class="fv-h">Colores</h4>
+      <div class="fv-legend" aria-label="Leyenda del plano">
+        <span data-tone="free"><i></i>Libre</span>
+        <span data-tone="busy"><i></i>Ocupada</span>
+        <span data-tone="ready"><i></i>Plato listo</span>
+        <span data-tone="call"><i></i>Llama al mesero</span>
+        <span data-tone="bill"><i></i>Pide la cuenta</span>
+        <span data-tone="reserved"><i></i>Reserva próxima</span>
+      </div>
+      <p class="fv-note">Arrastra una mesa ocupada sobre otra para moverla o unir las cuentas.</p>
+    </section>
+  }
+</aside>
+
+<div
+  class="fv-stage"
+  [class.closed]="activeTab() && !activeTab()!.open"
+  [class.dragging]="!!dragItem()"
+>
+  @if (dragItem(); as source) {
+    <div
+      class="fv-hint"
+      [class.merge]="targetItem()?.state?.table?.status === 'OPEN'"
+      [class.move]="targetItem() && targetItem()!.state.table.status !== 'OPEN'"
+    >
+      @if (targetItem(); as target) {
+        @if (target.state.table.status === 'OPEN') {
+          ⧉ Soltar para <b>unir</b> {{ source.state.table.label }} con
+          {{ target.state.table.label }}
+        } @else {
+          ⇄ Soltar para <b>mover</b> {{ source.state.table.label }} a {{ target.state.table.label }}
+        }
+      } @else {
+        Arrastra {{ source.state.table.label }} sobre una mesa libre para moverla o sobre una
+        ocupada para unirlas
+      }
+    </div>
+  }
+  @if (blockedHint() && !dragItem()) {
+    <div class="fv-hint">{{ blockedHint() }}</div>
+  }
+  @if (activeTab() && !activeTab()!.open) {
+    <div class="fv-closed-badge">Zona cerrada · no recibe comensales por QR</div>
+  }
+  <svg
+    #canvas
+    class="fp-svg"
+    [attr.viewBox]="viewBox()"
+    [style.aspect-ratio]="fit() || zoom() ? view().width + ' / ' + view().height : null"
+    (pointerdown)="gestureDown($event)"
+    (pointermove)="pointerMove($event)"
+    (pointerup)="pointerUp($event)"
+    (pointercancel)="gestureCancel()"
+    (wheel)="wheelZoom($event)"
+    role="group"
+    aria-label="Plano del salón"
+  >
+    <g appFloorElements [elements]="elements()"></g>
+
+    @for (item of items(); track item.state.table.id; let index = $index) {
+      <g
+        class="fp-table fv-table"
+        [attr.data-tone]="mode() === 'heat' ? 'heat' : item.state.tone"
+        [style.--heat]="heatColor(item.state.table.id)"
+        [class.dimmed]="item.state.dimmed"
+        [class.drag-source]="dragId() === item.state.table.id"
+        [class.drop-target]="targetId() === item.state.table.id"
+        [class.cooking]="item.state.cooking"
+        [class.reserved]="!!item.state.reservedAt"
+        [style.--zone-color]="item.color"
+        [style.--delay]="index * 35 + 'ms'"
+        [attr.transform]="translate(item)"
+        tabindex="0"
+        role="button"
+        [attr.aria-label]="ariaLabel(item.state)"
+        (pointerdown)="pointerDown($event, item.state)"
+        (keydown.enter)="interactive() && open.emit(item.state.table)"
+      >
+        @if (item.state.tone === 'call' || item.state.tone === 'bill') {
+          <circle class="fv-ring" [attr.r]="item.radius + 6" />
+          <circle class="fv-ring second" [attr.r]="item.radius + 6" />
+        }
+        @if (item.state.tone === 'ready') {
+          <circle class="fv-glow" [attr.r]="item.radius + 10" />
+        }
+        <g class="fp-body">
+          <g [attr.transform]="'rotate(' + item.rotation + ')'">
+            @for (chair of item.chairs; track $index; let seat = $index) {
+              <rect
+                class="fp-chair"
+                [class.taken]="seat < item.state.guests"
+                [style.--seat]="seat * 60 + 'ms'"
+                x="-9"
+                y="-7"
+                width="18"
+                height="14"
+                rx="5"
+                [attr.transform]="
+                  'translate(' + chair.x + ' ' + chair.y + ') rotate(' + chair.angle + ')'
+                "
+              />
+            }
+            @if (item.shape === 'ROUND') {
+              <circle class="fp-top" [attr.r]="item.size.width / 2" />
+            } @else {
+              <rect
+                class="fp-top"
+                [attr.x]="-item.size.width / 2"
+                [attr.y]="-item.size.height / 2"
+                [attr.width]="item.size.width"
+                [attr.height]="item.size.height"
+                rx="12"
+              />
+            }
+          </g>
+        </g>
+
+        @if (mode() === 'heat') {
+          <text class="fp-label" y="-14">{{ item.state.table.label }}</text>
+          <text class="fp-meta fv-heat-value" y="3">{{ heat()[item.state.table.id]?.label }}</text>
+          <text class="fp-sub" y="17">{{ heat()[item.state.table.id]?.detail }}</text>
+        } @else if (item.state.table.status === 'OPEN' && mode() === 'replay') {
+          <text class="fp-label" y="-7">{{ item.state.table.label }}</text>
+          <text class="fp-sub" y="10">⏱ {{ elapsedLabel(item.state.table) }}</text>
+        } @else if (item.state.table.status === 'OPEN') {
+          <text class="fp-label" y="-15">{{ item.state.table.label }}</text>
+          <text class="fp-meta fv-total" y="1">
+            {{ item.state.total | currency: 'PEN' : 'S/ ' : '1.0-0' }}
+          </text>
+          <text class="fp-sub" y="16">⏱ {{ elapsedLabel(item.state.table) }}</text>
+        } @else {
+          <text class="fp-label" [attr.y]="item.state.reservedAt ? -8 : -3">
+            {{ item.state.table.label }}
+          </text>
+          @if (item.state.reservedAt) {
+            <text class="fp-meta fv-reserved-time" y="10">
+              📅 {{ reservationTime(item.state.reservedAt) }}
+            </text>
+          } @else {
+            <text class="fp-sub" y="13">{{ item.state.table.capacity }} pers.</text>
+          }
+        }
+
+        <!-- Mesero a cargo: sus iniciales en la esquina inferior; «?» si nadie la atiende -->
+        @if (item.state.table.status === 'OPEN' && mode() !== 'heat' && mode() !== 'replay') {
+          <g class="fv-waiter" [class.mine]="!!me() && item.state.table.servedById === me()" [class.none]="!item.state.table.servedById"
+            [class.away]="!!item.state.table.servedByAway" [style.--hue]="hue(item.state.table.servedById)"
+            [attr.transform]="'translate(' + (-item.size.width / 2 + 2) + ' ' + (item.size.height / 2 - 2) + ')'">
+            <title>{{ item.state.table.servedByName ? 'Atiende ' + item.state.table.servedByName : 'Sin mesero' }}</title>
+            <circle r="12" />
+            <text>{{ item.state.table.servedById ? initials(item.state.table.servedByName) : '?' }}</text>
+          </g>
+        }
+        @switch (item.state.tone) {
+          @case ('call') {
+            <g
+              class="fv-badge"
+              [attr.transform]="
+                'translate(' + (item.size.width / 2 - 2) + ' ' + (-item.size.height / 2 + 2) + ')'
+              "
+            >
+              <circle r="14" />
+              <text>!</text>
+            </g>
+          }
+          @case ('bill') {
+            <g
+              class="fv-badge"
+              [attr.transform]="
+                'translate(' + (item.size.width / 2 - 2) + ' ' + (-item.size.height / 2 + 2) + ')'
+              "
+            >
+              <circle r="15" />
+              <text>S/</text>
+            </g>
+          }
+          @case ('ready') {
+            <g
+              class="fv-badge"
+              [attr.transform]="
+                'translate(' + (item.size.width / 2 - 2) + ' ' + (-item.size.height / 2 + 2) + ')'
+              "
+            >
+              <circle r="15" />
+              <text>✓{{ item.state.readyCount }}</text>
+            </g>
+          }
+          @case ('review') {
+            <g
+              class="fv-badge"
+              [attr.transform]="
+                'translate(' + (item.size.width / 2 - 2) + ' ' + (-item.size.height / 2 + 2) + ')'
+              "
+            >
+              <circle r="13" />
+              <text>?</text>
+            </g>
+          }
+        }
+        @if (item.state.cooking && item.state.tone !== 'ready') {
+          <text
+            class="fv-steam"
+            [attr.x]="-item.size.width / 2 + 4"
+            [attr.y]="-item.size.height / 2 + 2"
+          >
+            ♨
+          </text>
+        }
+      </g>
+    }
+
+    @if (dragItem(); as source) {
+      @if (ghost(); as point) {
+        <line
+          class="fv-band"
+          [attr.x1]="source.x"
+          [attr.y1]="source.y"
+          [attr.x2]="point.x"
+          [attr.y2]="point.y"
+        />
+        <g class="fv-ghost" [attr.transform]="translate(point)" [style.--zone-color]="source.color">
+          @if (source.shape === 'ROUND') {
+            <circle [attr.r]="source.size.width / 2" />
+          } @else {
+            <rect
+              [attr.x]="-source.size.width / 2"
+              [attr.y]="-source.size.height / 2"
+              [attr.width]="source.size.width"
+              [attr.height]="source.size.height"
+              rx="12"
+            />
+          }
+          <text>{{ source.state.table.label }}</text>
+        </g>
+      }
+    }
+  </svg>
+  @if (fit() && tabs().length > 1 && activeTab(); as tab) {
+    <span class="fv-zone-chip" [style.--zone-color]="tab.color"><i></i>{{ tab.name }}</span>
+  }
+  @if (fit()) {
+    <div class="fv-zoom" role="group" aria-label="Acercar el plano">
+      @if (zoomed()) { <button class="fv-zoom-all" (click)="resetCamera()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>Ver todo</button> }
+      <button (click)="zoomAt(1 / 1.6)" [disabled]="!zoomed()" aria-label="Alejar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+      <button (click)="zoomAt(1.6)" aria-label="Acercar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+    </div>
+    <p class="fv-gesture-hint">Pellizca o toca dos veces para acercar</p>
+  }
+  @if (!items().length) {
+    <div class="fv-empty">No hay mesas en esta zona.</div>
+  }
+
+</div>

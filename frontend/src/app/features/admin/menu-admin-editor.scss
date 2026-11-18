@@ -1,0 +1,35 @@
+// Editor del producto a la derecha: pestañas, datos, opciones y receta.
+.mn-editor { min-height: 0; display: flex; flex-direction: column; gap: 12px; padding: 18px; border-radius: 24px; overflow: hidden; }
+.mn-editor-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.mn-editor-head small { color: var(--muted); font-size: .74rem; font-weight: 700; }
+.mn-editor-head h2 { margin: 2px 0 0; font: 800 1.25rem var(--font-display); letter-spacing: -.02em; overflow: hidden; text-overflow: ellipsis; }
+.mn-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 3px; border-radius: 999px; background: color-mix(in srgb, var(--text) 6%, transparent); }
+.mn-tabs button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; height: 32px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-weight: 750; font-size: .78rem; }
+.mn-tabs button small { padding: 0 6px; border-radius: 999px; font-size: .66rem; background: color-mix(in srgb, var(--text) 10%, transparent); }
+.mn-tabs button[aria-selected='true'] { color: var(--text); background: var(--surface); box-shadow: var(--elev-1); }
+:host-context([data-theme='dark']) .mn-tabs button[aria-selected='true'] { background: color-mix(in srgb, white 12%, transparent); }
+.mn-editor-body { flex: 1; min-height: 0; overflow-y: auto; margin: 0 -6px; padding: 2px 6px; scrollbar-width: thin; }
+.mn-form { display: grid; gap: 11px; animation: mn-in .3s var(--ease-spring); }
+.mn-form label { display: grid; gap: 5px; font-size: .8rem; font-weight: 700; }
+.mn-form input, .mn-form select, .mn-form textarea, .modifier-editor input, .modifier-editor select { width: 100%; min-width: 0; padding: 0 12px; height: 38px; border: 0; border-radius: 12px; background: color-mix(in srgb, var(--text) 7%, transparent); color: var(--text); font: inherit; font-weight: 600; outline: none; }
+.mn-form textarea { height: auto; padding: 10px 12px; resize: vertical; }
+.mn-form :is(input, select, textarea):focus, .modifier-editor :is(input, select):focus { box-shadow: 0 0 0 2px var(--brand); }
+.mn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mn-money { display: flex; align-items: center; gap: 6px; padding-left: 12px; border-radius: 12px; background: color-mix(in srgb, var(--text) 7%, transparent); }
+.mn-money b { color: var(--muted); } .mn-money input { background: transparent !important; padding-left: 0 !important; }
+.mn-photo-edit { display: flex; align-items: center; gap: 12px; }
+.mn-photo-edit > img, .mn-photo-edit > span { width: 76px; height: 76px; flex-shrink: 0; display: grid; place-items: center; border-radius: 18px; object-fit: cover; color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); }
+.mn-photo-edit div { display: grid; gap: 4px; justify-items: start; } .mn-photo-edit small { color: var(--muted); font-size: .72rem; }
+.mn-editor .modifier-editor-row { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+.mn-editor .modifier-editor-row > input { flex: 1 1 100%; }
+.mn-editor .modifier-editor-row .inline-number { width: 96px; } .mn-editor .modifier-editor-row .icon-remove { margin-left: auto; }
+.mn-editor .modifier-editor-option { display: grid; grid-template-columns: minmax(0, 1fr) 96px 26px; gap: 6px; align-items: center; margin-top: 6px; }
+.mn-editor .modifier-editor-option.option-stock { grid-template-columns: auto minmax(0, 1fr) 96px; font-size: .72rem; color: var(--muted); }
+.mn-editor .modifier-editor-option.recipe-line { grid-template-columns: minmax(0, 1fr) 96px 62px 26px; }
+.mn-editor .inline-number { display: flex; align-items: center; gap: 4px; font-size: .72rem; font-weight: 700; color: var(--muted); }
+.mn-editor .inline-number input { padding: 0 8px; }
+.mn-editor .inline-check { display: flex; align-items: center; gap: 5px; font-size: .72rem; font-weight: 700; white-space: nowrap; }
+.mn-editor .inline-check input { width: auto; height: auto; }
+.mn-editor .recipe-line-cost { font: 750 .78rem var(--font-display); text-align: right; }
+.mn-editor .icon-remove { width: 26px; height: 26px; padding: 0; border: 0; border-radius: 50%; color: var(--muted); background: transparent; }
+.mn-editor .icon-remove:hover { color: var(--bad); background: var(--bad-soft); }

@@ -1,0 +1,6 @@
+// Estilos propios de la pantalla del comensal (fuera del paquete inicial).
+.diner-product-card.sold-out{ cursor: not-allowed; }
+.diner-product-card.sold-out img, .diner-product-card.sold-out .diner-product-placeholder{ filter: grayscale(1); opacity: .55; }
+.diner-product-card.sold-out h2, .diner-product-card.sold-out strong{ opacity: .6; }
+.diner-product-media{ position: relative; }
+.diner-product-media .sold-out-tag{ position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); }

@@ -1,0 +1,23 @@
+// Tomar pedido: carta a la izquierda (fotos, categorías, + en cada plato) y la ronda a la derecha.
+:host { display: contents; }
+svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.so-backdrop { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 16px; background: rgba(5, 7, 6, .55); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); animation: so-fade .2s ease-out; }
+.so { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 370px; width: min(1200px, 100%); height: min(820px, calc(100dvh - 32px)); overflow: hidden; border-radius: 30px; color: var(--text); background: var(--surface); box-shadow: 0 40px 100px rgba(0, 0, 0, .45); animation: so-in .35s cubic-bezier(.2, 1.2, .4, 1); }
+.so-menu { position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.so-head { display: flex; align-items: center; gap: 14px; padding: 18px 20px 10px; }
+.so-title { min-width: 0; }
+.so-title small { color: var(--brand-accent, var(--brand)); font-size: .66rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.so-title h2 { margin: 1px 0 0; overflow: hidden; font: 800 1.2rem var(--font-display); white-space: nowrap; text-overflow: ellipsis; }
+.so-search { flex: 1; display: flex; align-items: center; gap: 8px; max-width: 360px; height: 44px; margin-left: auto; padding: 0 14px; border-radius: 999px; color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); }
+.so-search:focus-within { box-shadow: 0 0 0 2px var(--brand); }
+.so-search input { flex: 1; min-width: 0; border: 0; color: var(--text); font: inherit; font-size: .88rem; background: transparent; outline: none; }
+.so-close { flex-shrink: 0; width: 42px; height: 42px; display: grid; place-items: center; border: 0; border-radius: 50%; color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); }
+.so-close:active { transform: scale(.92); }
+.so-close.floating { position: absolute; top: 12px; right: 12px; z-index: 2; color: #fff; background: rgba(0, 0, 0, .45); }
+.so-cats { display: flex; gap: 6px; padding: 4px 20px 12px; overflow-x: auto; scrollbar-width: none; flex-shrink: 0; }
+.so-cats button { flex-shrink: 0; height: 38px; padding: 0 15px; border: 0; border-radius: 999px; color: var(--muted); font-size: .84rem; font-weight: 750; white-space: nowrap; background: color-mix(in srgb, var(--text) 6%, transparent); transition: background .2s, color .2s; }
+.so-cats button.on { color: var(--on-brand, #fff); background: var(--brand); }
+.so-empty { display: grid; justify-items: center; gap: 6px; padding: 40px 20px; color: var(--muted); text-align: center; grid-column: 1 / -1; }
+.so-empty strong { color: var(--text); }
+@keyframes so-fade { from { opacity: 0; } }
+@keyframes so-in { from { opacity: 0; transform: translateY(14px) scale(.98); } }

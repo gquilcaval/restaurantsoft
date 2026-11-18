@@ -1,0 +1,33 @@
+// Tarjetas de la carta: foto, precio y el «+» que se vuelve − n + cuando el plato ya está en la ronda.
+.so-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); grid-auto-rows: max-content; align-content: start; gap: 12px; padding: 2px 20px 90px; overflow-y: auto; scrollbar-width: thin; }
+.so-card { position: relative; display: grid; overflow: hidden; border-radius: 20px; background: color-mix(in srgb, var(--text) 5%, transparent); transition: box-shadow .2s, transform .2s; }
+.so-card.in { box-shadow: inset 0 0 0 2px var(--brand); background: color-mix(in srgb, var(--brand) 8%, transparent); }
+.so-card.off { opacity: .55; }
+.so-card-main { display: grid; padding: 0; border: 0; color: inherit; text-align: left; font: inherit; background: transparent; cursor: pointer; }
+.so-card-main:active:not(:disabled) { transform: scale(.98); }
+.so-photo { position: relative; display: grid; place-items: center; aspect-ratio: 16 / 10; overflow: hidden; background: linear-gradient(135deg, hsl(var(--h) 55% 42%), hsl(calc(var(--h) + 40) 60% 30%)); }
+.so-photo img { width: 100%; height: 100%; object-fit: cover; }
+.so-photo b { color: rgba(255, 255, 255, .85); font: 800 2rem var(--font-display); }
+.so-badge { position: absolute; top: 8px; left: 8px; padding: 3px 9px; border-radius: 999px; color: #fff; font-size: .66rem; font-style: normal; font-weight: 800; background: rgba(0, 0, 0, .55); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.so-badge.off { background: rgba(239, 93, 85, .9); }
+.so-info { display: grid; gap: 4px; padding: 10px 12px 12px; }
+.so-info strong { display: -webkit-box; overflow: hidden; font-size: .9rem; line-height: 1.25; -webkit-line-clamp: 2; -webkit-box-orient: vertical; padding-right: 36px; }
+.so-tags { display: flex; flex-wrap: wrap; gap: 4px; min-height: 0; }
+.so-tags i { padding: 1px 7px; border-radius: 999px; color: var(--muted); font-size: .62rem; font-style: normal; font-weight: 750; background: color-mix(in srgb, var(--text) 7%, transparent); }
+.so-tags i.opt { color: var(--brand-accent, var(--brand)); background: color-mix(in srgb, var(--brand) 12%, transparent); }
+.so-price { font: 800 .95rem var(--font-display); }
+.so-add { position: absolute; right: 10px; bottom: 10px; width: 38px; height: 38px; display: grid; place-items: center; border: 0; border-radius: 50%; color: var(--on-brand, #fff); background: var(--brand); box-shadow: 0 6px 14px color-mix(in srgb, var(--brand) 40%, transparent); transition: transform .15s; }
+.so-add:active { transform: scale(.88); }
+.so-stepper { display: inline-flex; align-items: center; gap: 2px; padding: 3px; border-radius: 999px; background: var(--brand); box-shadow: 0 6px 14px color-mix(in srgb, var(--brand) 35%, transparent); }
+.so-card .so-stepper { position: absolute; right: 10px; bottom: 10px; }
+.so-stepper button { width: 32px; height: 32px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; color: var(--on-brand, #fff); background: transparent; }
+.so-stepper button:active { background: rgba(0, 0, 0, .15); }
+.so-stepper b { min-width: 22px; color: var(--on-brand, #fff); font: 800 .9rem var(--font-display); text-align: center; }
+.so-stepper.small { background: color-mix(in srgb, var(--text) 8%, transparent); box-shadow: none; }
+.so-stepper.small button, .so-stepper.small b { color: var(--text); }
+.so-stepper.small button { width: 28px; height: 28px; }
+.so-photo.noimg { aspect-ratio: 16 / 6; } .so-photo.noimg b { font-size: 1.4rem; }
+.so-card.pop { animation: so-pop .45s cubic-bezier(.2, 1.6, .4, 1); }
+.so-plus1 { position: absolute; right: 18px; bottom: 52px; z-index: 2; padding: 3px 9px; border-radius: 999px; color: var(--on-brand, #fff); font: 800 .8rem var(--font-display); background: var(--brand); pointer-events: none; animation: so-rise .65s ease-out forwards; }
+@keyframes so-pop { 0% { transform: scale(1); } 35% { transform: scale(.95); } 70% { transform: scale(1.03); } 100% { transform: scale(1); } }
+@keyframes so-rise { 0% { opacity: 0; transform: translateY(8px) scale(.7); } 25% { opacity: 1; transform: translateY(0) scale(1.1); } 100% { opacity: 0; transform: translateY(-30px) scale(1); } }

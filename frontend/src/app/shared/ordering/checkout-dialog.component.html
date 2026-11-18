@@ -1,0 +1,197 @@
+<div class="ck-backdrop" (click)="closed.emit()">
+  <section class="ck" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="checkout-title"
+    [class.dragging]="dragging()" [style.transform]="dragY() ? 'translateY(' + dragY() + 'px)' : null">
+    @if (payment(); as summary) {
+      <!-- Encabezado fijo -->
+      <header class="ck-head" (pointerdown)="dragStart($event)" (pointermove)="dragMove($event)" (pointerup)="dragEnd($event)" (pointercancel)="dragEnd($event)">
+        <span class="ck-grip" aria-hidden="true"></span>
+        <div class="ck-head-row">
+          <div class="ck-title"><small>Cobro</small><h2 id="checkout-title">{{ label() }}</h2></div>
+          <span class="ck-status" [attr.data-state]="summary.remaining === 0 ? 'paid' : billInProgress() ? 'progress' : 'idle'">{{ summary.remaining === 0 ? 'Pagada' : billInProgress() ? 'En cobro' : 'Sin iniciar' }}</span>
+          <button class="ck-close" type="button" (click)="closed.emit()" aria-label="Cerrar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+        </div>
+      </header>
+
+      <div class="ck-body">
+        <!-- Cuánto falta -->
+        <div class="ck-hero" [class.paid]="summary.remaining === 0">
+          <small>{{ summary.remaining === 0 ? 'Cuenta pagada' : 'Por cobrar' }}</small>
+          <strong>{{ (summary.remaining === 0 ? summary.total : summary.remaining) | currency:'PEN':'S/ ' }}</strong>
+          <div class="ck-hero-row">
+            <span>Total <b>{{ summary.total | currency:'PEN':'S/ ' }}</b></span>
+            <span>Pagado <b>{{ summary.paid | currency:'PEN':'S/ ' }}</b></span>
+            @if (summary.deliveryFee > 0) { <span>Envío <b>{{ summary.deliveryFee | currency:'PEN':'S/ ' }}</b></span> }
+          </div>
+          @if (summary.paid > 0 && summary.remaining > 0) { <i class="ck-progress"><em [style.width.%]="summary.paid / summary.total * 100"></em></i> }
+        </div>
+
+        @if (summary.discount; as discount) {
+          <div class="ck-note ok">
+            <span>%</span>
+            <div><b>Descuento {{ discount.kind === 'PERCENT' ? discount.value + ' %' : (discount.value | currency:'PEN':'S/ ') }} · −{{ discount.amount | currency:'PEN':'S/ ' }}</b><small>{{ discount.reason }}</small></div>
+            @if (isManager() && summary.paid === 0 && !loyalty()?.redeemedPoints) { <button type="button" class="ck-link" (click)="removeDiscount()">Quitar</button> }
+          </div>
+        }
+
+        @if (!canPay()) {
+          <div class="ck-note warn"><span>⏳</span><div><b>Se cobra al terminar el servicio</b><small>{{ pendingDelivery() }} producto(s) siguen en cocina o sin entregar.</small></div></div>
+        } @else if (summary.remaining > 0) {
+          @if (summary.preference; as preference) {
+            <div class="ck-note brand">
+              <span>📱</span>
+              <div><b>Pidieron: {{ preference.note || 'Una sola cuenta' }}</b><small>Lo eligieron desde el celular.</small></div>
+              <button type="button" class="ck-chip" (click)="applyPreference()">{{ preference.mode === 'EQUAL' ? 'Cobrar 1 parte' : preference.mode === 'GUEST' ? 'Siguiente' : 'Cobrar todo' }}</button>
+            </div>
+          }
+          @if (showSplit()) {
+            <section class="ck-section">
+              <h3>Dividir la cuenta</h3>
+              @for (share of summary.shares; track share.guestId) {
+                <div class="ck-share" [class.done]="share.pending === 0">
+                  <span><b>{{ share.name }}</b><small>Consumo {{ share.consumed | currency:'PEN':'S/ ' }}@if (share.paid > 0) { · pagó {{ share.paid | currency:'PEN':'S/ ' }} }</small></span>
+                  @if (share.pending > 0) { <button type="button" class="ck-chip" (click)="chargeShare(share)">Cobrar {{ share.pending | currency:'PEN':'S/ ' }}</button> } @else { <em>✓ Pagado</em> }
+                </div>
+              }
+              <div class="ck-equal"><span>Partes iguales</span><input type="number" min="2" max="20" [(ngModel)]="splitParts" aria-label="Cantidad de partes"><button type="button" class="ck-chip" (click)="splitEqually()">Calcular</button></div>
+            </section>
+          }
+
+          <!-- Pago -->
+          <section class="ck-section">
+            @if (payingGuest(); as guest) { <p class="ck-paying">Pago de <b>{{ guest.name }}</b><button type="button" (click)="payingGuest.set(null)" aria-label="Quitar comensal">✕</button></p> }
+            <h3>¿Cómo paga?</h3>
+            <div class="ck-methods" role="radiogroup" aria-label="Método de pago">
+              @for (method of methods; track method.id) {
+                <button type="button" role="radio" [attr.data-method]="method.id" [attr.aria-checked]="paymentMethod === method.id" (click)="paymentMethod = method.id; paymentReceived = null"><span>{{ method.icon }}</span>{{ method.label }}</button>
+              }
+            </div>
+          </section>
+
+          <section class="ck-section">
+            <h3>Monto</h3>
+            <label class="ck-amount"><span>S/</span><input type="number" min="0.01" step="0.01" [(ngModel)]="paymentAmount" aria-label="Monto a cobrar"></label>
+            <div class="ck-chips">
+              <button type="button" class="ck-chip" [class.on]="paymentAmount === summary.remaining" (click)="paymentAmount = summary.remaining">Todo · {{ summary.remaining | currency:'PEN':'S/ ' }}</button>
+              <button type="button" class="ck-chip" (click)="paymentAmount = half(summary.remaining)">Mitad</button>
+            </div>
+          </section>
+
+          <section class="ck-section">
+            <h3>Propina <small>{{ paymentTip > 0 ? '+ ' + (paymentTip | currency:'PEN':'S/ ') : 'opcional' }}</small></h3>
+            <div class="ck-chips ck-tips">
+              <button type="button" class="ck-chip" [class.on]="!paymentTip" (click)="paymentTip = 0">Sin propina</button>
+              @for (pct of [5, 10, 15]; track pct) { <button type="button" class="ck-chip" [class.on]="paymentTip > 0 && paymentTip === tipFor(pct)" (click)="paymentTip = tipFor(pct)">{{ pct }} %</button> }
+            </div>
+          </section>
+
+          @if (paymentMethod === 'CASH') {
+            <section class="ck-section">
+              <h3>¿Con cuánto paga?</h3>
+              <div class="ck-chips">@for (option of cashOptions(); track option) {<button type="button" class="ck-chip" [class.on]="paymentReceived === option" (click)="paymentReceived = option">{{ option === amountDue() ? 'Exacto' : 'S/ ' + option }}</button>}</div>
+              <label class="ck-amount small"><span>S/</span><input type="number" min="0" step="0.10" [(ngModel)]="paymentReceived" placeholder="Otro monto" aria-label="Efectivo recibido"></label>
+              @if (paymentReceived !== null && paymentReceived > 0) {
+                <div class="ck-change" [class.short]="paymentReceived < amountDue()">
+                  <small>{{ paymentReceived < amountDue() ? 'Faltan' : 'Vuelto' }}</small>
+                  <strong>{{ (paymentReceived < amountDue() ? amountDue() - paymentReceived : paymentReceived - amountDue()) | currency:'PEN':'S/ ' }}</strong>
+                </div>
+              }
+            </section>
+          } @else {
+            <section class="ck-section">
+              <h3>N° de operación <small>opcional</small></h3>
+              <input class="ck-input" [(ngModel)]="paymentReference" [placeholder]="paymentMethod === 'CARD' ? 'Últimos dígitos o voucher' : 'Código de la operación'" aria-label="Número de operación">
+            </section>
+          }
+        } @else if (pendingDelivery() > 0) {
+          <div class="ck-note warn"><span>📦</span><div><b>Pago completo</b><small>Entrega los {{ pendingDelivery() }} producto(s) pendientes para cerrar el pedido.</small></div></div>
+        } @else {
+          <div class="ck-note ok"><span>✓</span><div><b>Pago completo</b><small>Cierra la atención para terminar.</small></div></div>
+        }
+
+        @if (summary.payments.length) {
+          <section class="ck-section">
+            <h3>Pagos registrados</h3>
+            @for (entry of summary.payments; track entry.id) {
+              <div class="ck-paid-row">
+                <span><b>{{ methodLabel(entry.method) }}@if (entry.guestId) { · {{ guestLabel(entry.guestId) }} }</b><small>{{ entry.reference || '' }}@if (entry.tip > 0) { · Propina {{ entry.tip | currency:'PEN':'S/ ' }} }@if (entry.changeGiven > 0) { · Vuelto {{ entry.changeGiven | currency:'PEN':'S/ ' }} }</small></span>
+                <strong>{{ entry.amount | currency:'PEN':'S/ ' }}</strong>
+              </div>
+            }
+          </section>
+        }
+
+        <!-- Lo secundario, plegado -->
+        <details class="ck-more">
+          <summary>Más opciones <small>precuenta, cliente, descuento</small></summary>
+          <div class="ck-more-body">
+            <button type="button" class="ck-row-btn" (click)="printPrebill()"><span>⎙</span>Imprimir precuenta</button>
+            @if (isManager() && !summary.discount && summary.paid === 0 && summary.subtotal > 0) {
+              <button type="button" class="ck-row-btn" (click)="discountOpen.set(!discountOpen())"><span>%</span>{{ discountOpen() ? 'Cerrar descuento' : 'Aplicar descuento' }}</button>
+              @if (discountOpen()) {
+                <div class="ck-discount">
+                  <div class="ck-chips">
+                    <button type="button" class="ck-chip" [class.on]="discountKind === 'PERCENT'" (click)="discountKind = 'PERCENT'">Porcentaje %</button>
+                    <button type="button" class="ck-chip" [class.on]="discountKind === 'AMOUNT'" (click)="discountKind = 'AMOUNT'">Monto S/</button>
+                  </div>
+                  <input class="ck-input" type="number" min="0.01" [max]="discountKind === 'PERCENT' ? 100 : summary.subtotal" step="0.01" [(ngModel)]="discountValue" [attr.aria-label]="discountKind === 'PERCENT' ? 'Porcentaje' : 'Monto'">
+                  <input class="ck-input" [(ngModel)]="discountReason" maxlength="250" placeholder="Motivo: cliente frecuente, cortesía…" aria-label="Motivo">
+                  <button type="button" class="ck-chip strong" [disabled]="discountValue <= 0 || !discountReason.trim() || busy()" (click)="applyDiscount()">Aplicar descuento</button>
+                </div>
+              }
+            }
+            @if (loyalty(); as state) {
+              <div class="ck-customer">
+                @if (state.customer; as customer) {
+                  <div class="ck-customer-linked">
+                    <span class="ck-points">★ {{ customer.points }}</span>
+                    <span><b>{{ customer.fullName }}</b><small>{{ customer.phone }} · {{ customer.visits }} {{ customer.visits === 1 ? 'visita' : 'visitas' }}</small></span>
+                    @if (!state.redeemedPoints) { <button type="button" class="ck-link" (click)="linkCustomer(null)">Quitar</button> }
+                  </div>
+                  @if (state.redeemedPoints) {
+                    <small class="ck-muted">Canjeó {{ state.redeemedPoints }} puntos.@if (summary.paid === 0) { <button type="button" class="ck-link" (click)="cancelRedeem()">Cancelar canje</button> }</small>
+                  } @else if (canRedeem()) {
+                    <div class="ck-redeem"><span>Canjear</span><input class="ck-input" type="number" [min]="state.program.minRedeem" [max]="maxRedeemable()" step="10" [(ngModel)]="redeemPoints" aria-label="Puntos a canjear"><span>pts = <b>{{ redeemPoints * state.program.pointValue | currency:'PEN':'S/ ' }}</b></span><button type="button" class="ck-chip" [disabled]="redeemPoints < state.program.minRedeem || redeemPoints > maxRedeemable() || busy()" (click)="redeem()">Aplicar</button></div>
+                  } @else if (state.program.enabled) {
+                    <small class="ck-muted">Sumará puntos al cerrar la cuenta.</small>
+                  }
+                } @else {
+                  <div class="ck-search">
+                    <input class="ck-input" type="search" [(ngModel)]="customerQuery" (ngModelChange)="searchCustomers()" placeholder="Cliente frecuente: celular o nombre" aria-label="Buscar cliente frecuente">
+                    <button type="button" class="ck-chip" (click)="customerFormOpen.set(!customerFormOpen())">{{ customerFormOpen() ? 'Cancelar' : '+ Nuevo' }}</button>
+                  </div>
+                  @if (customerResults().length) {
+                    <div class="ck-results">@for (customer of customerResults(); track customer.id) { <button type="button" (click)="linkCustomer(customer)"><b>{{ customer.fullName }}</b><small>{{ customer.phone }} · ★ {{ customer.points }}</small></button> }</div>
+                  }
+                  @if (customerFormOpen()) {
+                    <div class="ck-discount">
+                      <input class="ck-input" [(ngModel)]="newCustomerName" placeholder="Nombre" aria-label="Nombre del cliente" maxlength="120">
+                      <input class="ck-input" type="tel" [(ngModel)]="newCustomerPhone" placeholder="Celular" aria-label="Celular del cliente" maxlength="30">
+                      <button type="button" class="ck-chip strong" [disabled]="!newCustomerName.trim() || !newCustomerPhone.trim() || busy()" (click)="createCustomer()">Registrar y asociar</button>
+                    </div>
+                  }
+                }
+              </div>
+            }
+            @if (billInProgress() && summary.paid === 0) { <button type="button" class="ck-row-btn danger" (click)="cancelBill()"><span>↺</span>Cancelar el cobro y reabrir el consumo</button> }
+          </div>
+        </details>
+      </div>
+
+      <!-- Pie fijo: la acción del paso actual -->
+      <footer class="ck-foot">
+        @if (!canPay()) {
+          <button type="button" class="ck-main" disabled>Disponible al terminar el servicio</button>
+        } @else if (summary.remaining > 0) {
+          @if (!billInProgress() && channel() === 'DINE_IN') { <p class="ck-foot-note"><span aria-hidden="true">🔒</span>Al pagar todo, la mesa se libera.</p> }
+          <button type="button" class="ck-main pay" [disabled]="!canSubmitPayment() || busy()" (click)="payNow()">Registrar {{ methodLabel(paymentMethod).toLowerCase() }} · {{ amountDue() | currency:'PEN':'S/ ' }}</button>
+        } @else if (pendingDelivery() > 0) {
+          <button type="button" class="ck-main" disabled>Entrega lo pendiente para cerrar</button>
+        } @else {
+          <button type="button" class="ck-main pay" [disabled]="busy()" (click)="closeSession()">Cerrar atención</button>
+        }
+      </footer>
+    } @else {
+      <div class="ck-loading"><span class="service-loader"></span><p>Cargando cuenta…</p></div>
+    }
+  </section>
+</div>

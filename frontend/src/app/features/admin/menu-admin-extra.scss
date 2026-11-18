@@ -1,0 +1,27 @@
+// Resumen del catálogo, opciones, etiquetas e interruptores.
+.mn-tags { display: grid; gap: 6px; font-size: .8rem; font-weight: 700; }
+.mn-tags > div { display: flex; flex-wrap: wrap; gap: 5px; }
+.mn-tags button { height: 30px; padding: 0 11px; border: 0; border-radius: 999px; font-size: .74rem; font-weight: 700; color: var(--text); background: color-mix(in srgb, var(--text) 7%, transparent); transition: transform .2s, background .2s; }
+.mn-tags button.on { background: color-mix(in srgb, var(--brand) 20%, transparent); box-shadow: inset 0 0 0 1.5px var(--brand); }
+.modifier-editor { margin: 0 !important; padding: 0 !important; border: 0 !important; background: none !important; display: grid; gap: 10px; }
+.modifier-editor > header { display: flex; align-items: center; justify-content: space-between; }
+.modifier-editor h3 { margin: 0; font: 750 .95rem var(--font-display); }
+.modifier-editor-group { padding: 10px; border: 0 !important; border-radius: 14px; background: color-mix(in srgb, var(--text) 4%, transparent) !important; }
+.recipe-summary { border: 0 !important; border-radius: 14px; }
+.mn-summary { display: grid; align-content: start; gap: 12px; overflow-y: auto; }
+.mn-summary h3 { margin: 0; font: 800 1.15rem var(--font-display); }
+.mn-summary h4 { margin: 6px 0 0; color: var(--muted); font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+.mn-summary-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.mn-summary-stats span { display: grid; gap: 1px; } .mn-summary-stats small { color: var(--muted); font-size: .72rem; font-weight: 650; }
+.mn-summary-stats b { font: 800 1.4rem var(--font-display); } .mn-summary-stats b.bad { color: var(--bad); }
+.mn-hint { display: flex; align-items: flex-start; gap: 10px; width: 100%; padding: 10px 12px; border: 0; border-radius: 14px; text-align: left; color: var(--text); background: color-mix(in srgb, var(--warn) 12%, transparent); }
+.mn-hint > app-icon { margin-top: 2px; color: var(--warn); } .mn-hint span { display: grid; gap: 1px; font-size: .82rem; } .mn-hint small { color: var(--muted); font-size: .72rem; }
+.mn-tip { margin: 4px 0 0; color: var(--muted); font-size: .78rem; line-height: 1.45; }
+.mn-icon { flex-shrink: 0; width: 34px; height: 34px; display: grid; place-items: center; border: 0; border-radius: 50%; color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); }
+.mn-icon:hover { background: color-mix(in srgb, var(--text) 14%, transparent); }
+.mn-icon.small { width: 28px; height: 28px; }
+.mn-link { border: 0; background: none; color: var(--muted); font-size: .76rem; font-weight: 700; }
+.mn-switch { display: inline-flex; align-items: center; gap: 10px; justify-self: start; height: 36px; padding: 0 14px 0 6px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--text) 6%, transparent); color: var(--text); font-weight: 700; font-size: .8rem; }
+.mn-switch i { position: relative; width: 36px; height: 22px; border-radius: 999px; background: color-mix(in srgb, var(--text) 18%, transparent); transition: background .25s; }
+.mn-switch i::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .35s var(--ease-spring); }
+.mn-switch[aria-checked='true'] i { background: var(--ok); } .mn-switch[aria-checked='true'] i::after { transform: translateX(14px); }

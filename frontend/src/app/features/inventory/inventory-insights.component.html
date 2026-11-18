@@ -1,0 +1,126 @@
+<div class="insights">
+  <section class="lg insight-panel">
+    <header>
+      <div>
+        <p class="eyebrow">Al ritmo de ventas de hoy</p>
+        <h2>¿Qué se acaba hoy?</h2>
+      </div>
+      <button class="ins-pill" (click)="load()"><app-icon name="refresh" [size]="14" /> Actualizar</button>
+    </header>
+    <div class="insight-scroll">
+    @for (item of urgent(); track item.ingredientId; let index = $index) {
+      <article
+        class="forecast-row"
+        [attr.data-level]="item.level"
+        [style.--delay]="index * 70 + 'ms'"
+      >
+        <span class="forecast-icon"><app-icon [name]="item.level === 'OUT' ? 'alert' : 'hourglass'" [size]="17" /></span>
+        <div>
+          <strong>{{ item.name }}</strong>
+          @if (item.level === 'OUT') {
+            <small>Se agotó. Los platos que lo usan pueden marcarse como agotados.</small>
+          } @else {
+            <small
+              >Al ritmo de hoy se acaba a las <b>{{ item.runsOutAt | date: 'h:mm a' }}</b> ({{
+                hoursLeft(item)
+              }})</small
+            >
+          }
+          <i class="forecast-bar"><b [style.width.%]="remaining(item)"></b></i>
+        </div>
+        <span class="forecast-stock"
+          >{{ item.stock | number: '1.0-2' }} {{ units[item.unit]
+          }}<small>{{ item.perHour | number: '1.0-2' }}/h</small></span
+        >
+      </article>
+    } @empty {
+      <p class="insight-ok"><app-icon name="check" [size]="16" /> Al ritmo de hoy no se acaba ningún insumo antes del cierre.</p>
+    }
+    @if (calm().length) {
+      <p class="insight-caption">
+        También se están usando:
+        @for (item of calm(); track item.ingredientId; let last = $last) {
+          {{ item.name }} ({{ hoursLeft(item) }}){{ last ? '' : ' · ' }}
+        }
+      </p>
+    }
+      </div>
+  </section>
+
+  <section class="lg insight-panel">
+    <header>
+      <div>
+        <p class="eyebrow">Lista de compras automática</p>
+        <h2>
+          <app-icon name="cart" [size]="18" /> {{ totalItems() }}
+          {{ totalItems() === 1 ? 'insumo por comprar' : 'insumos por comprar' }}
+        </h2>
+      </div>
+    </header>
+    <div class="insight-scroll">
+    @for (group of groups(); track group.key) {
+      <article class="supplier-card">
+        <header>
+          @if (editingSupplier() === (group.key || '__none__')) {
+            <div class="supplier-form">
+              <input
+                [(ngModel)]="supplierName"
+                placeholder="Proveedor (p. ej. Mercado Central)"
+                maxlength="100"
+              />
+              <input
+                [(ngModel)]="supplierPhone"
+                placeholder="WhatsApp (p. ej. 987654321)"
+                maxlength="30"
+                inputmode="tel"
+              />
+              <button class="primary small" (click)="saveSupplier(group)">Guardar</button>
+              <button class="secondary small" (click)="editingSupplier.set(null)">Cancelar</button>
+            </div>
+          } @else {
+            <div>
+              <strong>{{ group.name }}</strong>
+              <small>{{ group.phone ? group.phone : 'Sin número de WhatsApp' }}</small>
+            </div>
+            <button class="link-button" (click)="editSupplier(group)">
+              {{ group.key ? 'Editar' : 'Asignar proveedor' }}
+            </button>
+          }
+        </header>
+        @for (item of group.items; track item.ingredientId) {
+          <label class="shopping-row" [class.off]="!item.selected">
+            <input type="checkbox" [(ngModel)]="item.selected" />
+            <span
+              ><strong>{{ item.name }}</strong
+              ><small
+                >{{ item.reason }} · quedan {{ item.stock | number: '1.0-2' }}
+                {{ units[item.unit] }} · usas ~{{ item.dailyUse | number: '1.0-1' }}/día</small
+              ></span
+            >
+            <span class="shopping-qty"
+              ><input
+                type="number"
+                min="0"
+                step="0.5"
+                [(ngModel)]="item.quantity"
+                [disabled]="!item.selected"
+              /><small>{{ units[item.unit] }}</small></span
+            >
+          </label>
+        }
+        <footer>
+          <span
+            >Estimado <b>{{ groupCost(group) | currency: 'PEN' : 'S/ ' }}</b></span
+          >
+          <button class="ins-pill" (click)="copy(group)"><app-icon name="copy" [size]="14" /> Copiar</button>
+          <button class="ins-pill wa" (click)="whatsapp(group)">
+            <app-icon name="send" [size]="14" /> Enviar por WhatsApp
+          </button>
+        </footer>
+      </article>
+    } @empty {
+      <p class="insight-ok"><app-icon name="check" [size]="16" /> Todo en orden: ningún insumo está bajo el mínimo ni se acaba hoy.</p>
+    }
+      </div>
+  </section>
+</div>

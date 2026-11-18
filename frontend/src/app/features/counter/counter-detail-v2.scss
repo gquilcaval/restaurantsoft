@@ -1,0 +1,29 @@
+// Detalle: recorrido del pedido, contacto con un toque y la acción principal abajo.
+.cn-stepper { display: grid; grid-template-columns: repeat(5, 1fr); margin: 0; padding: 0; list-style: none; }
+.cn-stepper li { position: relative; display: grid; justify-items: center; gap: 4px; color: var(--muted); font-size: .64rem; font-weight: 750; text-align: center; }
+.cn-stepper li::before { content: ''; position: absolute; top: 11px; left: -50%; width: 100%; height: 2px; background: color-mix(in srgb, var(--text) 12%, transparent); }
+.cn-stepper li:first-child::before { display: none; }
+.cn-stepper li.done::before, .cn-stepper li.now::before { background: var(--brand); }
+.cn-stepper i { position: relative; z-index: 1; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; font-style: normal; font-size: .68rem; background: color-mix(in srgb, var(--text) 10%, var(--surface)); }
+.cn-stepper li.done i { color: var(--on-brand, #fff); background: var(--brand); }
+.cn-stepper li.now { color: var(--text); }
+.cn-stepper li.now i { color: var(--on-brand, #fff); background: var(--brand); box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 25%, transparent); }
+.cn-address { display: flex; gap: 8px; margin: 0; font-size: .84rem; font-weight: 650; }
+.cn-address app-icon { margin-top: 2px; color: var(--muted); }
+.cn-address small { display: block; color: var(--muted); font-weight: 600; }
+.cn-contact-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.cn-chip { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: 999px; color: var(--text) !important; font-size: .78rem; font-weight: 750; text-decoration: none; background: color-mix(in srgb, var(--text) 8%, transparent); }
+.cn-chip.wa { color: #fff !important; background: #25d366; }
+.cn-items h3 { display: flex; align-items: center; justify-content: space-between; margin: 0 0 2px; font-size: .86rem; }
+.cn-link { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border: 0; border-radius: 999px; color: var(--brand-accent, var(--brand)); font-size: .76rem; font-weight: 800; background: color-mix(in srgb, var(--brand) 12%, transparent); }
+.cn-detail-actions { display: grid; gap: 8px; }
+.cn-detail-more { display: flex; flex-wrap: wrap; gap: 6px; }
+.cn-detail-more .cn-pill { flex: 1; height: 38px; font-size: .78rem; }
+.cn-pick { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 6px 0 4px; }
+.cn-pick button { --tone: #0ea5e9; display: grid; justify-items: start; gap: 4px; padding: 14px; border: 0; border-radius: 18px; color: var(--text); text-align: left; background: color-mix(in srgb, var(--text) 5%, transparent); transition: box-shadow .2s, background .2s, transform .2s; }
+.cn-pick button.delivery { --tone: #f08a3c; }
+.cn-pick button > span { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 13px; color: var(--tone); background: color-mix(in srgb, var(--tone) 16%, transparent); }
+.cn-pick b { font-size: .95rem; } .cn-pick small { color: var(--muted); font-size: .72rem; line-height: 1.3; }
+.cn-pick button[aria-checked='true'] { background: color-mix(in srgb, var(--tone) 12%, transparent); box-shadow: inset 0 0 0 2px var(--tone); }
+.cn-contact .cn-contact-actions a.cn-chip { align-items: center; line-height: 1; }
+.cn-contact .cn-chip app-icon { margin-top: 0; color: inherit; }

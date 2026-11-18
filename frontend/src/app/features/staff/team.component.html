@@ -1,0 +1,51 @@
+@if (people(); as all) {
+  <header class="tm-head">
+    <div><h2>Equipo</h2><p>{{ total() }} {{ total() === 1 ? 'persona' : 'personas' }}. Toca a alguien para ver o cambiar sus datos.</p></div>
+    @if (all.length > 8) {
+      <label class="tm-search"><app-icon name="search" [size]="15" /><input type="search" placeholder="Buscar" [value]="query()" (input)="query.set($any($event.target).value)" aria-label="Buscar persona"></label>
+    }
+    <button class="tm-add" (click)="open.set('new')"><app-icon name="user-plus" [size]="17" />Agregar persona</button>
+  </header>
+
+  @if (!all.length) {
+    <div class="lg tm-empty">
+      <span><app-icon name="users" [size]="26" /></span>
+      <strong>Aún no hay nadie en tu equipo</strong>
+      <small>Registra a tus meseros, cocineros y demás personal. Solo necesitas su nombre y su puesto.</small>
+      <button class="tm-add" (click)="open.set('new')"><app-icon name="user-plus" [size]="17" />Agregar a la primera persona</button>
+    </div>
+  } @else {
+    <div class="lg tm-list">
+      @for (person of current(); track person.id; let index = $index) {
+        <button class="tm-row" [style.--tone]="tone(person)" [style.--d]="(index < 16 ? index * 25 : 0) + 'ms'" (click)="open.set(person)">
+          <span class="tm-avatar">{{ initials(person.fullName) }}</span>
+          <span class="tm-main"><strong>{{ person.fullName }}</strong><small>{{ postLabel(person) }}</small></span>
+          @if (!person.hasPin) { <span class="tm-tag warn">Sin PIN</span> }
+          @else if (entryLabel(person)) { <span class="tm-tag">{{ entryLabel(person) }}</span> }
+        </button>
+      } @empty { <p class="tm-muted">Nadie coincide con «{{ query() }}».</p> }
+    </div>
+
+    @if (former().length) {
+      <button class="tm-former" (click)="showFormer.set(!showFormer())" [attr.aria-expanded]="showFormer()">
+        Ya no trabajan aquí ({{ former().length }})<app-icon name="chevron-down" [size]="15" />
+      </button>
+      @if (showFormer()) {
+        <div class="lg tm-list">
+          @for (person of former(); track person.id) {
+            <button class="tm-row off" [style.--tone]="tone(person)" (click)="open.set(person)">
+              <span class="tm-avatar">{{ initials(person.fullName) }}</span>
+              <span class="tm-main"><strong>{{ person.fullName }}</strong><small>{{ postLabel(person) }}</small></span>
+            </button>
+          }
+        </div>
+      }
+    }
+  }
+
+  @if (open()) {
+    <app-person-sheet [person]="selected()" (saved)="load()" (closed)="open.set(null)" />
+  }
+} @else {
+  <div class="lg tm-list"><p class="tm-muted">{{ failed() ? 'No se pudo cargar el equipo. Revisa tu conexión.' : 'Cargando equipo…' }}</p></div>
+}

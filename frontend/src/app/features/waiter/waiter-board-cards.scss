@@ -1,0 +1,31 @@
+// Tarjeta de mesa compacta: el estado manda el color y todo se lee sin abrirla.
+.mz-table { --tone: #3fbf2a; position: relative; display: flex; flex-direction: column; min-width: 0; padding: 0; border-radius: 20px; animation: mz-in .4s var(--ease-spring) var(--d) backwards; transition: transform .35s var(--ease-spring), box-shadow .25s; }
+.mz-table[data-state='busy'] { --tone: #f08a3c; } .mz-table[data-state='ready'] { --tone: #3fbf2a; }
+.mz-table[data-state='bill'] { --tone: #a46bff; } .mz-table[data-state='call'] { --tone: #f5b301; } .mz-table[data-state='review'] { --tone: #ef5d55; }
+.mz-table:hover { transform: translateY(-2px); }
+.mz-table.is-selected { box-shadow: var(--elev-2), inset 0 0 0 2px var(--brand); }
+.mz-table::before { content: ''; position: absolute; left: 16px; right: 16px; top: 0; height: 3px; border-radius: 0 0 4px 4px; background: var(--tone); opacity: .9; }
+.mz-table[data-state='free']::before { opacity: .35; }
+.mz-open { min-width: 0; display: grid; align-content: start; gap: 6px; flex: 1; width: 100%; padding: 10px 13px 11px; border: 0; background: transparent; color: var(--text); text-align: left; font: inherit; cursor: pointer; }
+.mz-top { display: flex; align-items: center; min-height: 28px; padding-right: 34px; }
+.mz-top strong { min-width: 0; font: 750 1.05rem var(--font-display); letter-spacing: -.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mz-qr { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 10px; color: var(--muted); background: color-mix(in srgb, var(--text) 7%, transparent); transition: background .2s, color .2s, transform .3s var(--ease-spring); }
+.mz-qr:hover { color: var(--text); background: color-mix(in srgb, var(--text) 13%, transparent); }
+.mz-qr:active { transform: scale(.9); }
+.mz-qr svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+.mz-sub { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.mz-state { flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px; border-radius: 999px; font-size: .68rem; font-weight: 800; color: var(--tone); background: color-mix(in srgb, var(--tone) 15%, transparent); }
+.mz-state i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.mz-table:is([data-state='ready'], [data-state='bill'], [data-state='call'], [data-state='review']) .mz-state i { animation: mz-ping 1.6s infinite; }
+@keyframes mz-ping { 0% { box-shadow: 0 0 0 0 currentColor; } 70%, 100% { box-shadow: 0 0 0 6px transparent; } }
+.mz-zone { display: flex; align-items: center; gap: 5px; min-width: 0; color: var(--muted); font-size: .72rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mz-zone i { flex-shrink: 0; width: 7px; height: 7px; border-radius: 50%; background: var(--zone-color, var(--muted)); }
+.mz-time { flex-shrink: 0; display: inline-flex; align-items: center; gap: 3px; margin-left: auto; color: var(--muted); font-size: .72rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.mz-mid { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 26px; }
+.mz-total { min-width: 0; font: 800 .92rem var(--font-display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mz-muted { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-size: .74rem; font-weight: 600; }
+.mz-free { display: inline-flex; align-items: center; gap: 6px; color: var(--tone); font-size: .8rem; font-weight: 700; }
+.mz-progress-row { display: grid; gap: 4px; min-height: 22px; align-content: end; }
+.mz-table .service-avatars { flex-shrink: 0; } .mz-table .service-avatars i { width: 22px; height: 22px; margin-left: -7px; border-color: color-mix(in srgb, var(--surface) 80%, transparent); }
+@keyframes mz-in { from { opacity: 0; transform: translateY(10px) scale(.98); } }
+@media (prefers-reduced-motion: reduce) { .mz-table, .mz-state i { animation: none !important; } }

@@ -1,0 +1,84 @@
+<section class="team" [class.compact]="compact()">
+  <header class="team-head">
+    <h2>🏆 Ranking del equipo<app-info-tip text="Puntos: ventas 40 %, calificación 30 %, rapidez para atender llamadas y cuentas 15 % y propinas 15 %, comparados con el mejor del equipo." /></h2>
+    <div class="seg">
+      <button [class.active]="period() === 'today'" (click)="period.set('today')">Hoy</button>
+      <button [class.active]="period() === 'week'" (click)="period.set('week')">Semana</button>
+      <button [class.active]="period() === 'lastweek'" (click)="period.set('lastweek')">
+        Semana pasada
+      </button>
+    </div>
+  </header>
+
+  @if (data(); as value) {
+    @if (value.waiters.length) {
+      <div class="team-podium">
+        @for (item of podium(); track item.member.userId) {
+          <div class="team-step" [attr.data-place]="item.place" [class.me]="item.member.me">
+            <span class="team-avatar"
+              >{{ initials(item.member.name) }}<i>{{ item.place === 1 ? '👑' : '' }}</i></span
+            >
+            <strong>{{ firstName(item.member.name) }}{{ item.member.me ? ' (tú)' : '' }}</strong>
+            <small>{{ item.member.score }} pts</small>
+            <span class="team-medals">
+              @for (medal of item.member.medals; track medal) {
+                <i [title]="medals[medal].title">{{ medals[medal].icon }}</i>
+              }
+            </span>
+            <b class="team-block">{{ item.place }}</b>
+          </div>
+        }
+      </div>
+
+      <div class="team-awards">
+        @for (key of medalKeys; track key) {
+          @if (winner(key); as member) {
+            <div class="team-award" [class.me]="member.me">
+              <span>{{ medals[key].icon }}</span>
+              <div>
+                <strong>{{ medals[key].title }}</strong
+                ><small
+                  >{{ firstName(member.name) }}{{ member.me ? ' (tú)' : '' }} ·
+                  {{ medals[key].hint }}</small
+                >
+              </div>
+            </div>
+          }
+        }
+      </div>
+
+      @if (!compact()) {
+        <div class="team-table">
+          <div class="team-row head">
+            <span>#</span><span>Mesero</span><span>Ventas</span><span>Propinas</span><span>⭐</span
+            ><span>⚡ Atención</span><span>Puntos</span>
+          </div>
+          @for (member of value.waiters; track member.userId; let index = $index) {
+            <div class="team-row" [class.me]="member.me" [style.--delay]="index * 60 + 'ms'">
+              <span>{{ index + 1 }}</span>
+              <span
+                ><strong>{{ member.name }}</strong
+                ><small>{{ member.tables }} mesas</small></span
+              >
+              <span>{{ member.collected | currency: 'PEN' : 'S/ ' : '1.0-0' }}</span>
+              <span>{{ member.tips | currency: 'PEN' : 'S/ ' : '1.0-0' }}</span>
+              <span>{{
+                member.rating !== null ? member.rating + ' (' + member.ratings + ')' : '—'
+              }}</span>
+              <span>{{
+                member.responseMinutes !== null ? member.responseMinutes + ' min' : '—'
+              }}</span>
+              <span class="team-score"
+                ><i [style.width.%]="member.score"></i><b>{{ member.score }}</b></span
+              >
+            </div>
+          }
+        </div>
+      }
+    } @else {
+      <p class="team-empty">
+        Todavía no hay actividad en este período. ¡El primer cobro abre el marcador! 🚀
+      </p>
+    }
+  }
+</section>

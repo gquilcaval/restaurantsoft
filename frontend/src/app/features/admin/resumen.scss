@@ -1,0 +1,42 @@
+// Resumen en Liquid Glass: estructura, saludo, cápsulas y selector de período.
+.rs { display: grid; gap: 18px; }
+.rs-hello p { margin: 0; color: var(--muted); font-size: .86rem; font-weight: 600; }
+.rs-hello h2 { margin: 2px 0 0; font: 800 clamp(1.6rem, 2.6vw, 2.2rem) var(--font-display); letter-spacing: -.03em; }
+.rs-live { display: inline-flex; align-items: center; gap: 6px; color: var(--brand-accent); }
+.rs-live i { width: 7px; height: 7px; border-radius: 50%; background: var(--brand); animation: rs-ping 1.8s infinite; }
+.rs-idle { color: var(--muted); }
+@keyframes rs-ping { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand) 60%, transparent); } 70% { box-shadow: 0 0 0 8px transparent; } }
+.rs-actions { display: flex; gap: 8px; }
+.rs-pill {
+  display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 16px; border: 0; border-radius: 999px; font-weight: 700; font-size: .84rem;
+  color: var(--text); background: rgba(255, 255, 255, .1); box-shadow: var(--elev-1);
+  transition: transform .35s var(--ease-spring), background .2s;
+}
+.rs-pill:hover { background: rgba(255, 255, 255, .18); transform: translateY(-1px); box-shadow: var(--elev-3); }
+.rs-pill:active { transform: scale(.94); }
+.rs-pill.primary { background: var(--brand); color: var(--on-brand, #04110a); box-shadow: var(--elev-2); }
+.rs-pill.small { height: 36px; padding: 0 14px; font-size: .8rem; }
+.rs-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 18px; }
+.rs-card { padding: 22px 24px; transition: transform .45s var(--ease-spring); }
+.rs-card:hover { transform: translateY(-3px); box-shadow: var(--elev-4); }
+.rs-hero { grid-column: span 8; }
+.rs-kpis { grid-column: span 4; display: grid; gap: 12px; }
+.rs-attention { grid-column: span 7; }
+.rs-floor-card { grid-column: span 5; }
+.rs-third { grid-column: span 4; }
+.rs-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--muted); font-weight: 650; font-size: .88rem; }
+.rs-head h3 { margin: 0; color: var(--text); font: 700 1.05rem var(--font-display); }
+.rs-link { border: 0; background: transparent; color: var(--muted); font-weight: 700; font-size: .8rem; }
+.rs-link:hover { color: var(--brand-accent); }
+.rs-muted { margin: 12px 0 0; color: var(--muted); font-size: .8rem; }
+.rs-seg { position: relative; display: inline-flex; padding: 4px; border-radius: 999px; background: rgba(255, 255, 255, .08); box-shadow: var(--elev-1); }
+.rs-seg button { position: relative; z-index: 1; width: 72px; padding: 7px 0; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-weight: 700; font-size: .8rem; transition: color .3s; }
+.rs-seg button.on { color: var(--text); }
+.rs-seg-thumb {
+  position: absolute; top: 4px; bottom: 4px; left: 4px; width: 72px; border-radius: 999px; background: color-mix(in srgb, var(--surface) 70%, transparent);
+  box-shadow: var(--elev-2); transition: transform .5s var(--ease-spring);
+}
+.rs-seg-thumb[data-pos='week'] { transform: translateX(72px); }
+.rs-seg-thumb[data-pos='month'] { transform: translateX(144px); }
+@media (max-width: 1180px) { .rs-hero, .rs-kpis, .rs-attention, .rs-floor-card { grid-column: span 12; } .rs-third { grid-column: span 6; } .rs-kpis { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 760px) { .rs-third { grid-column: span 12; } .rs-actions .rs-pill:not(.primary) { display: none; } .rs-kpis { grid-template-columns: 1fr; } }

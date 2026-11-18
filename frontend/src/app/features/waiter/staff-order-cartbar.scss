@@ -1,0 +1,26 @@
+// Barra flotante «Ver pedido» (celular): miniaturas de lo agregado, cantidad, total y flecha.
+.so-cartbar, .so-cartbar-hint { display: none; }
+@media (max-width: 860px) {
+  .so-cartbar {
+    position: absolute; left: 12px; right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); z-index: 2;
+    display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: 12px; min-height: 64px; padding: 8px 8px 8px 10px;
+    border: 0; border-radius: 22px; color: var(--on-brand, #fff); text-align: left; font: inherit;
+    background: linear-gradient(180deg, color-mix(in srgb, white 12%, var(--brand)), var(--brand));
+    box-shadow: 0 16px 34px color-mix(in srgb, var(--brand) 38%, transparent), 0 4px 12px rgba(0, 0, 0, .25), inset 0 1px 0 rgba(255, 255, 255, .25);
+    animation: so-bar-in .45s cubic-bezier(.2, 1.3, .4, 1); transition: transform .15s;
+  }
+  .so-cartbar:active { transform: scale(.98); }
+  .so-cb-stack { position: relative; display: flex; align-items: center; padding-right: 6px; }
+  .so-cb-stack i { width: 38px; height: 38px; display: grid; place-items: center; overflow: hidden; margin-left: -14px; border-radius: 50%; color: #fff; font: 800 .9rem var(--font-display); font-style: normal; background: linear-gradient(135deg, hsl(var(--h) 55% 45%), hsl(calc(var(--h) + 40) 60% 32%)); box-shadow: 0 0 0 2.5px color-mix(in srgb, white 12%, var(--brand)); animation: so-in .3s ease; }
+  .so-cb-stack i:first-child { margin-left: 0; }
+  .so-cb-stack img { width: 100%; height: 100%; object-fit: cover; }
+  .so-cartbar-n { position: absolute; top: -6px; right: -2px; min-width: 22px; height: 22px; display: grid; place-items: center; padding: 0 6px; border-radius: 999px; color: var(--brand); font: 800 .72rem var(--font-display); background: #fff; box-shadow: 0 2px 6px rgba(0, 0, 0, .25); animation: so-bump .35s cubic-bezier(.2, 1.6, .4, 1); }
+  .so-cb-text { display: grid; gap: 1px; min-width: 0; }
+  .so-cb-text b { font-size: .98rem; font-weight: 800; }
+  .so-cb-text small { overflow: hidden; font-size: .72rem; font-weight: 650; opacity: .85; white-space: nowrap; text-overflow: ellipsis; }
+  .so-cb-total { font: 800 1.05rem var(--font-display); white-space: nowrap; }
+  .so-cb-go { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 14px; background: rgba(0, 0, 0, .16); }
+  .so-cb-go svg { width: 20px; height: 20px; }
+}
+@keyframes so-bar-in { from { opacity: 0; transform: translateY(30px) scale(.95); } }
+

@@ -1,0 +1,11 @@
+// Estilos propios de la pantalla del comensal (fuera del paquete inicial).
+.diner-dishes-scroll::-webkit-scrollbar-thumb{border-radius:999px;background:var(--border)}
+.diner-menu-view>.diner-skeleton-list{min-height:0;flex:1;overflow-y:auto;overscroll-behavior:contain}
+@media(max-width:420px){.diner-menu-view{height:calc(100dvh - 62px)}}
+.diner-cart-bar{overflow:hidden;isolation:isolate;border-color:color-mix(in srgb,var(--brand) 58%,white);background:linear-gradient(135deg,color-mix(in srgb,var(--brand) 78%,white),var(--brand) 55%,color-mix(in srgb,var(--brand) 86%,black));box-shadow:0 17px 38px color-mix(in srgb,var(--brand) 48%,transparent),0 7px 16px #00000035,inset 0 1px 0 #ffffff8a,inset 0 -1px 0 #00000024;filter:saturate(1.08);transition:transform .2s ease,box-shadow .2s ease,filter .2s ease}
+.diner-cart-bar::before{content:"";position:absolute;z-index:-1;inset:1px 2px 48%;border-radius:15px 15px 45% 45%;background:linear-gradient(180deg,#ffffff38,transparent);pointer-events:none}
+.diner-cart-bar:hover{transform:translate(-50%,-2px);box-shadow:0 21px 45px color-mix(in srgb,var(--brand) 54%,transparent),0 9px 20px #0000003d,inset 0 1px 0 #ffffff99}
+.diner-cart-bar:active{transform:translate(-50%,1px);box-shadow:0 9px 22px color-mix(in srgb,var(--brand) 38%,transparent),0 3px 8px #00000032,inset 0 1px 0 #ffffff70}
+.diner-cart-bar{box-shadow:0 0 18px color-mix(in srgb,var(--brand) 34%,transparent),0 0 0 1px #00000012,inset 0 1px 0 #ffffff7a,inset 0 -1px 0 #00000018}
+.diner-cart-bar:hover{transform:translateX(-50%);box-shadow:0 0 23px color-mix(in srgb,var(--brand) 42%,transparent),0 0 0 1px #00000018,inset 0 1px 0 #ffffff8a}
+.diner-cart-bar:active{transform:translateX(-50%) scale(.992);box-shadow:0 0 14px color-mix(in srgb,var(--brand) 30%,transparent),0 0 0 1px #00000015,inset 0 1px 0 #ffffff68}

@@ -1,0 +1,11 @@
+// Mini panel del equipo en la vista previa.
+.bd-app { --bg: #f2f3ef; --card: #fff; --tx: #1a1c1a; --mu: #6b706b; width: 100%; display: grid; grid-template-columns: 44px 1fr; gap: 8px; padding: 10px; border-radius: 20px; color: var(--tx); background: var(--bg); box-shadow: 0 20px 44px rgba(0, 0, 0, .28); transition: background .35s, color .35s; }
+.bd-app.dark { --bg: #121416; --card: #1e2124; --tx: #f2f3f2; --mu: #9aa09c; }
+.bd-app-side { display: grid; justify-items: center; align-content: start; gap: 10px; padding: 8px 0; border-radius: 14px; background: var(--card); }
+.bd-app-side i { width: 24px; height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--tx) 14%, transparent); } .bd-app-side i.on { background: var(--pv); }
+.bd-app-main { display: grid; gap: 8px; align-content: start; }
+.bd-app-top { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border-radius: 999px; font-size: .68rem; background: var(--card); } .bd-app-top span { color: var(--mu); }
+.bd-app-card { display: grid; gap: 4px; padding: 12px; border-radius: 14px; background: var(--card); } .bd-app-card small { color: var(--mu); font-size: .62rem; } .bd-app-card strong { font-size: 1.15rem; }
+.bd-app-bar { height: 6px; border-radius: 4px; background: color-mix(in srgb, var(--tx) 10%, transparent); } .bd-app-bar i { display: block; width: 72%; height: 100%; border-radius: inherit; background: var(--pv); }
+.bd-app-row { display: flex; gap: 6px; } .bd-app-row span { padding: 7px 12px; border-radius: 999px; font-size: .64rem; font-weight: 800; }
+.bd-app-pill { color: var(--pv-ink); background: var(--pv); } .bd-app-ghost { color: var(--tx); background: var(--card); }

@@ -1,0 +1,28 @@
+.tv-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.tv-heat-legend { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: .74rem; color: var(--muted); font-weight: 700; }
+.tv-heat-legend i { flex: 0 1 220px; height: 10px; border-radius: 9px; background: linear-gradient(90deg, hsl(215 80% 52%), hsl(140 80% 45%), hsl(55 90% 50%), hsl(0 80% 52%)); }
+.tv-date { display: flex; align-items: center; gap: 8px; font-weight: 750; font-size: .82rem; }
+.tv-date input { border: 1px solid var(--border); border-radius: 9px; padding: 7px 9px; background: var(--bg); color: var(--text); }
+.tv-replay-clock { display: flex; align-items: baseline; gap: 10px; }
+.tv-replay-clock strong { font-size: 1.8rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+.tv-replay-clock span { color: var(--muted); font-weight: 700; font-size: .82rem; }
+.tv-player { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; margin-top: 12px; }
+.tv-player input { width: 100%; accent-color: var(--brand); }
+.tv-player span { color: var(--muted); font-size: .76rem; font-weight: 700; }
+.tv-play {
+  width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; border: 0; background: var(--brand); color: #fff;
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--brand) 40%, transparent); transition: transform .15s;
+}
+.tv-play:active { transform: scale(.92); }
+.tv-hours { display: flex; align-items: flex-end; gap: 4px; height: 90px; margin-top: 14px; }
+.tv-hour { flex: 1; height: 100%; display: grid; grid-template-rows: 1fr auto; gap: 3px; padding: 0; border: 0; background: transparent; color: var(--muted); }
+.tv-hour i {
+  align-self: end; display: block; height: calc(var(--ratio) * 100% + 3px); border-radius: 6px 6px 2px 2px;
+  background: color-mix(in srgb, hsl(calc(140 - var(--ratio) * 140) 75% 48%) 75%, var(--surface)); transition: height .5s ease, outline-color .2s;
+  outline: 2px solid transparent; outline-offset: 2px;
+}
+.tv-hour small { font-size: .62rem; font-weight: 700; }
+.tv-hour.current i { outline-color: var(--text); }
+.tv-hour.current small { color: var(--text); }
+.tv-hour.peak i { box-shadow: 0 0 14px hsl(0 80% 55% / .55); }
+.tv-insight { margin: 12px 0 0; padding: 11px 13px; border-radius: 12px; background: var(--orange-soft); font-size: .86rem; line-height: 1.4; }

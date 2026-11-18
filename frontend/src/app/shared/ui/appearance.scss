@@ -1,0 +1,28 @@
+// Vista Apariencia: tema con miniaturas, efectos agrupados y estado del equipo.
+.effects-pop:has(.fx-cards) { width: 344px; }
+.fx-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.fx-card { position: relative; display: grid; gap: 7px; padding: 6px 6px 8px; border: 0; border-radius: 16px; color: var(--muted); font-size: .76rem; font-weight: 750; background: color-mix(in srgb, var(--text) 4%, transparent); transition: background .2s, color .2s, box-shadow .25s, transform .25s var(--ease-spring); }
+.fx-card:hover { color: var(--text); transform: translateY(-2px); }
+.fx-card[aria-checked='true'] { color: var(--text); background: color-mix(in srgb, var(--brand) 12%, transparent); box-shadow: 0 0 0 2px var(--brand), 0 8px 20px color-mix(in srgb, var(--brand) 22%, transparent); }
+.fx-prev { position: relative; height: 54px; overflow: hidden; border-radius: 11px; background: #f2f3ef; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .06); --ink: rgba(20, 22, 26, .16); --side: #fff; }
+.fx-prev[data-look='dark'] { background: #15171a; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06); --ink: rgba(255, 255, 255, .16); --side: #22252a; }
+.fx-prev[data-look='system'] { background: linear-gradient(135deg, #f2f3ef 50%, #15171a 50%); --ink: rgba(128, 130, 135, .35); --side: linear-gradient(180deg, #fff 45%, #22252a 45%); }
+.fx-prev i { position: absolute; top: 6px; bottom: 6px; left: 6px; width: 12px; border-radius: 5px; background: var(--side); }
+.fx-prev b { position: absolute; left: 24px; height: 6px; border-radius: 4px; background: var(--ink); }
+.fx-prev b:nth-of-type(1) { top: 10px; width: 38%; } .fx-prev b:nth-of-type(2) { top: 22px; width: 52%; }
+.fx-prev em { position: absolute; left: 24px; bottom: 9px; width: 24px; height: 9px; border-radius: 5px; background: var(--brand); }
+.fx-card-name { text-align: center; }
+.fx-check { position: absolute; top: 2px; right: 2px; width: 20px; height: 20px; display: grid; place-items: center; border-radius: 50%; color: var(--on-brand, #fff); background: var(--brand); box-shadow: 0 2px 6px rgba(0, 0, 0, .25); opacity: 0; transform: scale(.4); transition: opacity .2s, transform .35s var(--ease-spring); }
+.fx-check svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.fx-card[aria-checked='true'] .fx-check { opacity: 1; transform: scale(1); }
+.fx-group { display: grid; overflow: hidden; border-radius: 18px; background: color-mix(in srgb, var(--text) 4%, transparent); }
+.fx-group .fx-option { border-radius: 0; background: transparent; }
+.fx-group .fx-option + .fx-option { box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text) 7%, transparent); }
+.fx-ico.motion { color: #ec4899; background: rgba(236, 72, 153, .14); }
+.fx-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 4px; }
+.fx-device { display: flex; align-items: center; gap: 7px; min-width: 0; color: var(--muted); font-size: .72rem; }
+.fx-device i { width: 8px; height: 8px; flex-shrink: 0; border-radius: 50%; background: var(--ok, #3fbf2a); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok, #3fbf2a) 20%, transparent); }
+.fx-device.modest i { background: #f5b301; box-shadow: 0 0 0 3px rgba(245, 179, 1, .2); }
+.fx-reset { flex-shrink: 0; padding: 6px 10px; border: 0; border-radius: 999px; color: var(--muted); font-size: .72rem; font-weight: 750; background: transparent; }
+.fx-reset:hover { color: var(--text); background: color-mix(in srgb, var(--text) 7%, transparent); }
+@media (max-width: 600px) { .effects-pop:has(.fx-cards) { width: min(344px, calc(100vw - 24px)); } }

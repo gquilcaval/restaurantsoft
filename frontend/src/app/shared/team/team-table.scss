@@ -1,0 +1,12 @@
+.team-table { display: grid; font-size: .82rem; }
+.team-row { display: grid; grid-template-columns: 26px minmax(0, 1.5fr) repeat(4, minmax(0, 1fr)) 90px; gap: 8px; align-items: center; padding: 9px 4px; border-top: 1px solid var(--border); animation: tb-row .4s ease-out var(--delay) backwards; }
+.team-row.head { color: var(--muted); font-size: .7rem; font-weight: 800; text-transform: uppercase; border-top: 0; animation: none; }
+.team-row.me { background: var(--brand-soft); border-radius: 10px; }
+.team-row > span:nth-child(2) { display: grid; }
+.team-row small { color: var(--muted); font-size: .7rem; }
+.team-score { position: relative; height: 22px; border-radius: 8px; background: var(--surface-2); overflow: hidden; display: grid; place-items: center; }
+.team-score i { position: absolute; inset: 0 auto 0 0; background: color-mix(in srgb, var(--brand) 45%, transparent); transform-origin: left; animation: tb-bar 1s ease-out backwards; }
+.team-score b { position: relative; font-size: .78rem; }
+@keyframes tb-row { from { opacity: 0; transform: translateX(-8px); } }
+@keyframes tb-bar { from { transform: scaleX(0); } }
+@media (max-width: 720px) { .team-row { grid-template-columns: 22px 1fr 1fr 70px; } .team-row > span:nth-child(4), .team-row > span:nth-child(5), .team-row > span:nth-child(6) { display: none; } }

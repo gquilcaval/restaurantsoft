@@ -1,0 +1,38 @@
+// Medios de pago, controles, rentabilidad, zonas y platos.
+.rp-side { display: flex; flex-direction: column; }
+.rp-donut-wrap { display: grid; place-items: center; padding: 18px 0 8px; }
+.rp-donut { position: relative; width: 168px; aspect-ratio: 1; border-radius: 50%; animation: rp-spin .9s var(--ease-spring); }
+.rp-donut::after { content: ''; position: absolute; inset: 22px; border-radius: 50%; background: color-mix(in srgb, var(--surface) 92%, transparent); }
+.rp-donut span { position: absolute; inset: 0; z-index: 1; display: grid; place-content: center; text-align: center; }
+.rp-donut small { color: var(--muted); font-size: .72rem; font-weight: 650; }
+.rp-donut b { font: 800 1.4rem var(--font-display); }
+@keyframes rp-spin { from { transform: rotate(-120deg) scale(.7); opacity: 0; } }
+.rp-legend { display: grid; gap: 10px; margin-top: 10px; }
+.rp-legend > div { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; align-items: center; gap: 10px; font-weight: 700; font-size: .86rem; }
+.rp-legend i { width: 10px; height: 10px; border-radius: 50%; }
+.rp-legend span, .rp-legend b { display: grid; gap: 1px; }
+.rp-legend b { justify-items: end; font-family: var(--font-display); }
+.rp-legend small { color: var(--muted); font-size: .72rem; font-weight: 600; }
+.rp-rows { display: grid; gap: 4px; margin-top: 12px; }
+.rp-rows > * { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px; margin: 0 -8px; border: 0; border-radius: 14px; background: transparent; color: var(--text); font: inherit; font-weight: 700; font-size: .88rem; text-align: left; }
+.rp-rows.tight > * { grid-template-columns: minmax(0, 1fr) auto; }
+.rp-rows button { cursor: pointer; transition: background .2s; }
+.rp-rows button:hover { background: color-mix(in srgb, var(--text) 6%, transparent); }
+.rp-rows span:not(.rp-ico) { display: grid; gap: 1px; }
+.rp-rows small { color: var(--muted); font-size: .72rem; font-weight: 600; }
+.rp-rows b { font-family: var(--font-display); } .rp-rows b.warn { color: var(--warn); } .rp-rows b.ok { color: var(--ok); }
+.rp-ico { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 12px; font-weight: 900; color: var(--bad); background: var(--bad-soft); }
+.rp-ico[data-tone='amber'] { color: var(--warn); background: var(--warn-soft); } .rp-ico[data-tone='blue'] { background: rgba(79, 140, 255, .18); }
+.rp-margin { display: flex; align-items: center; gap: 18px; margin-top: 10px; }
+.rp-margin .rp-rows { flex: 1; }
+.rp-ring { flex-shrink: 0; width: 96px; aspect-ratio: 1; display: grid; place-content: center; text-align: center; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--surface) 92%, transparent) 76%, transparent 78%), conic-gradient(var(--ok) calc(var(--p) * 1%), color-mix(in srgb, var(--text) 9%, transparent) 0); }
+.rp-ring b { font: 800 1.2rem var(--font-display); } .rp-ring small { color: var(--muted); font-size: .68rem; }
+.rp-ranks { display: grid; gap: 12px; margin-top: 14px; }
+.rp-rank { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px 10px; align-items: end; font-weight: 700; font-size: .86rem; animation: rp-rise .45s var(--ease-out) var(--d) backwards; }
+.rp-rank span { display: grid; gap: 1px; min-width: 0; }
+.rp-rank strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-rank em { font-style: normal; color: var(--muted); margin-right: 8px; }
+.rp-rank small { color: var(--muted); font-size: .72rem; font-weight: 600; }
+.rp-rank b { font-family: var(--font-display); }
+.rp-track { grid-column: 1 / -1; display: block; height: 6px; border-radius: 9px; background: color-mix(in srgb, var(--text) 8%, transparent); overflow: hidden; }
+.rp-track > i { display: block; height: 100%; border-radius: 9px; background: var(--brand); transform-origin: left; animation: rp-grow-x .9s var(--ease-out) backwards; }

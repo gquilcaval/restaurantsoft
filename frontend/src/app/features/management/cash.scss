@@ -1,0 +1,31 @@
+// Caja en Liquid Glass: estructura, navegación del módulo y efectivo esperado.
+.cs { display: grid; gap: 16px; }
+.cs-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 18px; align-items: stretch; }
+.cs-view { animation: cs-rise .35s var(--ease-out); }
+.cs-card { padding: 22px 24px; min-width: 0; }
+.cs-hero { grid-column: span 7; display: flex; flex-direction: column; }
+.cs-work { grid-column: span 5; display: flex; flex-direction: column; min-height: 0; }
+.cs-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; color: var(--muted); font-size: .82rem; font-weight: 600; }
+.cs-head h3 { margin: 0; margin-right: auto; color: var(--text); font: 700 1.05rem var(--font-display); }
+.cs-pill {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 42px; padding: 0 18px; border: 0; border-radius: 999px;
+  font-weight: 700; font-size: .86rem; color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); text-decoration: none;
+  transition: transform .35s var(--ease-spring), background .2s, box-shadow .2s;
+}
+.cs-pill:hover:not(:disabled) { background: color-mix(in srgb, var(--text) 13%, transparent); transform: translateY(-1px); }
+.cs-pill:active:not(:disabled) { transform: scale(.95); }
+.cs-pill:disabled { opacity: .5; }
+.cs-pill.primary { background: var(--brand); color: var(--on-brand, #04110a); }
+.cs-status { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 999px; font-weight: 800; font-size: .8rem; color: var(--ok); background: var(--ok-soft); }
+.cs-status i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: cs-ping 1.8s infinite; }
+.cs-status.closed { color: var(--muted); background: color-mix(in srgb, var(--text) 8%, transparent); }
+.cs-status.closed i { animation: none; }
+@keyframes cs-ping { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 55%, transparent); } 70% { box-shadow: 0 0 0 8px transparent; } }
+.cs-label { margin: 16px 0 2px; color: var(--muted); font-weight: 650; font-size: .9rem; }
+.cs-big { display: block; font: 800 clamp(2.4rem, 4.4vw, 3.7rem) var(--font-display); letter-spacing: -.035em; line-height: 1.05; animation: cs-rise .6s var(--ease-spring) backwards; }
+.cs-note app-icon { vertical-align: -2px; }
+.cs-note { margin: 10px 0 0; color: var(--muted); font-size: .84rem; line-height: 1.5; }
+.cs-muted { margin: 12px 0 0; color: var(--muted); font-size: .8rem; line-height: 1.45; }
+.cs-muted b { color: var(--text); }
+@keyframes cs-rise { from { opacity: 0; transform: translateY(10px); } }
+@media (max-width: 1100px) { .cs-hero, .cs-work { grid-column: span 12; } .cs-keys { display: none; } }

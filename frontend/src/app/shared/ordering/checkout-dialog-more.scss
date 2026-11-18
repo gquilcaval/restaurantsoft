@@ -1,0 +1,23 @@
+// Cobro: avisos, pasos, cuenta dividida, pagos registrados y «Más opciones» plegable.
+.ck-note { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 12px; border-radius: 16px; background: color-mix(in srgb, var(--text) 5%, transparent); }
+.ck-note > span { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 12px; font-weight: 800; background: color-mix(in srgb, var(--text) 8%, transparent); }
+.ck-note div { display: grid; gap: 2px; min-width: 0; } .ck-note b { font-size: .86rem; } .ck-note small { color: var(--muted); font-size: .74rem; line-height: 1.35; }
+.ck-note.warn > span { background: rgba(245, 179, 1, .2); } .ck-note.ok > span { color: #16a34a; background: rgba(63, 191, 42, .18); } .ck-note.brand > span { background: color-mix(in srgb, var(--brand) 18%, transparent); }
+.ck-share { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 14px; background: color-mix(in srgb, var(--text) 5%, transparent); }
+.ck-share span { display: grid; gap: 1px; } .ck-share small { color: var(--muted); font-size: .72rem; } .ck-share em { color: #16a34a; font-size: .78rem; font-style: normal; font-weight: 800; }
+.ck-share.done { opacity: .6; }
+.ck-equal { display: flex; align-items: center; gap: 8px; font-size: .82rem; font-weight: 700; } .ck-equal input { width: 64px; height: 38px; padding: 0 10px; border: 0; border-radius: 12px; color: var(--text); font: inherit; background: color-mix(in srgb, var(--text) 6%, transparent); }
+.ck-paying { display: flex; align-items: center; gap: 8px; margin: 0; padding: 8px 12px; border-radius: 12px; font-size: .82rem; background: color-mix(in srgb, var(--brand) 12%, transparent); }
+.ck-paying button { margin-left: auto; border: 0; color: var(--muted); background: none; }
+.ck-paid-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: 14px; background: rgba(63, 191, 42, .1); }
+.ck-paid-row span { display: grid; gap: 1px; } .ck-paid-row small { color: var(--muted); font-size: .72rem; } .ck-paid-row strong { color: #16a34a; font-family: var(--font-display); }
+.ck-more { border-radius: 18px; background: color-mix(in srgb, var(--text) 4%, transparent); }
+.ck-more summary { display: flex; align-items: baseline; gap: 8px; padding: 14px 16px; font-size: .88rem; font-weight: 800; cursor: pointer; list-style: none; }
+.ck-more summary::-webkit-details-marker { display: none; }
+.ck-more summary small { color: var(--muted); font-size: .72rem; font-weight: 650; }
+.ck-more summary::after { content: '⌄'; margin-left: auto; color: var(--muted); transition: transform .2s; }
+.ck-more[open] summary::after { transform: rotate(180deg); }
+.ck-more-body { display: grid; gap: 8px; padding: 0 12px 14px; }
+.ck-row-btn { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 46px; padding: 0 12px; border: 0; border-radius: 14px; color: var(--text); font-size: .86rem; font-weight: 750; text-align: left; background: var(--surface); }
+.ck-row-btn span { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 9px; background: color-mix(in srgb, var(--text) 8%, transparent); }
+.ck-row-btn.danger { color: #ef4444; }
