@@ -1,0 +1,5 @@
+# Mantener finales de línea de Linux en lo que se ejecuta dentro de Docker o en Git Bash (Windows).
+* text=auto
+*.sh text eol=lf
+Dockerfile text eol=lf
+*.conf text eol=lf
