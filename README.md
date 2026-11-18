@@ -8,14 +8,18 @@ Sistema para restaurantes: carta por QR para el comensal, app del mesero, cocina
 
 ## Levantarlo en una computadora nueva
 
-Solo necesitas **Git** y **Docker Desktop** (no hace falta instalar Java ni Node).
+Solo necesitas **Git** (https://git-scm.com) y **Docker Desktop** (https://www.docker.com/products/docker-desktop) abierto.
+No hace falta instalar Java ni Node.
 
 ```bash
-git clone <enlace-del-repositorio> restos
+git clone https://github.com/gquilcaval/restaurantsoft.git restos
 cd restos
 cp .env.example .env
 docker compose up -d --build
 ```
+
+El repositorio es privado: al clonar, git pide tu usuario de GitHub y como contraseña un **token**
+(GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic), con el permiso `repo`).
 
 La primera vez tarda varios minutos. Luego abre http://localhost:8081
 
@@ -52,3 +56,7 @@ docker compose up -d --build
 ## Trabajar en dos computadoras
 
 Antes de empezar: `git pull`. Al terminar: `git add -A && git commit -m "..." && git push`.
+
+Si el push falla con `HTTP 400` / `RPC failed`, ejecuta una vez `git config http.postBuffer 157286400` y repite.
+
+Al abrir Claude Code en esta carpeta, lee `CLAUDE.md` con el contexto del proyecto.
